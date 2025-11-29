@@ -1,35 +1,18 @@
 :root {
   --bg-gradient-onyx: linear-gradient(
-    to bottom right, 
-    hsl(240, 1%, 25%) 3%, 
-    hsl(0, 0%, 19%) 97%
+    to bottom right,
+    hsla(240, 5%, 18%, 0.70) 0%,
+    hsla(240, 5%, 10%, 0.85) 100%
   );
+  
   --bg-gradient-jet: linear-gradient(
-    to bottom right, 
-    hsla(240, 1%, 18%, 0.251) 0%, 
-    hsla(240, 2%, 11%, 0) 100%
-  ), hsl(240, 2%, 13%);
-  --bg-gradient-yellow-1: linear-gradient(
-    to bottom right, 
-    hsl(45, 100%, 71%) 0%, 
-    hsla(36, 100%, 69%, 0) 50%
+    to bottom right,
+    hsla(240, 4%, 16%, 0.55) 0%,
+    hsla(240, 4%, 8%, 0.00) 100%
   );
-  --bg-gradient-yellow-2: linear-gradient(
-    135deg, 
-    hsla(45, 100%, 71%, 0.251) 0%, 
-    hsla(35, 100%, 68%, 0) 59.86%
-  ), hsl(240, 2%, 13%);
-  --border-gradient-onyx: linear-gradient(
-    to bottom right, 
-    hsl(0, 0%, 25%) 0%, 
-    hsla(0, 0%, 25%, 0) 50%
-  );
-  --text-gradient-yellow: linear-gradient(
-    to right, 
-    hsl(45, 100%, 72%), 
-    hsl(35, 100%, 68%)
-  );
+  
 
+  /* LAVA PALETTE */
   --lava-1: hsl(18, 89%, 62%);   /* bright molten orange */
   --lava-2: hsl(12, 74%, 54%);   /* deeper lava red */
   --lava-3: hsl(20, 68%, 42%);   /* dark magma orange */
@@ -48,9 +31,26 @@
     var(--lava-2)
   );
 
+  /* 👉 remap old "yellow" tokens to lava */
 
-  /* solid */
+  --text-gradient-yellow: var(--text-gradient-lava);
 
+  --bg-gradient-yellow-1: linear-gradient(
+    to bottom right,
+    var(--lava-1) 0%,
+    transparent 55%
+  );
+
+  --bg-gradient-yellow-2: linear-gradient(
+    135deg,
+    var(--lava-1) 0%,
+    transparent 60%
+  ), hsl(240, 2%, 13%);
+
+  --orange-yellow-crayola: var(--lava-1);
+  --vegas-gold: hsl(18, 95%, 70%);
+
+  /* solid greys etc (unchanged) */
   --jet: hsl(0, 0%, 22%);
   --onyx: hsl(240, 1%, 17%);
   --eerie-black-1: hsl(240, 2%, 13%);
@@ -58,11 +58,11 @@
   --smoky-black: hsl(0, 0%, 7%);
   --white-1: hsl(0, 0%, 100%);
   --white-2: hsl(0, 0%, 98%);
-  --orange-yellow-crayola: hsl(45, 100%, 72%);
-  --vegas-gold: hsl(45, 54%, 58%);
   --light-gray: hsl(0, 0%, 84%);
   --light-gray-70: hsla(0, 0%, 84%, 0.7);
   --bittersweet-shimmer: hsl(0, 43%, 51%);
+
+
 
   /**
    * typography
@@ -227,7 +227,7 @@ article::before {
 
 .icon-box {
   position: relative;
-  background: var(--lava-3);
+  /* background: var(--lava-3); */
   width: 30px;
   height: 30px;
   border-radius: 8px;
@@ -236,7 +236,7 @@ article::before {
   align-items: center;
   font-size: 16px;
   color: var(--lava-1);
-  box-shadow: 0 0 12px var(--lava-glow);
+  box-shadow: 0 0 6px var(--lava-glow);
   border: 1px solid var(--lava-2);
   z-index: 1;
 }
@@ -374,7 +374,7 @@ main {
 }
 
 .avatar-box {
-  background: var(--bg-gradient-onyx);
+  /* background: var(--bg-gradient-onyx); */
   border-radius: 20px;
 }
 
@@ -387,14 +387,27 @@ main {
 }
 
 .info-content .title {
+  position: relative;
   color: var(--white-1);
-  background: var(--onyx);
   font-size: var(--fs-8);
-  font-weight: var(--fw-300);
+  font-weight: var(--fw-400);
   width: max-content;
-  padding: 3px 12px;
-  border-radius: 8px;
+
+  padding: 4px 14px;
+  border-radius: 999px; /* nice pill shape */
+
+  /* subtle dark glass background */
+  background: hsla(240, 10%, 10%, 0.55);
+  backdrop-filter: blur(4px);
+
+  /* lava-style border + glow (same idea as icon-box) */
+  border: 1px solid var(--lava-2);
+  box-shadow: 0 0 6px var(--lava-glow);
+
+  /* white glow on the text itself */
+  /* text-shadow: 0 0 4px rgba(255, 255, 255, 0.6); */
 }
+
 
 .info_more-btn {
   position: absolute;
