@@ -30,6 +30,25 @@
     hsl(35, 100%, 68%)
   );
 
+  --lava-1: hsl(18, 89%, 62%);   /* bright molten orange */
+  --lava-2: hsl(12, 74%, 54%);   /* deeper lava red */
+  --lava-3: hsl(20, 68%, 42%);   /* dark magma orange */
+  --lava-glow: hsla(18, 89%, 62%, 0.35);
+
+  --border-lava: linear-gradient(
+    to bottom right,
+    var(--lava-1),
+    var(--lava-2),
+    var(--lava-3)
+  );
+
+  --text-gradient-lava: linear-gradient(
+    to right,
+    var(--lava-1),
+    var(--lava-2)
+  );
+
+
   /* solid */
 
   --jet: hsl(0, 0%, 22%);
@@ -144,26 +163,22 @@ body { background: var(--smoky-black); }
   padding: 14px 32px;
   margin-bottom: 12px;
 
-  background: var(--orange-yellow-crayola); /* solid yellow */
-  border: 1px solid var(--vegas-gold);
-
-  color: var(--eerie-black-1);
+  background: var(--border-lava);
+  color: black;
   font-weight: 600;
   font-size: 1.1rem;
-  text-decoration: none;
 
   border-radius: 12px;
-  box-shadow: var(--shadow-1);
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 0 15px var(--lava-glow);
+  transition: 0.25s ease;
 }
 
 .cv-button:hover {
-  background: var(--vegas-gold); /* slightly darker yellow */
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-4);
+  background: var(--lava-2);
+  color: black;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 25px var(--lava-glow);
 }
-
 
 
 
@@ -173,14 +188,34 @@ body { background: var(--smoky-black); }
 
 .sidebar,
 article {
-  background: hsla(240, 2%, 12%, 0.45); /* transparent dark grey */
-  border: 1px solid var(--jet);
+  position: relative;
+  background: hsla(240, 2%, 12%, 0.35);
   border-radius: 20px;
   padding: 15px;
-  box-shadow: var(--shadow-1);
-  z-index: 1;
-  backdrop-filter: blur(6px); /* OPTIONAL but looks amazing */
+  backdrop-filter: blur(8px);
+  overflow: hidden;
 }
+
+.sidebar::before,
+article::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--border-lava);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
 
 
 .separator {
@@ -192,7 +227,7 @@ article {
 
 .icon-box {
   position: relative;
-  background: var(--border-gradient-onyx);
+  background: var(--lava-3);
   width: 30px;
   height: 30px;
   border-radius: 8px;
@@ -200,18 +235,14 @@ article {
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  color: var(--orange-yellow-crayola);
-  box-shadow: var(--shadow-1);
+  color: var(--lava-1);
+  box-shadow: 0 0 12px var(--lava-glow);
+  border: 1px solid var(--lava-2);
   z-index: 1;
 }
 
 .icon-box::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  background: var(--eerie-black-1);
-  border-radius: inherit;
-  z-index: -1;
+  display: none;
 }
 
 .icon-box ion-icon { --ionicon-stroke-width: 35px; }
@@ -259,9 +290,12 @@ article.active {
   left: 0;
   width: 30px;
   height: 3px;
-  background: var(--text-gradient-yellow);
+  background: var(--text-gradient-lava);
   border-radius: 3px;
+  box-shadow: 0 0 8px var(--lava-glow);
 }
+
+
 
 .has-scrollbar::-webkit-scrollbar {
   width: 5px; /* for vertical scrollbar */
@@ -493,7 +527,10 @@ main {
 .navbar-link:hover,
 .navbar-link:focus { color: var(--light-gray-70); }
 
-.navbar-link.active { color: var(--orange-yellow-crayola); }
+.navbar-link.active {
+  color: var(--lava-1);
+  text-shadow: 0 0 8px var(--lava-glow);
+}
 
 
 
@@ -1206,8 +1243,8 @@ textarea.form-input::-webkit-resizer { display: none; }
 .form-btn {
   position: relative;
   width: 100%;
-  background: var(--border-gradient-onyx);
-  color: var(--orange-yellow-crayola);
+  background: var(--border-lava);
+  color: black;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1216,26 +1253,18 @@ textarea.form-input::-webkit-resizer { display: none; }
   border-radius: 14px;
   font-size: var(--fs-6);
   text-transform: capitalize;
-  box-shadow: var(--shadow-3);
+  box-shadow: 0 0 15px var(--lava-glow);
   z-index: 1;
   transition: var(--transition-1);
 }
 
-.form-btn::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  background: var(--bg-gradient-jet);
-  border-radius: inherit;
-  z-index: -1;
-  transition: var(--transition-1);
+/* remove this completely or leave empty */
+.form-btn::before { display: none; }
+
+.form-btn:hover {
+  background: var(--lava-2);
+  box-shadow: 0 0 25px var(--lava-glow);
 }
-
-.form-btn ion-icon { font-size: 16px; }
-
-.form-btn:hover { background: var(--bg-gradient-yellow-1); }
-
-.form-btn:hover::before { background: var(--bg-gradient-yellow-2); }
 
 .form-btn:disabled {
   opacity: 0.7;
