@@ -97,8 +97,8 @@
   /* Border gradient used by content cards / services / buttons in template */
   --border-gradient-onyx: linear-gradient(
     to bottom right,
-    hsla(240, 2%, 18%, 0.80) 0%,
-    hsla(240, 2%, 10%, 0.80) 100%
+    hsla(240, 2%, 18%, 0.2) 0%,
+    hsla(240, 2%, 10%, 0.2) 100%
   );
 
 
@@ -263,10 +263,12 @@
     var(--accent-2) 100%
   );
 
+  
+
   --glass-tint: linear-gradient(
     135deg,
     rgba(214, 241, 255, 0.08) 0%,
-    rgba(185, 190, 199, 0.10) 55%,
+    rgba(185, 190, 199, 0.10) 22%,
     rgba(11, 12, 16, 0.22) 100%
   );
 
@@ -608,6 +610,143 @@ article.active {
 }
 
 
+:root[data-theme="winter"]{
+  /* transparency (lower = more see-through snow) */
+  --glass-alpha: 0.10;
+  --glass-inner-alpha: 0.06;
+
+  /* icy glass tint (NOT grey/black) */
+  --glass-rgb: 232, 242, 255;      /* very light icy white-blue */
+  --glass-rim-alpha: 0.14;         /* thin rim visibility */
+
+  /* blur (lower = less muddy/grey) */
+  --glass-blur: 2.5px;
+  --glass-inner-blur: 1.5px;
+}
+
+/* main panels: make them light + subtle */
+.sidebar,
+article{
+  background: rgba(var(--glass-rgb), var(--glass-alpha)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+
+  /* optional: helps it feel like “snow glass” not fog */
+  border: 1px solid rgba(var(--glass-rgb), var(--glass-rim-alpha));
+}
+
+/* inner layers: keep them super light (no dark overlay) */
+.content-card::before,
+.service-item::before,
+.blog-post-item > a::before{
+  background: rgba(var(--glass-rgb), var(--glass-inner-alpha)) !important;
+  backdrop-filter: blur(var(--glass-inner-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--glass-inner-blur)) saturate(120%);
+}
+:root[data-theme="winter"]{
+  /* transparency (lower = more see-through snow) */
+  --glass-alpha: 0.10;
+  --glass-inner-alpha: 0.06;
+
+  /* icy glass tint (NOT grey/black) */
+  --glass-rgb: 232, 242, 255;      /* very light icy white-blue */
+  --glass-rim-alpha: 0.14;         /* thin rim visibility */
+
+  /* blur (lower = less muddy/grey) */
+  --glass-blur: .2px;
+  --glass-inner-blur: .5px;
+
+  /* text tweaks so it doesn’t look washed out */
+  --text-1: rgba(255,255,255,0.96);
+  --text-2: rgba(255,255,255,0.72);
+  --text-muted: rgba(255,255,255,0.62);
+
+}
+
+/* Navbar: make it bright “frost glass”, not dark */
+:root[data-theme="winter"] .navbar{
+  background: rgba(var(--glass-rgb), 0.10) !important;
+  backdrop-filter: blur(3px) saturate(125%);
+  -webkit-backdrop-filter: blur(3px) saturate(125%);
+  border: 1px solid rgba(var(--glass-rgb), 0.14) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18) !important; /* keep depth but not mud */
+}
+
+/* Navbar links: slightly brighter for winter */
+:root[data-theme="winter"] .navbar-link{
+  color: rgba(255,255,255,0.78) !important;
+}
+
+:root[data-theme="winter"] .navbar-link:hover,
+:root[data-theme="winter"] .navbar-link:focus{
+  color: rgba(255,255,255,0.90) !important;
+}
+
+/* Active link: icy glow instead of “lava” */
+:root[data-theme="winter"] .navbar-link.active{
+  color: var(--accent-4) !important; /* icy blue-white */
+  text-shadow: 0 0 10px rgba(214,241,255,0.35) !important;
+}
+
+/* Title pills under your name: make them frosty */
+/* :root[data-theme="winter"] .info-content .title{
+  background: rgba(var(--glass-rgb), var(--glass-ui-alpha)) !important;
+  border: 1px solid rgba(var(--glass-rgb), 0.16) !important;
+  box-shadow: 0 0 10px rgba(214,241,255,0.14) !important;
+  backdrop-filter: blur(2px) saturate(120%);
+  -webkit-backdrop-filter: blur(2px) saturate(120%);
+  color: rgba(255,255,255,0.86) !important;
+} */
+
+/* The little “Show Contacts” corner button often stays dark */
+:root[data-theme="winter"] .info_more-btn{
+  background: rgba(var(--glass-rgb), 0.10) !important;
+  border: 1px solid rgba(var(--glass-rgb), 0.14) !important;
+}
+
+:root[data-theme="winter"] .info_more-btn::before{
+  background: rgba(var(--glass-rgb), 0.06) !important;
+}
+
+/* Optional: separators + small labels so it feels less grey */
+:root[data-theme="winter"] .separator{
+  background: rgba(var(--glass-rgb), 0.14) !important;
+}
+
+:root[data-theme="winter"] .contact-title{
+  color: rgba(255,255,255,0.55) !important;
+}
+
+:root[data-theme="winter"] .social-item .social-link{
+  color: rgba(255,255,255,0.65) !important;
+}
+
+:root[data-theme="winter"] .social-item .social-link:hover{
+  color: rgba(255,255,255,0.90) !important;
+}
+
+/* main panels: make them light + subtle */
+.sidebar,
+article{
+  background: rgba(var(--glass-rgb), var(--glass-alpha)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+
+  /* optional: helps it feel like “snow glass” not fog */
+  border: 1px solid rgba(var(--glass-rgb), var(--glass-rim-alpha));
+}
+
+/* inner layers: keep them super light (no dark overlay) */
+.content-card::before,
+.service-item::before,
+.blog-post-item > a::before{
+  background: rgba(var(--glass-rgb), var(--glass-inner-alpha)) !important;
+  backdrop-filter: blur(var(--glass-inner-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--glass-inner-blur)) saturate(120%);
+}
+
+
+
 #fx-snow{
   position: fixed;
   inset: 0;
@@ -615,7 +754,7 @@ article.active {
   height: 100%;
   pointer-events: none;
   z-index: 0;           /* keep behind your UI */
-  opacity: 0.9;
+  opacity: 1.2;
 }
 
 

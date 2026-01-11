@@ -11,7 +11,7 @@
 
   let w = 0, h = 0, dpr = 1;
 
-  // ✅ Define helpers FIRST (so resize/initGlows can use them)
+  // ✅ Define helpers FIRST
   const rnd = (a, b) => a + Math.random() * (b - a);
 
   // Pull colors from your CSS theme (winter)
@@ -22,20 +22,6 @@
       css.getPropertyValue("--accent-2").trim() ||
       "rgba(220,235,255,0.85)");
 
-  // ✅ Glows live OUTSIDE tick (shared by resize + tick)
-  let glows = [];
-  function initGlows() {
-    glows = Array.from({ length: 7 }, () => ({
-      x: rnd(0, w),
-      y: rnd(0, h),
-      r: rnd(70, 160),
-      a: rnd(0.015, 0.05),
-      vx: rnd(-0.06, 0.06),
-      vy: rnd(-0.04, 0.04),
-      p: rnd(0, Math.PI * 2),
-    }));
-  }
-
   function resize() {
     dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     w = Math.floor(window.innerWidth);
@@ -43,27 +29,28 @@
     canvas.width = Math.floor(w * dpr);
     canvas.height = Math.floor(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    initGlows(); // ✅ now safe
   }
   window.addEventListener("resize", resize, { passive: true });
   resize();
 
   // Particles
   const area = w * h;
-  const baseCount = Math.round(Math.max(140, Math.min(320, area / 9000)));
+  const baseCount = Math.round(Math.max(240, Math.min(560, area / 6000)) * 0.99); // 1% fewer
   const particles = [];
 
   function spawn(i) {
     particles[i] = {
       x: rnd(0, w),
       y: rnd(-h, 0),
-      vx: rnd(-0.25, 0.25),
-      vy: rnd(0.55, 1.35),
-      r: rnd(0.9, 2.6),
-      a: rnd(0.45, 0.95),
-      drift: rnd(-0.12, 0.12),
-      tint: Math.random() < 0.4 ? 1 : 0,
+      vx: rnd(-0.14, 0.14),
+      vy: rnd(0.28, 0.75),
+      r: rnd(2.4, 4.2),
+      a: rnd(0.55, 0.98),
+      drift: rnd(-0.07, 0.07),
+      tint: Math.random() < 0.8 ? 1 : 0,   // ✅ more icy color
+      rot: rnd(0, Math.PI * 2),            // ✅ rotation for flake shape
+      spin: rnd(-0.04, 0.04),              // ✅ gentle spin
+      shape: Math.random() < 0.88 ? 1 : 0, // ✅ mostly flakes, few dots for depth
     };
   }
   for (let i = 0; i < baseCount; i++) spawn(i);
@@ -85,7 +72,7 @@
   const R = 220;
   const swirlStrength = 0.095;
   const repelStrength = 0.018;
-  const maxSpeed = 3.0;
+  const maxSpeed = 2.0;
 
   let last = performance.now();
   let rafId = 0;
@@ -94,6 +81,7 @@
 
   function tick(now) {
     const dt = clamp((now - last) / 16.6667, 0.6, 1.6);
+    const dtS = dt * 0.85; // 2% slower
     last = now;
 
     // Smooth cursor
@@ -102,35 +90,15 @@
 
     ctx.clearRect(0, 0, w, h);
 
-    // ✅ draw soft glows behind snow
-    ctx.save();
-    ctx.globalCompositeOperation = "screen";
-    for (const g of glows) {
-      g.p += 0.012 * dt;
-      g.x += g.vx * dt;
-      g.y += g.vy * dt;
-
-      // wrap
-      if (g.x < -g.r) g.x = w + g.r;
-      if (g.x > w + g.r) g.x = -g.r;
-      if (g.y < -g.r) g.y = h + g.r;
-      if (g.y > h + g.r) g.y = -g.r;
-
-      const pulse = 0.6 + 0.4 * Math.sin(g.p);
-      ctx.globalAlpha = g.a * pulse;
-      ctx.fillStyle = cIcy;
-      ctx.beginPath();
-      ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
 
       // base motion
-      p.vx += p.drift * 0.015 * dt;
-      p.vy += 0.002 * dt;
+      p.vx += p.drift * 0.015 * dtS;
+      p.vy += 0.0008 * dtS;
+
+      // gentle spin
+      p.rot += p.spin * dtS;
 
       // Cursor interaction
       const dx = p.x - cx;
@@ -146,8 +114,8 @@
         const txp = -ny;
         const typ = nx;
 
-        const swirl = swirlStrength * t * dt;
-        const repel = repelStrength * t * dt;
+        const swirl = swirlStrength * t * dtS;
+        const repel = repelStrength * t * dtS;
 
         p.vx += txp * swirl;
         p.vy += typ * swirl;
@@ -165,8 +133,8 @@
       }
 
       // integrate
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
+      p.x += p.vx * dtS;
+      p.y += p.vy * dtS;
 
       // wrap/recycle
       if (p.y > h + 10) {
@@ -176,18 +144,40 @@
       if (p.x < -10) p.x = w + 10;
       if (p.x > w + 10) p.x = -10;
 
-      // draw
-      ctx.fillStyle = p.tint ? cIcy : cWhite;
-
-      ctx.globalAlpha = p.a * 0.22;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * 2.1, 0, Math.PI * 2);
-      ctx.fill();
-
+      // draw (flake shapes, more icy)
       ctx.globalAlpha = p.a;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
+
+      if (p.shape === 1) {
+        // ❄️ simple 6-arm flake: 3 crossed lines
+        const L = p.r * 1.15;
+        const lw = Math.max(1, p.r * 0.22);
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+
+        ctx.strokeStyle = p.tint ? cIcy : cWhite;
+        ctx.lineWidth = lw;
+        ctx.lineCap = "round";
+
+        ctx.beginPath();
+        for (let k = 0; k < 3; k++) {
+          const a = (Math.PI / 3) * k; // 0, 60deg, 120deg
+          const x = Math.cos(a) * L;
+          const y = Math.sin(a) * L;
+          ctx.moveTo(-x, -y);
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+      } else {
+        // small dot for depth variation
+        ctx.fillStyle = p.tint ? cIcy : cWhite;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(1.2, p.r * 0.55), 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     if (!document.hidden) rafId = requestAnimationFrame(tick);
