@@ -1,77 +1,112 @@
 :root {
-  --bg-gradient-onyx: linear-gradient(
-    to bottom right,
-    hsla(240, 5%, 18%, 0.70) 0%,
-    hsla(240, 5%, 10%, 0.85) 100%
-  );
-  
-  --bg-gradient-jet: linear-gradient(
-    to bottom right,
-    hsla(240, 4%, 16%, 0.55) 0%,
-    hsla(240, 4%, 8%, 0.00) 100%
-  );
-  
+  /* =========================================================
+     1) BRAND / SEASON ACCENT API  (future-proof)
+     ---------------------------------------------------------
+     You will later override ONLY these per season:
+     --accent-1/2/3 + --accent-glow
+  ========================================================== */
+  --accent-1: hsl(18, 89%, 62%);     /* molten orange */
+  --accent-2: hsl(12, 74%, 54%);     /* deeper lava red */
+  --accent-3: hsl(20, 68%, 42%);     /* dark magma */
+  --accent-glow: hsla(18, 89%, 62%, 0.35);
 
-  /* LAVA PALETTE */
-  --lava-1: hsl(18, 89%, 62%);   /* bright molten orange */
-  --lava-2: hsl(12, 74%, 54%);   /* deeper lava red */
-  --lava-3: hsl(20, 68%, 42%);   /* dark magma orange */
-  --lava-glow: hsla(18, 89%, 62%, 0.35);
+  /* Backwards-compatible aliases (so your site doesn’t break) */
+  --lava-1: var(--accent-1);
+  --lava-2: var(--accent-2);
+  --lava-3: var(--accent-3);
+  --lava-glow: var(--accent-glow);
 
+  /* Accent gradients */
   --border-lava: linear-gradient(
     to bottom right,
-    var(--lava-1),
-    var(--lava-2),
-    var(--lava-3)
+    var(--accent-1),
+    var(--accent-2),
+    var(--accent-3)
   );
 
   --text-gradient-lava: linear-gradient(
     to right,
-    var(--lava-1),
-    var(--lava-2)
+    var(--accent-1),
+    var(--accent-2)
   );
 
-  /* 👉 remap old "yellow" tokens to lava */
 
+  /* =========================================================
+     2) LEGACY “YELLOW” TOKENS REMAPPED TO LAVA
+     ---------------------------------------------------------
+     Keeps existing template selectors working.
+  ========================================================== */
   --text-gradient-yellow: var(--text-gradient-lava);
 
   --bg-gradient-yellow-1: linear-gradient(
     to bottom right,
-    var(--lava-1) 0%,
+    var(--accent-1) 0%,
     transparent 55%
   );
 
   --bg-gradient-yellow-2: linear-gradient(
     135deg,
-    var(--lava-1) 0%,
+    var(--accent-1) 0%,
     transparent 60%
   ), hsl(240, 2%, 13%);
 
-  --orange-yellow-crayola: var(--lava-1);
+  --orange-yellow-crayola: var(--accent-1);
+
+  /* IMPORTANT: vegas-gold is used for text in your timeline.
+     You wanted it brighter for readability → keep it a “hot lava light” */
   --vegas-gold: hsl(18, 95%, 70%);
 
-  /* solid greys etc (unchanged) */
-  --jet: hsl(0, 0%, 22%);
-  --onyx: hsl(240, 1%, 17%);
+
+  /* =========================================================
+     3) NEUTRALS / SURFACES (dark glass theme)
+  ========================================================== */
+  --smoky-black: hsl(0, 0%, 7%);
   --eerie-black-1: hsl(240, 2%, 13%);
   --eerie-black-2: hsl(240, 2%, 12%);
-  --smoky-black: hsl(0, 0%, 7%);
+  --onyx: hsl(240, 1%, 17%);
+  --jet: hsl(0, 0%, 22%);
+
   --white-1: hsl(0, 0%, 100%);
   --white-2: hsl(0, 0%, 98%);
   --light-gray: hsl(0, 0%, 84%);
   --light-gray-70: hsla(0, 0%, 84%, 0.7);
+
   --bittersweet-shimmer: hsl(0, 43%, 51%);
 
 
+  /* =========================================================
+     4) BACKGROUND / PANEL GRADIENTS
+     ---------------------------------------------------------
+     Fix: you reference --border-gradient-onyx in multiple places
+     but it wasn’t defined. Now it is.
+  ========================================================== */
 
-  /**
-   * typography
-   */
+  /* Glassy panel base gradients */
+  --bg-gradient-onyx: linear-gradient(
+    to bottom right,
+    hsla(240, 5%, 18%, 0.70) 0%,
+    hsla(240, 5%, 10%, 0.85) 100%
+  );
 
-  /* font-family */
+  --bg-gradient-jet: linear-gradient(
+    to bottom right,
+    hsla(240, 4%, 16%, 0.55) 0%,
+    hsla(240, 4%, 8%, 0.00) 100%
+  );
+
+  /* Border gradient used by content cards / services / buttons in template */
+  --border-gradient-onyx: linear-gradient(
+    to bottom right,
+    hsla(240, 2%, 18%, 0.80) 0%,
+    hsla(240, 2%, 10%, 0.80) 100%
+  );
+
+
+  /* =========================================================
+     5) TYPOGRAPHY
+  ========================================================== */
   --ff-poppins: 'Poppins', sans-serif;
 
-  /* font-size */
   --fs-1: 24px;
   --fs-2: 18px;
   --fs-3: 17px;
@@ -81,31 +116,264 @@
   --fs-7: 13px;
   --fs-8: 11px;
 
-  /* font-weight */
   --fw-300: 300;
   --fw-400: 400;
   --fw-500: 500;
   --fw-600: 600;
 
-  /**
-   * shadow
-   */
-  
+
+  /* =========================================================
+     6) SHADOWS
+  ========================================================== */
   --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
   --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.25);
   --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.25);
   --shadow-4: 0 25px 50px hsla(0, 0%, 0%, 0.15);
   --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
 
-  /**
-   * transition
-   */
 
+  /* =========================================================
+     7) TRANSITIONS
+  ========================================================== */
   --transition-1: 0.25s ease;
   --transition-2: 0.5s ease-in-out;
+}
+
+/* =========================================================
+   THEME OVERRIDES (one-click swap)
+   Put this AFTER your base :root block
+========================================================= */
+
+/* Default = your current molten (we'll call it spring for now) */
+:root,
+:root[data-theme="Beachspring"] {
+  /* Light Spring (Pastel Spring) accent palette */
+--accent-1: hsl(190, 85%, 70%); /* light aqua */
+--accent-2: hsl(150, 55%, 70%); /* mint green */
+--accent-3: hsl(35, 95%, 75%);  /* buttery warm yellow */
+--accent-4: hsl(330, 80%, 80%); /* pale pink */
+
+--accent-glow: hsla(190, 85%, 70%, 0.28);
+
+/* neutrals for spring glass (dove-grey leaning) */
+--base-bg: hsl(220, 16%, 10%);          /* deep cool base */
+--surface-1: hsla(220, 14%, 16%, 0.55);  /* glass surface */
+--surface-2: hsla(220, 14%, 14%, 0.35);  /* softer surface */
+
+--border-soft: hsla(0, 0%, 100%, 0.10);  /* subtle rim */
+--text-1: hsl(0, 0%, 98%);
+--text-2: hsla(0, 0%, 92%, 0.75);
 
 }
 
+/* ===========================
+   TRUE SPRING (Violet primary)
+   Palette reference:
+   Ivory         #ECF2E6
+   Lemonade      #E8E9B5
+   Aqua Surf     #A8F5F9
+   Bright Navy   #33366D
+   Apple         #9AF2C7
+   Flamingo Pink #DC6274
+   Red Coral     #DA4957
+   Violet        #69398F
+=========================== */
+
+:root[data-theme="trueSpring"] {
+  /* --- the ONLY 3 colors --- */
+  --accent-1: #69398F; /* Violet (PRIMARY) */
+  --accent-2: #DC6274; /* Flamingo Pink (SECONDARY) */
+  --accent-3: #33366D; /* Bright Navy (DEPTH) */
+
+  /* --- glow (no white) --- */
+  --accent-glow: rgba(105, 57, 143, 0.32);
+
+  /* --- gradients (ONLY these 3 colors) --- */
+  --border-accent: linear-gradient(
+    135deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 55%,
+    var(--accent-3) 100%
+  );
+
+  --text-gradient-accent: linear-gradient(
+    90deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 60%,
+    var(--accent-3) 100%
+  );
+
+  /* optional subtle panel tint (still only 3 colors) */
+  --glass-tint: linear-gradient(
+    135deg,
+    rgba(51, 54, 109, 0.40) 0%,
+    rgba(105, 57, 143, 0.22) 55%,
+    rgba(220, 98, 116, 0.10) 100%
+  );
+
+  /* --- map into your existing lava tokens so everything updates automatically --- */
+  --lava-1: var(--accent-1);
+  --lava-2: var(--accent-2);
+  --lava-3: var(--accent-3);
+  --lava-glow: var(--accent-glow);
+
+  --border-lava: var(--border-accent);
+  --text-gradient-lava: var(--text-gradient-accent);
+  --text-gradient-yellow: var(--text-gradient-accent);
+
+  /* Replace any “gold” usage with Flamingo so it stays springy (no pale/white) */
+  --vegas-gold: var(--accent-2);
+
+  /* selection/focus accent */
+  --orange-yellow-crayola: var(--accent-2);
+}
+
+
+/*
+  WINTER THEME
+  1) <html lang="en" data-theme="winter">
+  2) Paste this block AFTER your base :root (so it overrides tokens)
+*/
+/*
+  WINTER THEME (minimal)
+  <html lang="en" data-theme="winter">
+*/
+:root[data-theme="winter"] {
+  /* --- 4 colors (winter needs this) --- */
+  --accent-1: #E6E8EE; /* Soft Snow (PRIMARY text/highlight, not pure white) */
+  --accent-2: #B9BEC7; /* Graphite (BORDERS / lines) */
+  --accent-3: #0B0C10; /* Deep Black (DEPTH) */
+  --accent-4: #D6F1FF; /* Icy Blue-White (SPECIAL accents / “gold” replacement) */
+
+  /* --- glow --- */
+  --accent-glow: rgba(214, 241, 255, 0.20);
+
+  /* --- gradients --- */
+  --border-accent: linear-gradient(
+    135deg,
+    var(--accent-4) 0%,
+    var(--accent-2) 55%,
+    var(--accent-3) 100%
+  );
+
+  --text-gradient-accent: linear-gradient(
+    90deg,
+    var(--accent-4) 0%,
+    var(--accent-1) 55%,
+    var(--accent-2) 100%
+  );
+
+  --glass-tint: linear-gradient(
+    135deg,
+    rgba(214, 241, 255, 0.08) 0%,
+    rgba(185, 190, 199, 0.10) 55%,
+    rgba(11, 12, 16, 0.22) 100%
+  );
+
+  /* --- map into your existing lava tokens --- */
+  --lava-1: var(--accent-4); /* “hot” highlight becomes icy */
+  --lava-2: var(--accent-2); /* borders MUST stay visible */
+  --lava-3: var(--accent-3);
+  --lava-glow: var(--accent-glow);
+
+  --border-lava: var(--border-accent);
+  --text-gradient-lava: var(--text-gradient-accent);
+  --text-gradient-yellow: var(--text-gradient-accent);
+
+  /* “gold text” becomes icy blue-white */
+  --vegas-gold: var(--accent-4);
+
+  /* selection/focus */
+  --orange-yellow-crayola: var(--accent-4);
+
+  /* OPTIONAL: tone down default whites so not everything screams white */
+  --white-1: var(--accent-1);
+  --white-2: rgba(230, 232, 238, 0.92);
+  --light-gray: rgba(230, 232, 238, 0.78);
+  --light-gray-70: rgba(230, 232, 238, 0.60);
+
+
+  
+}
+
+
+
+/* ===========================
+   TRUE AUTUMN (3 colors max)
+   Rust + Orange Ochre + Rich Chocolate
+=========================== */
+
+:root[data-theme="trueAutumn"] {
+  /* --- accents (ONLY 3) --- */
+  --accent-1: hsl(10, 70%, 45%);  /* Rust */
+  --accent-2: hsl(32, 85%, 45%);  /* Orange Ochre */
+  --accent-3: hsl(20, 35%, 18%);  /* Rich Chocolate */
+  --accent-glow: hsla(10, 70%, 45%, 0.32);
+
+    /* optional 4th accent (use sparingly) */
+    --moss: hsl(85, 30%, 34%);                 /* Moss */
+    --moss-glow: hsla(85, 45%, 55%, 0.22);     /* soft green glow */
+  
+
+  /* gradients (only these 3) */
+  --border-accent: linear-gradient(
+    135deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 55%,
+    var(--accent-3) 100%
+  );
+
+  --text-gradient-accent: linear-gradient(
+    90deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 55%,
+    var(--accent-3) 100%
+  );
+
+  
+  /* --- supporting neutrals (NOT accents) --- */
+  --base-bg: hsl(20, 25%, 6%);                 /* warm near-black */
+  --surface-1: hsla(20, 30%, 12%, 0.55);       /* main glass */
+  --surface-2: hsla(20, 28%, 10%, 0.35);       /* secondary glass */
+  --border-soft: hsla(32, 40%, 85%, 0.10);     /* warm rim border */
+
+  /* text (warm whites so it matches autumn) */
+  --text-1: hsl(40, 30%, 96%);
+  --text-2: hsla(40, 20%, 92%, 0.75);
+
+  /* warm shadowing */
+  --shadow-warm: 0 18px 45px hsla(20, 60%, 5%, 0.45);
+
+  /* optional subtle tint for cards (still derived vibe) */
+  --glass-tint: linear-gradient(
+    135deg,
+    hsla(20, 35%, 18%, 0.45) 0%,
+    hsla(10, 70%, 45%, 0.10) 55%,
+    hsla(32, 85%, 45%, 0.06) 100%
+  );
+
+  /* --- map into your existing lava tokens so everything updates --- */
+  --lava-1: var(--accent-1);
+  --lava-2: var(--accent-2);
+  --lava-3: var(--accent-3);
+  --lava-glow: var(--accent-glow);
+
+  --border-lava: var(--border-accent);
+  --text-gradient-lava: var(--text-gradient-accent);
+  --text-gradient-yellow: var(--text-gradient-accent);
+
+  /* "gold" token replacement */
+  --vegas-gold: var(--accent-2);
+
+  /* selection/focus */
+  --orange-yellow-crayola: var(--accent-1);
+}
+
+
+
+/* (optional placeholder for later)
+:root[data-theme="summer"] { ... }
+*/
 
 
 
@@ -180,6 +448,11 @@ body { background: var(--smoky-black); }
   box-shadow: 0 0 25px var(--lava-glow);
 }
 
+.skills-tags li:hover {
+  background: var(--moss);
+  color: var(--text-1);
+  box-shadow: 0 0 10px var(--moss-glow);
+}
 
 
 /*-----------------------------------*\
