@@ -137,6 +137,13 @@
   ========================================================== */
   --transition-1: 0.25s ease;
   --transition-2: 0.5s ease-in-out;
+
+  --dust-opacity: 1;
+  --dust-density: 4;     /* big jump */
+  --dust-sway: 1.5;
+  --sparkle-rate: 2.0;     /* optional */
+  --sparkle-brightness: 1.2;
+
 }
 
 /* =========================================================
@@ -653,8 +660,8 @@ article{
   --glass-rim-alpha: 0.14;         /* thin rim visibility */
 
   /* blur (lower = less muddy/grey) */
-  --glass-blur: .2px;
-  --glass-inner-blur: .5px;
+  --glass-blur: 1.5px;
+  --glass-inner-blur: 1.2px;
 
   /* text tweaks so it doesn’t look washed out */
   --text-1: rgba(255,255,255,0.96);
@@ -747,14 +754,50 @@ article{
 
 
 
+/* Force correct layering (put near bottom of CSS) */
 #fx-snow{
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
-  z-index: 0;           /* keep behind your UI */
-  opacity: 1.2;
+  z-index: 2;
+  opacity: 1; /* IMPORTANT: must be <= 1 */
+}
+
+/* ===========================
+   FX LAYERING (FINAL OVERRIDE)
+   Put this at the END of style.css
+   =========================== */
+
+/* Dust canvas: above body background, below UI */
+#fx-dust{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+
+  /* THIS is what prevents "can't click UI" */
+  pointer-events: none !important;
+
+  /* layer: background < canvas < UI */
+  z-index: 1;
+}
+
+/* Force UI above the canvas */
+main{
+  position: relative;
+  z-index: 10;
+}
+
+/* Your navbar is fixed and had z-index:5 — make sure it's above canvas */
+.navbar{
+  z-index: 15;
+}
+
+/* Modals must be on top of everything */
+.modal-container{
+  z-index: 100;
 }
 
 
@@ -2376,7 +2419,7 @@ body {
 body {
   margin: 0;
   /* 👇 change to .png if your file is .png */
-  background-image: url("../images/winter_background.png"); 
+  background-image: url("../images/Anotheronne.png"); 
   background-repeat: no-repeat;
   background-position: top center;
   background-attachment: fixed;
