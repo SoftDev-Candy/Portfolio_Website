@@ -1,0 +1,152 @@
+@layer tokens;
+@layer tokens {
+:root {
+    /* =========================================================
+       1) BRAND / SEASON ACCENT API  (future-proof)
+       ---------------------------------------------------------
+       You will later override ONLY these per season:
+       --accent-1/2/3 + --accent-glow
+    ========================================================== */
+    --accent-1: hsl(18, 89%, 62%);     /* molten orange */
+    --accent-2: hsl(12, 74%, 54%);     /* deeper lava red */
+    --accent-3: hsl(20, 68%, 42%);     /* dark magma */
+    --accent-glow: hsla(18, 89%, 62%, 0.35);
+  
+    /* Backwards-compatible aliases (so your site doesn’t break) */
+    --lava-1: var(--accent-1);
+    --lava-2: var(--accent-2);
+    --lava-3: var(--accent-3);
+    --lava-glow: var(--accent-glow);
+  
+    /* Accent gradients */
+    --border-lava: linear-gradient(
+      to bottom right,
+      var(--accent-1),
+      var(--accent-2),
+      var(--accent-3)
+    );
+  
+    --text-gradient-lava: linear-gradient(
+      to right,
+      var(--accent-1),
+      var(--accent-2)
+    );
+  
+  
+    /* =========================================================
+       2) LEGACY “YELLOW” TOKENS REMAPPED TO LAVA
+       ---------------------------------------------------------
+       Keeps existing template selectors working.
+    ========================================================== */
+    --text-gradient-yellow: var(--text-gradient-lava);
+  
+    --bg-gradient-yellow-1: linear-gradient(
+      to bottom right,
+      var(--accent-1) 0%,
+      transparent 55%
+    );
+  
+    --bg-gradient-yellow-2: linear-gradient(
+      135deg,
+      var(--accent-1) 0%,
+      transparent 60%
+    ), hsl(240, 2%, 13%);
+  
+    --orange-yellow-crayola: var(--accent-1);
+  
+    /* IMPORTANT: vegas-gold is used for text in your timeline.
+       You wanted it brighter for readability → keep it a “hot lava light” */
+    --vegas-gold: hsl(18, 95%, 70%);
+  
+  
+    /* =========================================================
+       3) NEUTRALS / SURFACES (dark glass theme)
+    ========================================================== */
+    --smoky-black: hsl(0, 0%, 7%);
+    --eerie-black-1: hsl(240, 2%, 13%);
+    --eerie-black-2: hsl(240, 2%, 12%);
+    --onyx: hsl(240, 1%, 17%);
+    --jet: hsl(0, 0%, 22%);
+  
+    --white-1: hsl(0, 0%, 100%);
+    --white-2: hsl(0, 0%, 98%);
+    --light-gray: hsl(0, 0%, 84%);
+    --light-gray-70: hsla(0, 0%, 84%, 0.7);
+  
+    --bittersweet-shimmer: hsl(0, 43%, 51%);
+  
+  
+    /* =========================================================
+       4) BACKGROUND / PANEL GRADIENTS
+       ---------------------------------------------------------
+       Fix: you reference --border-gradient-onyx in multiple places
+       but it wasn’t defined. Now it is.
+    ========================================================== */
+  
+    /* Glassy panel base gradients */
+    --bg-gradient-onyx: linear-gradient(
+      to bottom right,
+      hsla(240, 5%, 18%, 0.70) 0%,
+      hsla(240, 5%, 10%, 0.85) 100%
+    );
+  
+    --bg-gradient-jet: linear-gradient(
+      to bottom right,
+      hsla(240, 4%, 16%, 0.55) 0%,
+      hsla(240, 4%, 8%, 0.00) 100%
+    );
+  
+    /* Border gradient used by content cards / services / buttons in template */
+    --border-gradient-onyx: linear-gradient(
+      to bottom right,
+      hsla(240, 2%, 18%, 0.2) 0%,
+      hsla(240, 2%, 10%, 0.2) 100%
+    );
+  
+  
+    /* =========================================================
+       5) TYPOGRAPHY
+    ========================================================== */
+    --ff-poppins: 'Poppins', sans-serif;
+  
+    --fs-1: 24px;
+    --fs-2: 18px;
+    --fs-3: 17px;
+    --fs-4: 16px;
+    --fs-5: 15px;
+    --fs-6: 14px;
+    --fs-7: 13px;
+    --fs-8: 11px;
+  
+    --fw-300: 300;
+    --fw-400: 400;
+    --fw-500: 500;
+    --fw-600: 600;
+  
+  
+    /* =========================================================
+       6) SHADOWS
+    ========================================================== */
+    --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
+    --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.25);
+    --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.25);
+    --shadow-4: 0 25px 50px hsla(0, 0%, 0%, 0.15);
+    --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
+  
+  
+    /* =========================================================
+       7) TRANSITIONS
+    ========================================================== */
+    --transition-1: 0.25s ease;
+    --transition-2: 0.5s ease-in-out;
+  
+    --dust-opacity: 1;
+    --dust-density: 4;     /* big jump */
+    --dust-sway: 1.5;
+    --sparkle-rate: 2.0;     /* optional */
+    --sparkle-brightness: 1.2;
+
+    
+  
+  }
+}
