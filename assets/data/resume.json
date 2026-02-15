@@ -1,0 +1,18 @@
+{
+    "education": [
+      { "school": "Future Games", "years": "2024 — 2026", "text": "Diploma in Game Engine Specialization" },
+      { "school": "Chandigarh University", "years": "2020 — 2024", "text": "Bachelor of Engineering in Computer Science" }
+    ],
+    "experience": [
+      {
+        "company": "Future Games Warsaw",
+        "years": "2024 — Present",
+        "text": "I've worked as a game programmer on diverse projects, specializing in tools, gameplay mechanics, and UI development. My experience includes building core systems and enhancing gameplay, collaborating with cross-functional teams from regions like Sweden, Poland, and India. This global collaboration has shaped my approach to high-quality game and tools development."
+      }
+    ],
+    "skills": {
+      "technical": ["C++","C#","Unreal Engine5","Unity","OOP / OOD","STL","Boost","CMake","Unit Testing","Perforce","Git","UMTS/LTE","Linux","OpenGL","SDL","GLFW","GLAD","GLM"],
+      "professional": ["Problem Solving","Debugging","Team Collaboration","Jira Agile Teamwork","Sprint Delivery","Time Management","Technical Communication","Project Ownership"]
+    }
+  }
+  

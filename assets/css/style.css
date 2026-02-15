@@ -2076,14 +2076,6 @@ background: conic-gradient(
 }
 
 
-
-
-
-
-
-
-
-
 /*-----------------------------------*\
   #CONTACT
 \*-----------------------------------*/
@@ -2180,9 +2172,6 @@ textarea.form-input::-webkit-resizer { display: none; }
 .form-btn:disabled:hover::before { background: var(--bg-gradient-jet); }
 
 
-
-
-
 /*-----------------------------------*\
   #RESPONSIVE
 \*-----------------------------------*/
@@ -2209,10 +2198,6 @@ textarea.form-input::-webkit-resizer { display: none; }
   .blog-banner-box { height: auto; }
 
 }
-
-
-
-
 
 /**
  * responsive larger than 580px screen
@@ -2270,7 +2255,6 @@ textarea.form-input::-webkit-resizer { display: none; }
   }
 
 
-
   /**
    * #MAIN
    */
@@ -2279,7 +2263,6 @@ textarea.form-input::-webkit-resizer { display: none; }
     margin-top: 60px;
     margin-bottom: 100px;
   }
-
 
 
   /**
@@ -2500,9 +2483,6 @@ textarea.form-input::-webkit-resizer { display: none; }
 }
 
 
-
-
-
 /**
  * responsive larger than 768px screen
  */
@@ -2518,7 +2498,6 @@ textarea.form-input::-webkit-resizer { display: none; }
   .has-scrollbar::-webkit-scrollbar-button { width: 100px; }
 
 
-
   /**
    * SIDEBAR
    */
@@ -2527,7 +2506,6 @@ textarea.form-input::-webkit-resizer { display: none; }
     grid-template-columns: 1fr 1fr;
     gap: 30px 15px;
   }
-
 
 
   /**

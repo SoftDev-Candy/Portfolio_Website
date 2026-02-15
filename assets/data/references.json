@@ -1,0 +1,20 @@
+{
+    "title": "References",
+    "items": [
+      {
+        "name": "Jeremiasz Kacprzak",
+        "role": "Mentor/Programmer at The Astronauts",
+        "avatar": "./assets/images/avatar-1.png",
+        "phone": "+48 782 827 105",
+        "email": "kacprzakjeremiasz@gmail.com"
+      },
+      {
+        "name": "Maria Glowacka",
+        "role": "C.D Project Red / Producer",
+        "avatar": "./assets/images/avatar-2.png",
+        "phone": "+48 502 608 571",
+        "email": "Majkaglowacka@icloud.com"
+      }
+    ]
+  }
+  
