@@ -647,3 +647,76 @@ body {
   background-attachment: fixed;
   background-size: cover;
 }
+
+/* ===========================
+   APP SHELL LAYOUT
+   =========================== */
+
+   :root{
+    --rail-w: 90px;
+    --sidebar-w: 320px;
+    --gutter: 24px;
+  }
+  
+  body{
+    min-height: 100vh;
+  }
+  
+  /* The main app wrapper your JS renders into */
+  .app-shell{
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 18px var(--gutter);
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--rail-w);
+    gap: 22px;
+    align-items: start;
+  }
+  
+  /* Left column */
+  .app-sidebar{
+    position: sticky;
+    top: 18px;
+    align-self: start;
+  }
+  
+  /* Center column */
+  .app-main{
+    min-height: 70vh;
+  }
+  
+  /* Right rail */
+  .nav-rail{
+    position: sticky;
+    top: 18px;
+    align-self: start;
+    height: calc(100vh - 36px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: auto;
+  }
+  
+  /* Optional: flip rail to left later with a single class */
+  html.rail-left .app-shell{
+    grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--sidebar-w);
+  }
+  
+  html.rail-left .nav-rail{ grid-column: 1; }
+  html.rail-left .app-main{ grid-column: 2; }
+  html.rail-left .app-sidebar{ grid-column: 3; }
+  
+  /* Responsive: hide rail on small screens (we’ll do mobile nav later) */
+  @media (max-width: 1024px){
+    .app-shell{
+      grid-template-columns: 1fr;
+    }
+    .nav-rail{
+      display: none;
+    }
+    .app-sidebar{
+      position: relative;
+      top: auto;
+    }
+  }
+  

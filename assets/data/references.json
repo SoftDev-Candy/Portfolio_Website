@@ -1,20 +1,44 @@
 {
-    "title": "References",
-    "items": [
-      {
-        "name": "Jeremiasz Kacprzak",
-        "role": "Mentor/Programmer at The Astronauts",
-        "avatar": "./assets/images/avatar-1.png",
-        "phone": "+48 782 827 105",
-        "email": "kacprzakjeremiasz@gmail.com"
-      },
-      {
-        "name": "Maria Glowacka",
-        "role": "C.D Project Red / Producer",
-        "avatar": "./assets/images/avatar-2.png",
-        "phone": "+48 502 608 571",
-        "email": "Majkaglowacka@icloud.com"
-      }
-    ]
+    "references": {
+      "title": "References",
+      "items": [
+        {
+          "id": "jeremiasz",
+          "name": "Jeremiasz Kacprzak",
+          "role": "Mentor/Programmer at The Astronauts",
+          "avatar": "./assets/images/avatar-1.png",
+          "contacts": [
+            { "icon": "phone-portrait-outline", "value": "+48 782 827 105", "href": "tel:+48782827105" },
+            { "icon": "mail-outline", "value": "kacprzakjeremiasz@gmail.com", "href": "mailto:kacprzakjeremiasz@gmail.com" }
+          ],
+          "modal": {
+            "title": "Jeremiasz Kacprzak",
+            "lines": [
+              "Mentor/Programmer at The Astronauts",
+              "Phone: +48 782 827 105",
+              "Email: kacprzakjeremiasz@gmail.com"
+            ]
+          }
+        },
+        {
+          "id": "maria",
+          "name": "Maria Glowacka",
+          "role": "CD PROJEKT RED / Producer",
+          "avatar": "./assets/images/avatar-2.png",
+          "contacts": [
+            { "icon": "phone-portrait-outline", "value": "+48 502 608 571", "href": "tel:+48502608571" },
+            { "icon": "mail-outline", "value": "Majkaglowacka@icloud.com", "href": "mailto:Majkaglowacka@icloud.com" }
+          ],
+          "modal": {
+            "title": "Maria Glowacka",
+            "lines": [
+              "CD PROJEKT RED / Producer",
+              "Phone: +48 502 608 571",
+              "Email: Majkaglowacka@icloud.com"
+            ]
+          }
+        }
+      ]
+    }
   }
   

@@ -1,0 +1,12 @@
+{
+    "nav": {
+      "defaultPage": "about",
+      "items": [
+        { "label": "About", "page": "about" },
+        { "label": "Resume", "page": "resume" },
+        { "label": "Portfolio", "page": "portfolio" },
+        { "label": "Contact", "page": "contact" }
+      ]
+    }
+  }
+  

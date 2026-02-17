@@ -1,345 +1,587 @@
+// assets/js/app.js
+const $ = (sel, root = document) => root.querySelector(sel);
+const el = (id) => document.getElementById(id);
+
+const DATA = {
+  site: "./assets/data/site.json",
+  profile: "./assets/data/profile.json",
+  nav: "./assets/data/nav.json",
+  about: "./assets/data/about.json",
+  services: "./assets/data/services.json",
+  references: "./assets/data/references.json",
+  resume: "./assets/data/resume.json",
+  portfolio: "./assets/data/portfolio.json",
+  projects: "./assets/data/projects.json",
+  contact: "./assets/data/contact.json",
+};
+
 async function loadJSON(path) {
-    const res = await fetch(path, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
-    return res.json();
+  const res = await fetch(path, { cache: "no-cache" });
+  if (!res.ok) throw new Error(`Failed to load ${path} (${res.status})`);
+  return res.json();
+}
+
+function safeText(node, value) {
+  if (!node) return;
+  node.textContent = value ?? "";
+}
+
+function normalizeKey(s) {
+  return String(s ?? "").trim().toLowerCase();
+}
+
+// -----------------------------
+// NAV + PAGE SWITCH
+// -----------------------------
+function setActivePage(pageKey) {
+  const key = normalizeKey(pageKey);
+
+  document.querySelectorAll("article[data-page]").forEach((a) => {
+    a.classList.toggle("active", normalizeKey(a.dataset.page) === key);
+  });
+
+  document.querySelectorAll(".navbar-link[data-page]").forEach((b) => {
+    b.classList.toggle("active", normalizeKey(b.dataset.page) === key);
+  });
+}
+
+function renderNav(nav) {
+  const list = el("nav-list");
+  if (!list) return;
+
+  list.innerHTML = "";
+  const items = nav?.items ?? [];
+
+  items.forEach((item) => {
+    const page = normalizeKey(item.page);
+    const li = document.createElement("li");
+    li.className = "navbar-item";
+
+    const btn = document.createElement("button");
+    btn.className = "navbar-link";
+    btn.type = "button";
+    btn.dataset.navLink = "";
+    btn.dataset.page = page;
+    btn.textContent = item.label ?? item.page ?? "Page";
+
+    btn.addEventListener("click", () => setActivePage(page));
+
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+
+  // initial active
+  setActivePage(nav?.active ?? items[0]?.page ?? "about");
+}
+
+// -----------------------------
+// SIDEBAR
+// -----------------------------
+function wireSidebarToggle() {
+  const sidebar = document.querySelector(".sidebar[data-sidebar]");
+  const btn = document.querySelector("[data-sidebar-btn]");
+  if (!sidebar || !btn) return;
+
+  btn.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+  });
+}
+
+function renderProfile(profile) {
+  safeText(el("profile-name"), profile?.name);
+
+  const avatar = el("profile-avatar");
+  if (avatar && profile?.avatar) {
+    avatar.src = profile.avatar;
+    avatar.alt = profile?.name ?? "Avatar";
   }
-  
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-  
-  function normalizeTag(s) {
-    return String(s).trim().toLowerCase();
-  }
-  
-  function setActive(el, on) {
-    el.classList.toggle("active", !!on);
-  }
-  
-  function initNavPages() {
-    const navLinks = document.querySelectorAll("[data-nav-link]");
-    const pages = document.querySelectorAll("article[data-page]");
-  
-    navLinks.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const label = btn.textContent.trim().toLowerCase();
-        pages.forEach((p) => setActive(p, p.dataset.page === label));
-        navLinks.forEach((b) => setActive(b, b === btn));
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
+
+  // roles
+  const rolesWrap = el("profile-roles");
+  if (rolesWrap) {
+    rolesWrap.innerHTML = "";
+    (profile?.roles ?? []).forEach((r) => {
+      const p = document.createElement("p");
+      p.className = "title";
+      p.style.marginBottom = "10px";
+      p.textContent = r;
+      rolesWrap.appendChild(p);
     });
   }
-  
-  function initSidebarToggle() {
-    const sidebar = document.querySelector("[data-sidebar]");
-    const btn = document.querySelector("[data-sidebar-btn]");
-    if (!sidebar || !btn) return;
-  
-    btn.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
+
+  // contacts
+  const contacts = el("contacts-list");
+  if (contacts) {
+    contacts.innerHTML = "";
+    (profile?.contacts ?? []).forEach((c) => {
+      const li = document.createElement("li");
+      li.className = "contact-item";
+
+      const iconBox = document.createElement("div");
+      iconBox.className = "icon-box";
+      const icon = document.createElement("ion-icon");
+      icon.setAttribute("name", c.icon ?? "mail-outline");
+      iconBox.appendChild(icon);
+
+      const info = document.createElement("div");
+      info.className = "contact-info";
+
+      const title = document.createElement("p");
+      title.className = "contact-title";
+      title.textContent = c.title ?? "";
+
+      info.appendChild(title);
+
+      if (c.href) {
+        const a = document.createElement("a");
+        a.className = "contact-link";
+        a.href = c.href;
+        a.textContent = c.value ?? "";
+        info.appendChild(a);
+      } else if (c.value) {
+        const addr = document.createElement("address");
+        addr.textContent = c.value;
+        info.appendChild(addr);
+      }
+
+      li.appendChild(iconBox);
+      li.appendChild(info);
+      contacts.appendChild(li);
     });
   }
-  
-  function initTestimonialsModal() {
-    const modalContainer = document.querySelector("[data-modal-container]");
-    const overlay = document.querySelector("[data-overlay]");
-    const closeBtn = document.querySelector("[data-modal-close-btn]");
-    const modalImg = document.querySelector("[data-modal-img]");
-    const modalTitle = document.querySelector("[data-modal-title]");
-    const modalText = document.querySelector("[data-modal-text]");
-  
-    if (!modalContainer || !overlay || !closeBtn || !modalImg || !modalTitle || !modalText) return;
-  
-    function openModal(card) {
-      const avatar = card.querySelector("[data-testimonials-avatar]")?.getAttribute("src") || "";
-      const title = card.querySelector("[data-testimonials-title]")?.textContent || "";
-      const textNode = card.querySelector("[data-testimonials-text]");
-      const html = textNode ? textNode.innerHTML : "";
-  
-      modalImg.src = avatar;
-      modalTitle.textContent = title;
-      modalText.innerHTML = html;
-  
-      modalContainer.classList.add("active");
+
+  // social
+  const socials = el("social-list");
+  if (socials) {
+    socials.innerHTML = "";
+    (profile?.social ?? []).forEach((s) => {
+      const li = document.createElement("li");
+      li.className = "social-item";
+      const a = document.createElement("a");
+      a.className = "social-link";
+      a.target = "_blank";
+      a.rel = "noreferrer";
+      a.href = s.href ?? "#";
+      const icon = document.createElement("ion-icon");
+      icon.setAttribute("name", s.icon ?? "logo-github");
+      a.appendChild(icon);
+      li.appendChild(a);
+      socials.appendChild(li);
+    });
+  }
+}
+
+// -----------------------------
+// ABOUT + SERVICES
+// -----------------------------
+function renderAbout(about) {
+  safeText(el("about-title"), about?.title ?? "About");
+
+  const wrap = el("about-text");
+  if (!wrap) return;
+
+  wrap.innerHTML = "";
+  (about?.paragraphs ?? []).forEach((p) => {
+    const para = document.createElement("p");
+    para.textContent = p;
+    wrap.appendChild(para);
+  });
+}
+
+function renderServices(services) {
+  safeText(el("services-title"), services?.title ?? "What I’m doing");
+
+  const list = el("services-list");
+  if (!list) return;
+  list.innerHTML = "";
+
+  (services?.items ?? []).forEach((it) => {
+    const li = document.createElement("li");
+    li.className = "service-item";
+
+    const iconBox = document.createElement("div");
+    iconBox.className = "service-icon-box";
+
+    if (it.icon) {
+      const img = document.createElement("img");
+      img.src = it.icon;
+      img.alt = it.title ?? "icon";
+      img.width = it.iconWidth ?? 55;
+      iconBox.appendChild(img);
+    }
+
+    const content = document.createElement("div");
+    content.className = "service-content-box";
+
+    const h = document.createElement("h4");
+    h.className = "h4 service-item-title";
+    h.textContent = it.title ?? "";
+
+    const p = document.createElement("p");
+    p.className = "service-item-text";
+    p.textContent = it.text ?? "";
+
+    content.appendChild(h);
+    content.appendChild(p);
+
+    li.appendChild(iconBox);
+    li.appendChild(content);
+
+    list.appendChild(li);
+  });
+}
+
+// -----------------------------
+// REFERENCES (simple cards; modal optional)
+// -----------------------------
+function wireReferenceModal() {
+  const container = document.querySelector("[data-modal-container]");
+  const overlay = document.querySelector("[data-overlay]");
+  const closeBtn = document.querySelector("[data-modal-close-btn]");
+  if (!container || !overlay || !closeBtn) return;
+
+  function close() {
+    container.classList.remove("active");
+    overlay.classList.remove("active");
+  }
+
+  overlay.addEventListener("click", close);
+  closeBtn.addEventListener("click", close);
+
+  return {
+    open(ref) {
+      const avatar = el("ref-modal-avatar");
+      const name = el("ref-modal-name");
+      const body = el("ref-modal-body");
+
+      if (avatar && ref.avatar) avatar.src = ref.avatar;
+      safeText(name, ref.name);
+
+      if (body) {
+        body.innerHTML = "";
+
+        if (ref.role) {
+          const p = document.createElement("p");
+          p.textContent = ref.role;
+          body.appendChild(p);
+        }
+
+        if (ref.phone) {
+          const row = document.createElement("p");
+          row.innerHTML = `<strong>Phone:</strong> ${ref.phone}`;
+          body.appendChild(row);
+        }
+
+        if (ref.email) {
+          const row = document.createElement("p");
+          row.innerHTML = `<strong>Email:</strong> ${ref.email}`;
+          body.appendChild(row);
+        }
+      }
+
       overlay.classList.add("active");
+      container.classList.add("active");
     }
-  
-    function closeModal() {
-      modalContainer.classList.remove("active");
-      overlay.classList.remove("active");
+  };
+}
+
+function renderReferences(refs) {
+  safeText(el("references-title"), refs?.title ?? "References");
+
+  const list = el("references-list");
+  if (!list) return;
+  list.innerHTML = "";
+
+  const modal = wireReferenceModal();
+
+  (refs?.items ?? []).forEach((r) => {
+    const li = document.createElement("li");
+    li.className = "testimonials-item";
+
+    const card = document.createElement("div");
+    card.className = "content-card";
+
+    const fig = document.createElement("figure");
+    fig.className = "testimonials-avatar-box";
+
+    const img = document.createElement("img");
+    img.src = r.avatar ?? "./assets/images/avatar-1.png";
+    img.alt = r.name ?? "Reference";
+    img.width = 60;
+
+    fig.appendChild(img);
+
+    const h = document.createElement("h4");
+    h.className = "h4 testimonials-item-title";
+    h.textContent = r.name ?? "";
+
+    const text = document.createElement("div");
+    text.className = "testimonials-text";
+    const p = document.createElement("p");
+    p.textContent = r.role ?? "";
+    text.appendChild(p);
+
+    card.appendChild(fig);
+    card.appendChild(h);
+    card.appendChild(text);
+
+    if (modal) {
+      card.style.cursor = "pointer";
+      card.addEventListener("click", () => modal.open(r));
     }
-  
-    document.addEventListener("click", (e) => {
-      const card = e.target.closest("[data-testimonials-item]");
-      if (card) openModal(card);
+
+    li.appendChild(card);
+    list.appendChild(li);
+  });
+}
+
+// -----------------------------
+// RESUME
+// -----------------------------
+function renderResume(resume) {
+  safeText(el("resume-title"), resume?.title ?? "Resume");
+
+  const cvLink = el("cv-link");
+  if (cvLink && resume?.cvUrl) cvLink.href = resume.cvUrl;
+  safeText(el("cv-label"), resume?.cvLabel ?? "Curriculum Vitae");
+
+  const edu = el("education-list");
+  if (edu) {
+    edu.innerHTML = "";
+    (resume?.education ?? []).forEach((it) => {
+      const li = document.createElement("li");
+      li.className = "timeline-item";
+
+      li.innerHTML = `
+        <h4 class="h4 timeline-item-title">${it.title ?? ""}</h4>
+        <span>${it.range ?? ""}</span>
+        <p class="timeline-text">${it.text ?? ""}</p>
+      `;
+      edu.appendChild(li);
     });
-  
-    closeBtn.addEventListener("click", closeModal);
-    overlay.addEventListener("click", closeModal);
   }
-  
-  function initContactForm() {
-    const form = document.querySelector("[data-form]");
-    const inputs = document.querySelectorAll("[data-form-input]");
-    const btn = document.querySelector("[data-form-btn]");
-    if (!form || !btn || !inputs.length) return;
-  
-    function update() {
-      const allFilled = Array.from(inputs).every((i) => i.value.trim().length > 0);
-      btn.disabled = !allFilled;
-    }
-  
-    inputs.forEach((i) => i.addEventListener("input", update));
-    update();
+
+  const exp = el("experience-list");
+  if (exp) {
+    exp.innerHTML = "";
+    (resume?.experience ?? []).forEach((it) => {
+      const li = document.createElement("li");
+      li.className = "timeline-item";
+
+      li.innerHTML = `
+        <h4 class="h4 timeline-item-title">${it.title ?? ""}</h4>
+        <span>${it.range ?? ""}</span>
+        <p class="timeline-text">${it.text ?? ""}</p>
+      `;
+      exp.appendChild(li);
+    });
   }
-  
-  function applyProjectFilter(filterLabel) {
-    const selected = normalizeTag(filterLabel);
-    const items = document.querySelectorAll(".project-item[data-filter-item]");
-    items.forEach((li) => {
-      const raw = li.dataset.category || "";
-      const tags = raw.split(",").map(normalizeTag).filter(Boolean);
-  
-      const show =
-        selected === "all" ||
-        tags.includes(selected);
-  
+
+  const tech = el("skills-technical");
+  if (tech) {
+    tech.innerHTML = "";
+    (resume?.skills?.technical ?? []).forEach((s) => {
+      const li = document.createElement("li");
+      li.textContent = s;
+      tech.appendChild(li);
+    });
+  }
+
+  const prof = el("skills-professional");
+  if (prof) {
+    prof.innerHTML = "";
+    (resume?.skills?.professional ?? []).forEach((s) => {
+      const li = document.createElement("li");
+      li.textContent = s;
+      prof.appendChild(li);
+    });
+  }
+}
+
+// -----------------------------
+// PORTFOLIO (filters + projects)
+// -----------------------------
+function parseCategories(cat) {
+  if (Array.isArray(cat)) return cat.map(normalizeKey);
+  return String(cat ?? "")
+    .split(",")
+    .map((s) => normalizeKey(s))
+    .filter(Boolean);
+}
+
+function renderPortfolio(portfolio, projects) {
+  safeText(el("portfolio-title"), portfolio?.title ?? "Portfolio");
+
+  const filters = portfolio?.filters ?? ["All"];
+  const defaultFilter = normalizeKey(portfolio?.defaultFilter ?? "all");
+
+  const filtersList = el("filters-list");
+  const filtersSelectList = el("filters-select-list");
+  const selectValue = el("filter-select-value");
+  const projectsList = el("projects-list");
+
+  if (filtersList) filtersList.innerHTML = "";
+  if (filtersSelectList) filtersSelectList.innerHTML = "";
+  if (projectsList) projectsList.innerHTML = "";
+
+  function applyFilter(filterKey) {
+    const key = normalizeKey(filterKey);
+    if (selectValue) selectValue.textContent = filterKey;
+
+    // desktop buttons active state
+    document.querySelectorAll("#filters-list button[data-filter]").forEach((b) => {
+      b.classList.toggle("active", normalizeKey(b.dataset.filter) === key);
+    });
+
+    // project show/hide
+    document.querySelectorAll("#projects-list .project-item[data-filter-item]").forEach((li) => {
+      const cats = parseCategories(li.dataset.category);
+      const show = key === "all" || cats.includes(key);
       li.classList.toggle("active", show);
     });
   }
-  
-  function initPortfolioFiltering(defaultFilter = "Highlighted Projects") {
-    const filterButtons = document.querySelectorAll("[data-filter-btn]");
-    const select = document.querySelector("[data-select]");
-    const selectValue = document.querySelector("[data-selecct-value]");
-    const selectItems = document.querySelectorAll("[data-select-item]");
-  
-    function setFilter(label) {
-      // buttons
-      filterButtons.forEach((b) => setActive(b, b.textContent.trim() === label));
-      // dropdown label
-      if (selectValue) selectValue.textContent = label;
-      applyProjectFilter(label);
-    }
-  
-    filterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => setFilter(btn.textContent.trim()));
+
+  // build filter buttons (desktop)
+  if (filtersList) {
+    filters.forEach((f) => {
+      const li = document.createElement("li");
+      li.className = "filter-item";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.filterBtn = "";
+      btn.dataset.filter = f;
+      btn.textContent = f;
+      btn.addEventListener("click", () => applyFilter(f));
+      li.appendChild(btn);
+      filtersList.appendChild(li);
     });
-  
-    if (select) {
-      select.addEventListener("click", () => select.classList.toggle("active"));
-    }
-    selectItems.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        setFilter(btn.textContent.trim());
-        select?.classList.remove("active");
-      });
+  }
+
+  // build select list (mobile)
+  if (filtersSelectList) {
+    filters.forEach((f) => {
+      const li = document.createElement("li");
+      li.className = "select-item";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.selectItem = "";
+      btn.textContent = f;
+      btn.addEventListener("click", () => applyFilter(f));
+      li.appendChild(btn);
+      filtersSelectList.appendChild(li);
     });
-  
-    setFilter(defaultFilter);
   }
-  
-  async function renderAll() {
-    const [profile, about, services, refs, resume, projects] = await Promise.all([
-      loadJSON("./assets/data/profile.json"),
-      loadJSON("./assets/data/about.json"),
-      loadJSON("./assets/data/services.json"),
-      loadJSON("./assets/data/references.json"),
-      loadJSON("./assets/data/resume.json"),
-      loadJSON("./assets/data/projects.json")
-    ]);
-  
-    // Profile
-    const nameEl = document.getElementById("profile-name");
-    if (nameEl) {
-      nameEl.textContent = profile.name;
-      nameEl.title = profile.name;
-    }
-  
-    const avatarImg = document.querySelector(".avatar-box img");
-    if (avatarImg) {
-      avatarImg.src = profile.avatar;
-      avatarImg.alt = profile.name;
-    }
-  
-    const rolesRoot = document.getElementById("profile-roles");
-    if (rolesRoot) {
-      rolesRoot.innerHTML = (profile.roles || [])
-        .map((r) => `<p class="title profile-role">${escapeHtml(r)}</p>`)
-        .join("");
-    }
-  
-    const contactsRoot = document.getElementById("contacts-list");
-    if (contactsRoot) {
-      contactsRoot.innerHTML = (profile.contacts || []).map((c) => {
-        const icon = escapeHtml(c.icon || "ellipse-outline");
-        const label = escapeHtml(c.label || "");
-        const text = escapeHtml(c.text || "");
-        const href = c.href ? String(c.href) : "";
-  
-        const valueHtml = href
-          ? `<a href="${escapeHtml(href)}" class="contact-link">${text}</a>`
-          : `<address>${text}</address>`;
-  
-        return `
-  <li class="contact-item">
-    <div class="icon-box"><ion-icon name="${icon}"></ion-icon></div>
-    <div class="contact-info">
-      <p class="contact-title">${label}</p>
-      ${valueHtml}
-    </div>
-  </li>`;
-      }).join("");
-    }
-  
-    const socialsRoot = document.getElementById("social-list");
-    if (socialsRoot) {
-      socialsRoot.innerHTML = (profile.socials || []).map((s) => `
-  <li class="social-item">
-    <a href="${escapeHtml(s.href)}" target="_blank" class="social-link">
-      <ion-icon name="${escapeHtml(s.icon)}"></ion-icon>
-    </a>
-  </li>`).join("");
-    }
-  
-    // About paragraphs
-    const aboutRoot = document.getElementById("about-text");
-    if (aboutRoot) {
-      aboutRoot.innerHTML = (about.paragraphs || [])
-        .map((p) => `<p>${escapeHtml(p)}</p>`)
-        .join("");
-    }
-  
-    // Services
-    const servicesRoot = document.getElementById("services-list");
-    if (servicesRoot) {
-      servicesRoot.innerHTML = (services.items || []).map((it) => `
-  <li class="service-item">
-    <div class="service-icon-box">
-      <img src="${escapeHtml(it.icon)}" alt="${escapeHtml(it.iconAlt || it.title)}" width="${Number(it.iconWidth || 55)}">
-    </div>
-    <div class="service-content-box">
-      <h4 class="h4 service-item-title">${escapeHtml(it.title)}</h4>
-      <p class="service-item-text">${escapeHtml(it.text)}</p>
-    </div>
-  </li>`).join("");
-    }
-  
-    // References
-    const refsRoot = document.getElementById("references-list");
-    if (refsRoot) {
-      refsRoot.innerHTML = (refs.items || []).map((r, idx) => `
-  <li class="testimonials-item">
-    <div class="content-card" data-testimonials-item>
-      <figure class="testimonials-avatar-box">
-        <img src="${escapeHtml(r.avatar)}" alt="${escapeHtml(r.name)}" width="60" data-testimonials-avatar>
-      </figure>
-  
-      <h4 class="h4 testimonials-item-title" data-testimonials-title>${escapeHtml(r.name)}</h4>
-  
-      <div class="testimonials-text" data-testimonials-text>
-        <p>${escapeHtml(r.role)}</p>
-  
-        <div style="display:flex; gap:8px; padding-top:5px;">
-          <div class="icon-box"><ion-icon name="phone-portrait-outline"></ion-icon></div>
-          <div class="contact-info" style="display:flex; align-items:center;">
-            <a href="tel:${escapeHtml(r.phone)}" class="contact-link">${escapeHtml(r.phone)}</a>
-          </div>
-        </div>
-  
-        <div style="display:flex; gap:8px; padding-top:5px;">
-          <div class="icon-box"><ion-icon name="mail-outline"></ion-icon></div>
-          <div class="contact-info" style="display:flex; align-items:center;">
-            <a href="mailto:${escapeHtml(r.email)}" class="contact-link">${escapeHtml(r.email)}</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </li>`).join("");
-    }
-  
-    // Resume
-    const eduRoot = document.getElementById("education-list");
-    if (eduRoot) {
-      eduRoot.innerHTML = (resume.education || []).map((e) => `
-  <li class="timeline-item">
-    <h4 class="h4 timeline-item-title">${escapeHtml(e.school)}</h4>
-    <span>${escapeHtml(e.years)}</span>
-    <p class="timeline-text">${escapeHtml(e.text)}</p>
-  </li>`).join("");
-    }
-  
-    const expRoot = document.getElementById("experience-list");
-    if (expRoot) {
-      expRoot.innerHTML = (resume.experience || []).map((e) => `
-  <li class="timeline-item">
-    <h4 class="h4 timeline-item-title">${escapeHtml(e.company)}</h4>
-    <span>${escapeHtml(e.years)}</span>
-    <p class="timeline-text">${escapeHtml(e.text)}</p>
-  </li>`).join("");
-    }
-  
-    const skillsTech = document.getElementById("skills-technical");
-    if (skillsTech) {
-      skillsTech.innerHTML = (resume.skills?.technical || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
-    }
-  
-    const skillsPro = document.getElementById("skills-professional");
-    if (skillsPro) {
-      skillsPro.innerHTML = (resume.skills?.professional || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
-    }
-  
-    // Portfolio filters
-    const filtersRoot = document.getElementById("filters-list");
-    if (filtersRoot) {
-      filtersRoot.innerHTML = (projects.filters || []).map((f) => `
-  <li class="filter-item">
-    <button data-filter-btn>${escapeHtml(f)}</button>
-  </li>`).join("");
-    }
-  
-    const selectListRoot = document.getElementById("filters-select-list");
-    if (selectListRoot) {
-      selectListRoot.innerHTML = (projects.filters || []).map((f) => `
-  <li class="select-item">
-    <button data-select-item>${escapeHtml(f)}</button>
-  </li>`).join("");
-    }
-  
-    // Projects list
-    const projectsRoot = document.getElementById("projects-list");
-    if (projectsRoot) {
-      projectsRoot.innerHTML = (projects.projects || []).map((p) => {
-        const tags = (p.tags || []).map(normalizeTag).join(",");
-        return `
-  <li class="project-item" data-filter-item data-category="${escapeHtml(tags)}">
-    <a href="${escapeHtml(p.href)}" target="_blank">
-      <figure class="project-img">
-        <div class="project-item-icon-box">
-          <ion-icon name="eye-outline"></ion-icon>
-        </div>
-        <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.alt || p.title)}" loading="lazy">
-      </figure>
-  
-      <h3 class="project-title">${escapeHtml(p.title)}</h3>
-      <p class="project-category">${escapeHtml(p.categoryLabel || "")}</p>
-    </a>
-  </li>`;
-      }).join("");
-    }
-  
-    // Now that DOM is rendered, init UI behaviors
-    initSidebarToggle();
-    initNavPages();
-    initTestimonialsModal();
-    initContactForm();
-    initPortfolioFiltering("Highlighted Projects");
+
+  // build projects
+  if (projectsList) {
+    (projects?.items ?? []).forEach((p) => {
+      const li = document.createElement("li");
+      li.className = "project-item";
+      li.dataset.filterItem = "";
+      li.dataset.category = parseCategories(p.categories ?? p.category).join(",");
+
+      li.innerHTML = `
+        <a href="${p.href ?? "#"}" target="_blank" rel="noreferrer">
+          <figure class="project-img">
+            <div class="project-item-icon-box">
+              <ion-icon name="eye-outline"></ion-icon>
+            </div>
+            <img src="${p.image ?? ""}" alt="${p.title ?? "project"}" loading="lazy">
+          </figure>
+          <h3 class="project-title">${p.title ?? ""}</h3>
+          <p class="project-category">${p.label ?? p.categoryLabel ?? (p.category ?? "")}</p>
+        </a>
+      `;
+
+      projectsList.appendChild(li);
+    });
   }
-  
-  renderAll().catch((err) => console.error(err));
-  
+
+  // wire dropdown open/close
+  const selectBtn = document.querySelector("[data-select]");
+  if (selectBtn) {
+    selectBtn.addEventListener("click", () => {
+      selectBtn.classList.toggle("active");
+      const list = selectBtn.nextElementSibling;
+      if (list) list.classList.toggle("active");
+    });
+  }
+
+  // initial filter
+  applyFilter(filters.find((f) => normalizeKey(f) === defaultFilter) ?? "All");
+}
+
+// -----------------------------
+// CONTACT
+// -----------------------------
+function renderContact(contact) {
+  safeText(el("contact-title"), contact?.title ?? "Contact");
+  safeText(el("contact-form-title"), contact?.formTitle ?? "Contact Form");
+
+  const map = el("contact-map");
+  if (map && contact?.mapEmbed) map.src = contact.mapEmbed;
+
+  const form = el("contact-form");
+  if (form && contact?.formAction) form.action = contact.formAction;
+
+  // enable submit when fields filled
+  const inputs = document.querySelectorAll("[data-form-input]");
+  const btn = el("contact-submit");
+
+  function update() {
+    const allFilled = Array.from(inputs).every((i) => i.value.trim().length > 0);
+    if (btn) btn.disabled = !allFilled;
+  }
+
+  inputs.forEach((i) => i.addEventListener("input", update));
+  update();
+}
+
+// -----------------------------
+// INIT
+// -----------------------------
+async function init() {
+  wireSidebarToggle();
+
+  const [
+    site,
+    profile,
+    nav,
+    about,
+    services,
+    references,
+    resume,
+    portfolio,
+    projects,
+    contact,
+  ] = await Promise.all([
+    loadJSON(DATA.site),
+    loadJSON(DATA.profile),
+    loadJSON(DATA.nav),
+    loadJSON(DATA.about),
+    loadJSON(DATA.services),
+    loadJSON(DATA.references),
+    loadJSON(DATA.resume),
+    loadJSON(DATA.portfolio),
+    loadJSON(DATA.projects),
+    loadJSON(DATA.contact),
+  ]);
+
+  if (site?.title) document.title = site.title;
+  if (site?.theme) document.documentElement.dataset.theme = site.theme;
+
+  renderProfile(profile);
+  renderNav(nav);
+  renderAbout(about);
+  renderServices(services);
+  renderReferences(references);
+  renderResume(resume);
+  renderPortfolio(portfolio, projects);
+  renderContact(contact);
+
+  console.log("[app] render ok");
+}
+
+init().catch((err) => {
+  console.error("[app] init failed:", err);
+});

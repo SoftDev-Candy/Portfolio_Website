@@ -1,8 +1,42 @@
 {
-    "paragraphs": [
-      "I’m Swastik, a developer focused on backend systems, networking, and game engine technology. I enjoy working close to the system—building tools and services, and understanding low-level concepts such as sockets, concurrency, and performance.",
-      "I’m driven by solving challenging problems and learning through real-world constraints. I regularly participate in team-based projects, hackathons, and community initiatives, where collaboration, ownership, and clear communication matter as much as technical skill.",
-      "I’m continuously strengthening my foundation in modern C++, Linux, and CMake, while expanding into cloud and DevOps practices through ongoing EPAM certification programs. I value steady improvement, reliability, and writing software that scales beyond prototypes."
-    ]
+    "about": {
+      "title": "About me",
+      "paragraphs": [
+        "I’m Swastik, a developer focused on backend systems, networking, and game engine technology. I enjoy working close to the system—building tools and services, and understanding low-level concepts such as sockets, concurrency, and performance.",
+        "I’m driven by solving challenging problems and learning through real-world constraints. I regularly participate in team-based projects, hackathons, and community initiatives, where collaboration, ownership, and clear communication matter as much as technical skill.",
+        "I’m continuously strengthening my foundation in modern C++, Linux, and CMake, while expanding into cloud and DevOps practices through ongoing EPAM certification programs. I value steady improvement, reliability, and writing software that scales beyond prototypes."
+      ],
+      "servicesTitle": "What i'm doing",
+      "services": [
+        {
+          "title": "Backend Development",
+          "text": "Building reliable and scalable systems with C++ and modern tools, focusing on performance and clean architecture.",
+          "icon": "./assets/images/icon-design.svg",
+          "iconAlt": "Backend icon",
+          "iconWidth": 55
+        },
+        {
+          "title": "Networking",
+          "text": "Learning and developing socket-based applications, exploring protocols, and building secure, efficient client-server solutions.",
+          "icon": "./assets/images/icon-dev.svg",
+          "iconAlt": "Networking icon",
+          "iconWidth": 55
+        },
+        {
+          "title": "Game Engine Fundamentals",
+          "text": "Studying the internals of game engines, from rendering and physics to memory management and real-time systems.",
+          "icon": "./assets/images/icon-app.svg",
+          "iconAlt": "Game engine icon",
+          "iconWidth": 66
+        },
+        {
+          "title": "Hackathons & Volunteering",
+          "text": "Participating in hackathons and volunteering for tech events, gaining hands-on experience while collaborating with others.",
+          "icon": "./assets/images/icon-photo.svg",
+          "iconAlt": "Hackathon icon",
+          "iconWidth": 58
+        }
+      ]
+    }
   }
   

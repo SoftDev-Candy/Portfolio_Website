@@ -771,3 +771,89 @@
   .form-btn:disabled:hover { background: var(--border-gradient-onyx); }
   .form-btn:disabled:hover::before { background: var(--bg-gradient-jet); }
   
+  /* ===========================
+   REVOLVER RAIL (VISUAL)
+   =========================== */
+
+.nav-rail{
+  padding: 10px 6px;
+}
+
+/* the rail container */
+.rail-stack{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 12px;
+}
+
+/* chamber outline item */
+.rail-item{
+  width: 100%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* outline-only “chamber” */
+.rail-chamber{
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.22) inset;
+  position: relative;
+}
+
+/* small notch like chamber edge */
+.rail-chamber::after{
+  content:"";
+  position:absolute;
+  top: 50%;
+  right: -6px;
+  width: 10px;
+  height: 2px;
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-50%);
+  border-radius: 2px;
+}
+
+/* active = stronger outline + subtle glow */
+.rail-item.is-active .rail-chamber{
+  border-color: rgba(255,255,255,0.32);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.10) inset,
+    0 0 18px rgba(214,241,255,0.12);
+}
+
+/* tiny label (optional) */
+.rail-label{
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+/* Back to top button (bottom of rail) */
+.rail-top{
+  display: grid;
+  place-items: center;
+  padding-bottom: 10px;
+}
+
+.rail-top button{
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.rail-top button:hover{
+  border-color: rgba(255,255,255,0.28);
+  box-shadow: 0 0 18px rgba(214,241,255,0.10);
+}
