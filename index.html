@@ -1,169 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="winter">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Swastik Toprani</title>
-
-  <!-- favicon -->
   <link rel="shortcut icon" href="./assets/images/Iconpng.ico" type="image/x-icon" />
 
-  <!-- Google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Split CSS (your new system) -->
-  <link rel="stylesheet" href="./assets/css/00-tokens.css" />
-  <link rel="stylesheet" href="./assets/css/01-theme.css" />
-  <link rel="stylesheet" href="./assets/css/02-reset.css" />
-  <link rel="stylesheet" href="./assets/css/10-layout.css" />
-  <link rel="stylesheet" href="./assets/css/11-base.css" />
-  <link rel="stylesheet" href="./assets/css/20-components.css" />
-  <link rel="stylesheet" href="./assets/css/90-effects.css" />
-  <link rel="stylesheet" href="./assets/css/99-overrides.css" />
-
-  <!-- IMPORTANT: do NOT include the old massive style.css anymore -->
-  <!-- <link rel="stylesheet" href="./assets/css/style.css" /> -->
+  <link rel="stylesheet" href="assets/css/00-tokens.css" />
+  <link rel="stylesheet" href="assets/css/01-theme.css" />
+  <link rel="stylesheet" href="assets/css/02-reset.css" />
+  <link rel="stylesheet" href="assets/css/10-layout.css" />
+  <link rel="stylesheet" href="assets/css/11-base.css" />
+  <link rel="stylesheet" href="assets/css/20-components.css" />
+  <link rel="stylesheet" href="assets/css/90-effects.css" />
+  <link rel="stylesheet" href="assets/css/99-overrides.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-
 <body>
-
-  <!-- FX canvases (keep both if you use both effects) -->
-  <canvas id="fx-dust" aria-hidden="true"></canvas>
-  <canvas id="fx-snow" aria-hidden="true"></canvas>
-  <body>
-    <canvas id="fx-dust"></canvas>
-  
-    <div id="app" class="app-shell">
-      <aside id="sidebar" class="app-sidebar"></aside>
-      <main id="main" class="app-main"></main>
-  
-      <nav id="rail" class="nav-rail" aria-label="Section navigation">
-        <div class="rail-stack" id="railStack"></div>
-  
-        <div class="rail-top">
-          <button id="backToTop" aria-label="Back to top">↑</button>
-        </div>
-      </nav>
-    </div>
-  
-    <script src="./assets/js/app.js"></script>
-  </body>
-  
+  <canvas id="fx-fluid" aria-hidden="true"></canvas>
 
   <main>
-
-    <!-- SIDEBAR -->
     <aside class="sidebar" data-sidebar>
       <div class="sidebar-info">
-
         <figure class="avatar-box">
-          <!-- JS will fill these -->
-          <img id="profile-avatar" src="./assets/images/avatar.png" alt="Swastik Toprani" width="80" />
+          <img
+            id="profile-avatar"
+            src="./assets/images/avatar.png"
+            alt="Swastik Toprani"
+            width="80"
+          />
         </figure>
 
         <div class="info-content">
           <h1 class="name" id="profile-name" title="Swastik Toprani">Swastik Toprani</h1>
-
-          <!-- Roles rendered by JS -->
-          <div id="profile-roles" class="role-stack">
-            <!-- Example fallback if JS fails -->
-            <!-- <p class="title profile-role">🖥️ Systems Engineer</p> -->
-          </div>
+          <div id="profile-roles" class="role-stack"></div>
         </div>
 
-        <button class="info_more-btn" data-sidebar-btn>
+        <button class="info_more-btn" type="button" data-sidebar-btn aria-label="Toggle contacts">
           <span>Show Contacts</span>
           <ion-icon name="chevron-down"></ion-icon>
         </button>
-
       </div>
 
       <div class="sidebar-info_more">
         <div class="separator"></div>
-
-        <!-- Contacts rendered by JS -->
         <ul class="contacts-list" id="contacts-list"></ul>
-
         <div class="separator"></div>
-
-        <!-- Socials rendered by JS -->
         <ul class="social-list" id="social-list"></ul>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-
-      <!-- NAVBAR -->
-      <nav class="navbar">
-        <ul class="navbar-list">
-          <li class="navbar-item"><button class="navbar-link active" data-nav-link>About</button></li>
-          <li class="navbar-item"><button class="navbar-link" data-nav-link>Resume</button></li>
-          <li class="navbar-item"><button class="navbar-link" data-nav-link>Portfolio</button></li>
-          <li class="navbar-item"><button class="navbar-link" data-nav-link>Contact</button></li>
+    <div class="main-content" id="app">
+      <nav class="navbar" aria-label="Primary navigation">
+        <ul class="navbar-list navbar-list-static">
+          <li class="navbar-item"><a class="navbar-link" href="#portfolio">Portfolio</a></li>
+          <li class="navbar-item"><a class="navbar-link" href="#about">About</a></li>
+          <li class="navbar-item"><a class="navbar-link" href="#resume">Resume</a></li>
+          <li class="navbar-item"><a class="navbar-link" href="#contact">Contact</a></li>
         </ul>
+        <ul class="navbar-list navbar-list-dynamic" id="nav-list" aria-hidden="true"></ul>
       </nav>
 
-      <!-- ABOUT -->
-      <article class="about active" data-page="about">
+      <section id="portfolio" class="page-section portfolio">
         <header>
-          <h2 class="h2 article-title">About me</h2>
+          <h2 class="h2 article-title" id="portfolio-title">Portfolio</h2>
         </header>
 
-        <!-- About text rendered by JS -->
+        <section class="projects">
+          <div class="filter-select-box">
+            <button class="filter-select" data-select type="button">
+              <div id="filter-select-value">Select category</div>
+              <div class="select-icon">
+                <ion-icon name="chevron-down"></ion-icon>
+              </div>
+            </button>
+            <ul class="select-list" id="filters-select-list"></ul>
+          </div>
+
+          <ul class="filter-list" id="filters-list"></ul>
+          <ul class="project-list" id="projects-list"></ul>
+        </section>
+      </section>
+
+      <section id="about" class="page-section about">
+        <header>
+          <h2 class="h2 article-title" id="about-title">About Me</h2>
+        </header>
+
         <section class="about-text" id="about-text"></section>
 
-        <!-- Services -->
         <section class="service">
-          <h3 class="h3 service-title" id="services-title">What i'm doing</h3>
+          <h3 class="h3 service-title" id="services-title">What I'm Doing</h3>
           <ul class="service-list" id="services-list"></ul>
         </section>
 
-        <!-- References -->
         <section class="testimonials">
           <h3 class="h3 testimonials-title" id="references-title">References</h3>
           <ul class="testimonials-list has-scrollbar" id="references-list"></ul>
         </section>
+      </section>
 
-        <!-- Modal (kept same behavior as template) -->
-        <div class="modal-container" data-modal-container>
-          <div class="overlay" data-overlay></div>
-
-          <section class="testimonials-modal">
-            <button class="modal-close-btn" data-modal-close-btn>
-              <ion-icon name="close-outline"></ion-icon>
-            </button>
-
-            <div class="modal-img-wrapper">
-              <figure class="modal-avatar-box">
-                <img src="./assets/images/avatar-1.png" alt="Reference" width="80" data-modal-img />
-              </figure>
-              <img src="./assets/images/icon-quote.svg" alt="quote icon" />
-            </div>
-
-            <div class="modal-content">
-              <h4 class="h3 modal-title" data-modal-title>Reference</h4>
-              <div data-modal-text></div>
-            </div>
-          </section>
-        </div>
-      </article>
-
-      <!-- RESUME -->
-      <article class="resume" data-page="resume">
+      <section id="resume" class="page-section resume">
         <header>
-          <h2 class="h2 article-title">Resume</h2>
+          <h2 class="h2 article-title" id="resume-title">Resume</h2>
         </header>
 
-        <section class="cv-section">
-          <a href="/assets/Swastik.Resume_General.pdf" class="cv-button" target="_blank">
-            <ion-icon name="document-text-outline"></ion-icon>
-            Curriculum Vitae
-          </a>
-        </section>
+        <a
+          id="cv-link"
+          class="cv-button"
+          href="./assets/Swastik.Resume_General.pdf"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ion-icon name="document-text-outline"></ion-icon>
+          <span id="cv-label">Curriculum Vitae</span>
+        </a>
 
         <section class="timeline">
           <div class="title-wrapper">
@@ -175,96 +130,109 @@
 
         <section class="timeline">
           <div class="title-wrapper">
-            <div class="icon-box"><ion-icon name="book-outline"></ion-icon></div>
+            <div class="icon-box"><ion-icon name="briefcase-outline"></ion-icon></div>
             <h3 class="h3">Experience</h3>
           </div>
           <ol class="timeline-list" id="experience-list"></ol>
         </section>
 
-        <section class="skills timeline">
-          <h3 class="h3 skills-title">My Skills</h3>
-
+        <section class="skills">
+          <h3 class="h3 skills-title">Technical Skills</h3>
           <div class="skills-category">
-            <h4 class="h4">Technical Skills</h4>
             <ul class="skills-tags" id="skills-technical"></ul>
           </div>
 
+          <h3 class="h3 skills-title">Professional Skills</h3>
           <div class="skills-category">
-            <h4 class="h4">Professional Skills</h4>
             <ul class="skills-tags" id="skills-professional"></ul>
           </div>
         </section>
-      </article>
+      </section>
 
-      <!-- PORTFOLIO -->
-      <article class="portfolio" data-page="portfolio">
+      <section id="contact" class="page-section contact">
         <header>
-          <h2 class="h2 article-title">Portfolio</h2>
+          <h2 class="h2 article-title" id="contact-title">Contact</h2>
         </header>
 
-        <section class="projects">
-
-          <!-- Desktop filter pills (rendered by JS) -->
-          <ul class="filter-list" id="filters-list"></ul>
-
-          <!-- Mobile dropdown -->
-          <div class="filter-select-box">
-            <button class="filter-select" data-select>
-              <div class="select-value" data-selecct-value>Select category</div>
-              <div class="select-icon"><ion-icon name="chevron-down"></ion-icon></div>
-            </button>
-            <ul class="select-list" id="filters-select-list"></ul>
-          </div>
-
-          <!-- Projects rendered by JS -->
-          <ul class="project-list" id="projects-list"></ul>
-        </section>
-      </article>
-
-      <!-- CONTACT -->
-      <article class="contact" data-page="contact">
-        <header>
-          <h2 class="h2 article-title">Contact</h2>
-        </header>
-
-        <section class="mapbox" data-mapbox>
+        <section class="mapbox">
           <figure>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8212.322924347149!2d21.02112040499714!3d52.26993022763472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471ecc103b236a29%3A0x95cd2b718c7463c3!2sCD%20PROJEKT%20S.A.!5e0!3m2!1sen!2sin!4v1758825046426!5m2!1sen!2sin"
-              width="600" height="450" loading="lazy"></iframe>
+              id="contact-map"
+              src=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Map"
+            ></iframe>
           </figure>
         </section>
 
         <section class="contact-form">
-          <h3 class="h3 form-title">Contact Form</h3>
+          <h3 class="h3 form-title" id="contact-form-title">Contact Form</h3>
 
-          <form action="https://formspree.io/f/xrbybwrb" method="POST" class="form" data-form>
+          <form id="contact-form" class="form" method="POST">
             <div class="input-wrapper">
-              <input type="text" name="fullname" class="form-input" placeholder="Full name" required data-form-input />
-              <input type="email" name="email" class="form-input" placeholder="Email address" required data-form-input />
+              <input
+                class="form-input"
+                type="text"
+                name="name"
+                placeholder="Full name"
+                required
+                data-form-input
+              />
+
+              <input
+                class="form-input"
+                type="email"
+                name="email"
+                placeholder="Email address"
+                required
+                data-form-input
+              />
             </div>
 
-            <textarea name="message" class="form-input" placeholder="Your Message" required data-form-input></textarea>
+            <textarea
+              class="form-input"
+              name="message"
+              placeholder="Your message"
+              required
+              data-form-input
+            ></textarea>
 
-            <button class="form-btn" type="submit" disabled data-form-btn>
+            <button id="contact-submit" class="form-btn" type="submit" disabled>
               <ion-icon name="paper-plane"></ion-icon>
-              <span>Send Message</span>
+              <span class="form-btn-label">Send Message</span>
             </button>
           </form>
         </section>
-      </article>
-
+      </section>
     </div>
   </main>
-  <!-- APP (data-driven renderer) -->
-  <script type="module" src="./assets/js/app.js"></script>
 
-  <!-- FX scripts (optional) -->
-  <script src="./assets/js/fx-dust.js" defer></script>
-  <!-- If you have a snow JS file, include it like this: -->
-  <!-- <script src="./assets/js/fx-snow.js" defer></script> -->
+  <div class="modal-container" data-modal-container>
+    <div class="overlay" data-overlay></div>
 
-  <!-- Ionicons -->
+    <section class="testimonials-modal">
+      <button class="modal-close-btn" data-modal-close-btn type="button" aria-label="Close modal">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+      <div class="modal-img-wrapper">
+        <figure class="modal-avatar-box">
+          <img id="ref-modal-avatar" src="./assets/images/avatar-1.png" alt="Reference avatar" width="80" />
+        </figure>
+      </div>
+
+      <div class="modal-content">
+        <h4 class="h3 modal-title" id="ref-modal-name"></h4>
+        <div id="ref-modal-body"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="./assets/js/app.js" defer></script>
+  <script src="./assets/js/fluid-init.js" defer></script>
+  <script src="./Fluids_v3/js/script.js" defer></script>
+
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>

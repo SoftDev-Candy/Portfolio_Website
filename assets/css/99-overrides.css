@@ -386,4 +386,232 @@
     box-shadow: 0 0 14px rgba(57,216,255,0.18);
   }
 
-  main { background: transparent !important; }
+/* ===========================
+   FINAL OVERRIDES
+   =========================== */
+
+/* One authoritative page background (theme-safe + image fallback) */
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--base-bg, var(--layout-bg-fallback, #07080b)) !important;
+  background-image:
+    radial-gradient(
+      1200px 900px at 20% 10%,
+      color-mix(in srgb, var(--accent-glow, rgba(255,255,255,0.16)) 45%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 700px at 80% 30%,
+      color-mix(in srgb, var(--accent-2, #a9b6c8) 18%, transparent),
+      transparent 60%
+    ),
+    url("../images/Anotheronne.png") !important;
+  background-repeat: no-repeat, no-repeat, no-repeat !important;
+  background-position: top center, top center, top center !important;
+  background-size: cover, cover, cover !important;
+  background-attachment: fixed, fixed, fixed !important;
+}
+
+/* Keep shell transparent so background + FX stay visible */
+main,
+.main-content {
+  background: transparent !important;
+}
+
+/* Glass UI panels (no solid greys) */
+.sidebar-info,
+.sidebar-info_more,
+article {
+  background: var(--ui-bg, rgba(255,255,255,0.06)) !important;
+  border-color: var(--ui-border, rgba(255,255,255,0.14)) !important;
+  box-shadow: var(--ui-shadow, 0 16px 30px rgba(0,0,0,0.25)) !important;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
+
+/* FX canvases stay behind UI and never block clicks */
+#fx-dust,
+#fx-snow {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+}
+
+#fx-dust { z-index: 1 !important; }
+#fx-snow { z-index: 2 !important; }
+
+main { position: relative; z-index: 10; }
+.navbar { position: relative; z-index: 15; }
+.modal-container { z-index: 100; }
+
+/* Unified corner system */
+.sidebar,
+article,
+.sidebar-info,
+.sidebar-info_more,
+.content-card,
+.service-item,
+.project-item > a {
+  border-radius: var(--radius-card, var(--card-radius, 20px)) !important;
+}
+
+.project-img,
+.project-item-icon-box,
+.content-card::before,
+.service-item::before {
+  border-radius: var(--radius-soft, 14px) !important;
+}
+
+.role-stack > *,
+.info-content .title {
+  border-radius: var(--radius-pill, var(--pill-radius, 999px)) !important;
+}
+
+/* ===========================
+   SIDEBAR SPLIT FINAL
+   =========================== */
+
+/* Sidebar = transparent shell; child blocks = the two visible panels */
+.sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.sidebar-info,
+.sidebar-info_more {
+  background: var(--ui-bg, rgba(255,255,255,0.06)) !important;
+  border: 1px solid var(--ui-border, rgba(255,255,255,0.14)) !important;
+  box-shadow: var(--ui-shadow, 0 16px 30px rgba(0,0,0,0.25)) !important;
+}
+
+/* Push lower panel to bottom to create the large split gap */
+.sidebar-info_more {
+  margin-top: auto !important;
+}
+
+/* Avatar frame must be transparent (border only) */
+.avatar-box {
+  background: transparent !important;
+  border: 1px solid var(--ui-border, rgba(255,255,255,0.22)) !important;
+  box-shadow: none !important;
+}
+
+/* Desktop: never collapse the split sidebar */
+@media (min-width: 1025px) {
+  .sidebar {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+/* Mobile: keep toggle/collapsible behavior */
+@media (max-width: 1024px) {
+  .sidebar {
+    max-height: 112px;
+    overflow: hidden;
+    transition: var(--transition-2, 0.5s ease-in-out);
+  }
+
+  .sidebar.active {
+    max-height: 650px;
+  }
+
+  .sidebar-info_more {
+    margin-top: 18px !important;
+  }
+}
+
+/* ===========================
+   APP STRUCTURE + NAV
+   =========================== */
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 64px);
+  padding-inline: clamp(10px, 2vw, 26px);
+}
+
+.navbar {
+  align-self: flex-end;
+  margin: 22px 0 18px;
+  background: var(--ui-bg, rgba(255,255,255,0.06)) !important;
+  border: 1px solid var(--ui-border, rgba(255,255,255,0.14)) !important;
+  border-radius: var(--radius-soft, 14px);
+  box-shadow: var(--ui-shadow, 0 16px 30px rgba(0,0,0,0.25));
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+.navbar-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+}
+
+.navbar-link {
+  color: var(--text-2, rgba(255,255,255,0.72));
+  font-size: var(--fs-6, 14px);
+  font-weight: var(--fw-500, 500);
+  padding: 10px 14px;
+  border-radius: var(--radius-pill, 999px);
+  transition: color var(--transition-1, 0.25s ease), background-color var(--transition-1, 0.25s ease), box-shadow var(--transition-1, 0.25s ease);
+}
+
+.navbar-link:hover,
+.navbar-link:focus-visible {
+  color: var(--text-1, #fff);
+  background: color-mix(in srgb, var(--accent-glow) 20%, transparent);
+}
+
+.navbar-link.active {
+  color: var(--accent-1);
+  background: color-mix(in srgb, var(--accent-glow) 28%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-2) 45%, transparent) inset;
+}
+
+article[data-page] {
+  display: none;
+  padding: clamp(20px, 3vw, 32px);
+}
+
+article[data-page].active {
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  article[data-page].active {
+    animation: pageFadeIn 260ms ease both;
+  }
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  .navbar {
+    align-self: stretch;
+    margin: 12px 0 16px;
+  }
+
+  .navbar-list {
+    justify-content: center;
+  }
+
+  article[data-page] {
+    padding: 16px;
+  }
+}

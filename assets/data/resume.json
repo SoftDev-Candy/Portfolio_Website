@@ -1,27 +1,56 @@
 {
-    "resume": {
-      "title": "Resume",
-      "education": [
-        { "title": "Future Games", "date": "2024 — 2026", "text": "Diploma in Game Engine Specialization" },
-        { "title": "Chandigarh University", "date": "2020 — 2024", "text": "Bachelor of Engineering in Computer Science" }
-      ],
-      "experience": [
-        {
-          "title": "Future Games Warsaw",
-          "date": "2024 — Present",
-          "text": "I’ve worked as a game programmer on diverse projects, specializing in tools, gameplay mechanics, and UI development. My experience includes building core systems and enhancing gameplay, collaborating with cross-functional teams from regions like Sweden, Poland, and India."
-        }
-      ],
-      "skills": {
-        "technical": [
-          "C++", "C#", "Unreal Engine 5", "Unity", "OOP / OOD", "STL", "Boost", "CMake",
-          "Unit Testing", "Perforce", "Git", "UMTS/LTE", "Linux", "OpenGL", "SDL", "GLFW", "GLAD", "GLM"
-        ],
-        "professional": [
-          "Problem Solving", "Debugging", "Team Collaboration", "Jira Agile Teamwork",
-          "Sprint Delivery", "Time Management", "Technical Communication", "Project Ownership"
-        ]
+  "resume": {
+    "title": "Resume",
+    "education": [
+      {
+        "title": "Future Games",
+        "date": "2024 - 2026",
+        "text": "Diploma in Game Engine Specialization"
+      },
+      {
+        "title": "Chandigarh University",
+        "date": "2020 - 2024",
+        "text": "Bachelor of Engineering in Computer Science"
       }
+    ],
+    "experience": [
+      {
+        "title": "Future Games Warsaw",
+        "date": "2024 - Present",
+        "text": "I've worked as a game programmer on diverse projects, specializing in tools, gameplay mechanics, and UI development. My experience includes building core systems and improving gameplay while collaborating with cross-functional teams in Sweden, Poland, and India."
+      }
+    ],
+    "skills": {
+      "technical": [
+        "C++",
+        "C#",
+        "Unreal Engine 5",
+        "Unity",
+        "OOP / OOD",
+        "STL",
+        "Boost",
+        "CMake",
+        "Unit Testing",
+        "Perforce",
+        "Git",
+        "UMTS/LTE",
+        "Linux",
+        "OpenGL",
+        "SDL",
+        "GLFW",
+        "GLAD",
+        "GLM"
+      ],
+      "professional": [
+        "Problem Solving",
+        "Debugging",
+        "Team Collaboration",
+        "Jira Agile Teamwork",
+        "Sprint Delivery",
+        "Time Management",
+        "Technical Communication",
+        "Project Ownership"
+      ]
     }
   }
-  
+}

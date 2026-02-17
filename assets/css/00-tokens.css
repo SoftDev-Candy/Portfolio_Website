@@ -146,7 +146,30 @@
     --sparkle-rate: 2.0;     /* optional */
     --sparkle-brightness: 1.2;
 
-    
+    /* =========================================================
+       8) 
+    ========================================================== */
+/* ===== Theme Surface API (used by layout/components) ===== */
+--base-bg: var(--smoky-black);
+--surface-1: hsla(240, 5%, 14%, 0.55);
+--surface-2: hsla(240, 5%, 12%, 0.35);
+--border-soft: hsla(0, 0%, 100%, 0.14);
+
+--text-1: var(--white-2);
+--text-2: hsla(0, 0%, 92%, 0.75);
+
+--card-radius: 26px;
+--pill-radius: 999px;
+
+/* Layout-safe aliases (non-breaking additions) */
+--radius-card: var(--card-radius, 26px);
+--radius-soft: 14px;
+--radius-pill: var(--pill-radius, 999px);
+
+--ui-bg: var(--surface-1, rgba(255,255,255,0.06));
+--ui-border: var(--border-soft, rgba(255,255,255,0.14));
+--ui-shadow: var(--shadow-2, 0 16px 30px rgba(0,0,0,0.25));
+
   
   }
 }

@@ -1,722 +1,342 @@
-html { font-family: var(--ff-poppins); }
+/* =========================================================
+   10-LAYOUT.CSS — V3 RAIL LAYOUT 
+   Goals
+   - Left rail FLUSH to left edge
+   - Rail split into 2 square blocks
+   - Big negative space in the middle (future "chamber" idea)
+   - Main window on the right
+   - Uses your tokens (theme swappable)
+========================================================= */
 
-body { background: var(--smoky-black); }
+/* --- Safety: if tokens fail to load, we still don't go white --- */
+:root{
+  --layout-bg-fallback: #07080b;
 
-.sidebar,
-article {
-  position: relative;
-  background: hsla(240, 2%, 12%, 0.35);
-  border-radius: 20px;
-  padding: 15px;
-  backdrop-filter: blur(8px);
-  overflow: hidden;
+  /* Layout surfaces (theme-safe: derived from your neutral tokens) */
+  --layout-bg: var(--base-bg, var(--smoky-black));
+  --panel-bg: rgba(255,255,255,0.06);
+  --panel-border: rgba(255,255,255,0.12);
+  --panel-shadow: 0 20px 60px rgba(0,0,0,0.40);
+
+  /* Accent glow (theme-safe) */
+  --panel-glow: var(--accent-glow);
+
+  /* Text */
+  --text-strong: var(--white-2);
+  --text-muted: var(--light-gray-70);
 }
 
-.sidebar::before,
-article::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: var(--border-lava);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.55;
-}
+html, body { height: 100%; }
 
-/* article show/hide behavior is layout flow */
-article { display: none; }
-
-article.active {
-  display: block;
-  animation: fade 0.5s ease backwards;
-}
-
-@keyframes fade {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-
-
-/*-----------------------------------*\
-  #MAIN
-\*-----------------------------------*/
-
-main {
-    margin: 15px 12px;
-    margin-bottom: 75px;
-    min-width: 259px;
-  }
-  
-  
-  
-  
-  
-  /*-----------------------------------*\
-    #SIDEBAR
-  \*-----------------------------------*/
-  
-  .sidebar {
-    margin-bottom: 15px;
-    max-height: 112px;
-    overflow: hidden;
-    transition: var(--transition-2);
-  }
-  
-  .sidebar.active { max-height: 405px; }
-  
-  .sidebar-info {
-    position: relative;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .avatar-box {
-    /* background: var(--bg-gradient-onyx); */
-    border-radius: 20px;
-  }
-  
-  .info-content .name {
-    color: var(--white-2);
-    font-size: var(--fs-3);
-    font-weight: var(--fw-500);
-    letter-spacing: -0.25px;
-    margin-bottom: 10px;
-  }
-  
-  .info-content .title {
-    position: relative;
-    color: var(--white-1);
-    font-size: var(--fs-8);
-    font-weight: var(--fw-400);
-    width: max-content;
-  
-    padding: 4px 14px;
-    border-radius: 999px; /* nice pill shape */
-  
-    /* subtle dark glass background */
-    background: hsla(240, 10%, 10%, 0.55);
-    backdrop-filter: blur(4px);
-  
-    /* lava-style border + glow (same idea as icon-box) */
-    border: 1px solid var(--lava-2);
-    box-shadow: 0 0 6px var(--lava-glow);
-  
-    /* white glow on the text itself */
-    /* text-shadow: 0 0 4px rgba(255, 255, 255, 0.6); */
-  }
-  
-  
-  .info_more-btn {
-    position: absolute;
-    top: -15px;
-    right: -15px;
-    border-radius: 0 15px;
-    font-size: 13px;
-    color: var(--orange-yellow-crayola);
-    background: var(--border-gradient-onyx);
-    padding: 10px;
-    box-shadow: var(--shadow-2);
-    transition: var(--transition-1);
-    z-index: 1;
-  }
-  
-  .info_more-btn::before {
-    content: "";
-    position: absolute;
-    inset: 1px;
-    border-radius: inherit;
-    background: var(--bg-gradient-jet);
-    transition: var(--transition-1);
-    z-index: -1;
-  }
-  
-  .info_more-btn:hover,
-  .info_more-btn:focus { background: var(--bg-gradient-yellow-1); }
-  
-  .info_more-btn:hover::before,
-  .info_more-btn:focus::before { background: var(--bg-gradient-yellow-2); }
-  
-  .info_more-btn span { display: none; }
-  
-  .sidebar-info_more {
-    opacity: 0;
-    visibility: hidden;
-    transition: var(--transition-2);
-  }
-  
-  .sidebar.active .sidebar-info_more {
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  .contacts-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  
-  .contact-item {
-    min-width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  
-  .contact-info {
-    max-width: calc(100% - 46px);
-    width: calc(100% - 46px);
-  }
-  
-  .contact-title {
-    color: var(--light-gray-70);
-    font-size: var(--fs-8);
-    text-transform: uppercase;
-    margin-bottom: 2px;
-  }
-  
-  .contact-info :is(.contact-link, time, address) {
-    color: var(--white-2);
-    font-size: var(--fs-7);
-  }
-  
-  .contact-info address { font-style: normal; }
-  
-  .social-list {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 15px;
-    padding-bottom: 4px;
-    padding-left: 7px;
-  }
-  
-  .social-item .social-link {
-    color: var(--light-gray-70);
-    font-size: 18px;
-  }
-  
-  
-  .social-item .social-link:hover { color: var(--light-gray); }
-  
-  
-  
-  
-  
-  /*-----------------------------------*\
-    #NAVBAR
-  \*-----------------------------------*/
-  
-  .navbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: hsla(240, 1%, 17%, 0.75);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--jet);
-    border-radius: 12px 12px 0 0;
-    box-shadow: var(--shadow-2);
-    z-index: 5;
-  }
-  
-  .navbar-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    padding: 0 10px;
-  }
-  
-  .navbar-link {
-    color: var(--light-gray);
-    font-size: var(--fs-8);
-    padding: 20px 7px;
-    transition: color var(--transition-1);
-  }
-  
-  .navbar-link:hover,
-  .navbar-link:focus { color: var(--light-gray-70); }
-  
-  .navbar-link.active {
-    color: var(--lava-1);
-    text-shadow: 0 0 8px var(--lava-glow);
-  }
-  
-  /*-----------------------------------*\
-  #RESPONSIVE (no blog)
-\*-----------------------------------*/
-
-/* >= 450px */
-@media (min-width: 450px) {
-    .clients-item { min-width: calc(33.33% - 10px); }
-  
-    /* REMOVE THIS (conflicts with your fixed project tile height)
-       .project-img { height: auto; }
-    */
-  }
-  
-  /* >= 580px */
-  @media (min-width: 580px) {
-    :root {
-      --fs-1: 32px;
-      --fs-2: 24px;
-      --fs-3: 26px;
-      --fs-4: 18px;
-      --fs-6: 15px;
-      --fs-7: 15px;
-      --fs-8: 12px;
-    }
-  
-    .sidebar, article {
-      width: 520px;
-      margin-inline: auto;
-      padding: 30px;
-    }
-  
-    .article-title {
-      font-weight: var(--fw-600);
-      padding-bottom: 15px;
-    }
-  
-    .article-title::after {
-      width: 40px;
-      height: 5px;
-    }
-  
-    .icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      font-size: 18px;
-    }
-  
-    main {
-      margin-top: 60px;
-      margin-bottom: 100px;
-    }
-  
-    .sidebar {
-      max-height: 180px;
-      margin-bottom: 30px;
-    }
-  
-    .sidebar.active { max-height: 584px; }
-  
-    .sidebar-info { gap: 25px; }
-  
-    .avatar-box { border-radius: 30px; }
-    .avatar-box img { width: 120px; }
-  
-    .info-content .name { margin-bottom: 15px; }
-    .info-content .title { padding: 5px 18px; }
-  
-    .info_more-btn {
-      top: -30px;
-      right: -30px;
-      padding: 10px 15px;
-    }
-  
-    .info_more-btn span {
-      display: block;
-      font-size: var(--fs-8);
-    }
-  
-    .info_more-btn ion-icon { display: none; }
-  
-    .separator { margin: 32px 0; }
-  
-    .contacts-list { gap: 20px; }
-  
-    .contact-info {
-      max-width: calc(100% - 64px);
-      width: calc(100% - 64px);
-    }
-  
-    .navbar { border-radius: 20px 20px 0 0; }
-    .navbar-list { gap: 20px; }
-    .navbar-link { --fs-8: 14px; }
-  
-    .about .article-title { margin-bottom: 20px; }
-    .about-text { margin-bottom: 40px; }
-  
-    .service-item {
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-start;
-      gap: 18px;
-      padding: 30px;
-    }
-  
-    .service-icon-box {
-      margin-bottom: 0;
-      margin-top: 5px;
-    }
-  
-    .service-content-box { text-align: left; }
-  
-    .testimonials-title { margin-bottom: 25px; }
-  
-    .testimonials-list {
-      gap: 30px;
-      margin: 0 -30px;
-      padding: 30px;
-      padding-bottom: 35px;
-    }
-  
-    .content-card {
-      padding: 30px;
-      padding-top: 25px;
-    }
-  
-    .testimonials-avatar-box {
-      transform: translate(30px, -30px);
-      border-radius: 20px;
-    }
-  
-    .testimonials-avatar-box img { width: 80px; }
-  
-    .testimonials-item-title {
-      margin-bottom: 10px;
-      margin-left: 95px;
-    }
-  
-    .testimonials-text {
-      line-clamp: 2;
-      -webkit-line-clamp: 2;
-    }
-  
-    .modal-container { padding: 20px; }
-  
-    .testimonials-modal {
-      display: flex;
-      justify-content: flex-start;
-      align-items: stretch;
-      gap: 25px;
-      padding: 30px;
-      border-radius: 20px;
-    }
-  
-    .modal-img-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    .modal-avatar-box {
-      border-radius: 18px;
-      margin-bottom: 0;
-    }
-  
-    .modal-avatar-box img { width: 65px; }
-  
-    .modal-img-wrapper > img {
-      display: block;
-      flex-grow: 1;
-      width: 35px;
-    }
-  
-    .clients-list {
-      gap: 50px;
-      margin: 0 -30px;
-      padding: 45px;
-      scroll-padding-inline: 45px;
-    }
-  
-    .clients-item { min-width: calc(33.33% - 35px); }
-  
-    .timeline-list { margin-left: 65px; }
-    .timeline-item:not(:last-child)::before { left: -40px; }
-    .timeline-item::after {
-      height: 8px;
-      width: 8px;
-      left: -43px;
-    }
-  
-    /* CONTACT (responsive) */
-    .mapbox {
-      height: 380px;
-      border-radius: 18px;
-    }
-  
-    .input-wrapper {
-      gap: 30px;
-      margin-bottom: 30px;
-    }
-  
-    .form-input { padding: 15px 20px; }
-    textarea.form-input { margin-bottom: 30px; }
-  
-    .form-btn {
-      --fs-6: 16px;
-      padding: 16px 20px;
-    }
-  
-    .form-btn ion-icon { font-size: 18px; }
-  }
-  
-  /* >= 768px */
-  @media (min-width: 768px) {
-    .sidebar, article { width: 700px; }
-  
-    .has-scrollbar::-webkit-scrollbar-button { width: 100px; }
-  
-    .contacts-list {
-      grid-template-columns: 1fr 1fr;
-      gap: 30px 15px;
-    }
-  
-    .navbar-link { --fs-8: 15px; }
-  
-    .testimonials-modal {
-      gap: 35px;
-      max-width: 680px;
-    }
-  
-    .modal-avatar-box img { width: 80px; }
-  
-    /* PORTFOLIO grid only (blog removed) */
-    .project-list { grid-template-columns: 1fr 1fr; }
-  
-    /* CONTACT */
-    .input-wrapper { grid-template-columns: 1fr 1fr; }
-  
-    .form-btn {
-      width: max-content;
-      margin-left: auto;
-    }
-  }
-  
-  /* >= 1024px */
-  @media (min-width: 1024px) {
-    :root {
-      --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.125);
-      --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.125);
-      --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.125);
-    }
-  
-    .sidebar, article {
-      width: 950px;
-      box-shadow: var(--shadow-5);
-    }
-  
-    main { margin-bottom: 60px; }
-  
-    .main-content {
-      position: relative;
-      width: max-content;
-      margin: auto;
-    }
-  
-    .navbar {
-      position: absolute;
-      bottom: auto;
-      top: 0;
-      left: auto;
-      right: 0;
-      width: max-content;
-      border-radius: 0 20px;
-      padding: 0 20px;
-      box-shadow: none;
-    }
-  
-    .navbar-list {
-      gap: 30px;
-      padding: 0 20px;
-    }
-  
-    .navbar-link { font-weight: var(--fw-500); }
-  
-    .service-list {
-      grid-template-columns: 1fr 1fr;
-      gap: 20px 25px;
-    }
-  
-    .testimonials-item { min-width: calc(50% - 15px); }
-  
-    .clients-item { min-width: calc(25% - 38px); }
-  
-    /* PORTFOLIO */
-    .project-list { grid-template-columns: repeat(3, 1fr); }
-  }
-  
-  /* >= 1250px */
-  @media (min-width: 1250px) {
-    body::-webkit-scrollbar { width: 20px; }
-    body::-webkit-scrollbar-track { background: var(--smoky-black); }
-  
-    body::-webkit-scrollbar-thumb {
-      border: 5px solid var(--smoky-black);
-      background: hsla(0, 0%, 100%, 0.1);
-      border-radius: 20px;
-      box-shadow: inset 1px 1px 0 hsla(0, 0%, 100%, 0.11),
-                  inset -1px -1px 0 hsla(0, 0%, 100%, 0.11);
-    }
-  
-    body::-webkit-scrollbar-thumb:hover { background: hsla(0, 0%, 100%, 0.15); }
-  
-    body::-webkit-scrollbar-button { height: 60px; }
-  
-    .sidebar, article { width: auto; }
-    article { min-height: 100%; }
-  
-    main {
-      max-width: 1200px;
-      margin-inline: auto;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      gap: 25px;
-    }
-  
-    .main-content {
-      min-width: 75%;
-      width: 75%;
-      margin: 0;
-    }
-  
-    .sidebar {
-      position: sticky;
-      top: 60px;
-      max-height: max-content;
-      height: 100%;
-      margin-bottom: 0;
-      padding-top: 60px;
-      z-index: 1;
-    }
-  
-    .sidebar-info { flex-direction: column; }
-  
-    .avatar-box img { width: 150px; }
-  
-    .info-content .name {
-      white-space: nowrap;
-      text-align: center;
-    }
-  
-    .info-content .title { margin: auto; }
-  
-    .info_more-btn { display: none; }
-  
-    .sidebar-info_more {
-      opacity: 1;
-      visibility: visible;
-    }
-  
-    .contacts-list { grid-template-columns: 1fr; }
-  
-    .contact-info :is(.contact-link) {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  
-    .contact-info :is(.contact-link, time, address) {
-      --fs-7: 14px;
-      font-weight: var(--fw-300);
-    }
-  
-    .separator:last-of-type {
-      margin: 15px 0;
-      opacity: 0;
-    }
-  
-    .social-list { justify-content: center; }
-  
-    .timeline-text { max-width: 700px; }
-  }
-  
-  html, body { height: 100%; }
-
-body {
+body{
   margin: 0;
-  background-image: url("../images/Anotheronne.png");
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-attachment: fixed;
-  background-size: cover;
+  color: var(--text-strong);
+
+  /* fallback first, then token-based */
+  background: var(--layout-bg-fallback);
+  background:
+    radial-gradient(1200px 900px at 20% 10%, color-mix(in srgb, var(--panel-glow) 45%, transparent), transparent 55%),
+    radial-gradient(900px 700px at 80% 30%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 60%),
+    var(--layout-bg, var(--layout-bg-fallback));
 }
 
-/* ===========================
-   APP SHELL LAYOUT
-   =========================== */
+/* --- Put FX canvas behind everything (prevents "white overlay" disasters) --- */
+#fx-dust{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
 
-   :root{
-    --rail-w: 90px;
-    --sidebar-w: 320px;
-    --gutter: 24px;
+/* --- Main shell: rail + content --- */
+main{
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  margin: 0;
+
+  /* FLUSH left edge, give breathing room on the right */
+  padding: 0 32px 0 0;
+
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+
+  min-height: 100vh;
+}
+
+/* --- Main content placeholder (big "window" like your sketch) --- */
+.main-content{
+  min-height: calc(100vh - 64px);
+  margin: 32px 0;
+
+  /* big framed window vibe */
+  border: 3px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.02);
+}
+
+/* =========================================================
+   LEFT RAIL (your .sidebar)
+   - No rounding
+   - Full height
+   - Split into 2 blocks with a huge gap
+========================================================= */
+.sidebar{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+
+  /* rail itself is just a container */
+  padding: 24px 16px 24px 16px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* the TWO blocks */
+.sidebar-info,
+.sidebar-info_more{
+  border-radius: 0; /* square */
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+
+  /* keep it crisp */
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
+/* TOP CARD LAYOUT */
+.sidebar-info{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+/* Avatar circle in the middle */
+.avatar-box{
+  width: 150px;
+  height: 150px;
+  border-radius: 999px;
+  overflow: hidden;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 0 26px var(--accent-glow, rgba(214,241,255,0.16));
+  background: rgba(0,0,0,0.18);
+}
+
+.avatar-box img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Name */
+.info-content{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-content .name{
+  margin: 8px 0 4px 0;
+  font-size: 30px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text-1, var(--white-2));
+}
+
+/* Kill your JS inline margins cleanly */
+.role-stack .title{ margin: 0 !important; }
+
+/* Role pills (outlined, not filled) */
+.role-stack{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.role-stack > *{
+  width: fit-content;
+  padding: 10px 18px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  color: var(--text-2, rgba(255,255,255,0.85));
+  background: transparent; /* IMPORTANT: no grey fill */
+  border: 1px solid rgba(255,255,255,0.28);
+
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.12) inset;
+}
+
+/* kill the inline margins your JS adds */
+.role-stack .title{ margin: 0 !important; }
+
+/* role pills -> more like small labels */
+.role-stack > *{
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 0; /* square */
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--text-strong);
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+/* toggle button (desktop hidden, mobile used) */
+.info_more-btn{
+  display: none;
+}
+
+/* BOTTOM BLOCK (contacts/social) */
+.sidebar-info_more{
+  margin-top: auto;   /* <-- creates the BIG negative space gap */
+  padding: 16px;
+}
+
+/* divider */
+.separator{
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 14px 0;
+}
+
+.contacts-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-box{
+  width: 36px;
+  height: 36px;
+  border-radius: 0; /* square */
+  display: grid;
+  place-items: center;
+
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.contact-info{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contact-title{
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.contact-link,
+.contact-info address,
+.contact-info time{
+  font-size: 13px;
+  color: var(--text-strong);
+  text-decoration: none;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-link:hover{ text-decoration: underline; }
+
+.social-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  gap: 12px;
+}
+
+.social-link{
+  width: 38px;
+  height: 38px;
+  border-radius: 0; /* square */
+  display: grid;
+  place-items: center;
+
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--text-strong);
+  text-decoration: none;
+}
+
+.social-link:hover{
+  border-color: rgba(255,255,255,0.22);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--panel-glow) 55%, transparent);
+}
+
+/* =========================================================
+   Responsive: stack on smaller screens
+========================================================= */
+@media (max-width: 1024px){
+  main{
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 18px;
   }
-  
-  body{
-    min-height: 100vh;
+
+  .sidebar{
+    position: relative;
+    height: auto;
+    padding: 0;
   }
-  
-  /* The main app wrapper your JS renders into */
-  .app-shell{
-    max-width: 1250px;
-    margin: 0 auto;
-    padding: 18px var(--gutter);
-    display: grid;
-    grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--rail-w);
-    gap: 22px;
-    align-items: start;
+
+  .sidebar-info_more{
+    margin-top: 18px;
   }
-  
-  /* Left column */
-  .app-sidebar{
-    position: sticky;
-    top: 18px;
-    align-self: start;
+
+  .main-content{
+    margin: 0;
+    min-height: 60vh;
   }
-  
-  /* Center column */
-  .app-main{
-    min-height: 70vh;
+
+  .info_more-btn{
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 0;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text-strong);
+    cursor: pointer;
   }
-  
-  /* Right rail */
-  .nav-rail{
-    position: sticky;
-    top: 18px;
-    align-self: start;
-    height: calc(100vh - 36px);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    pointer-events: auto;
-  }
-  
-  /* Optional: flip rail to left later with a single class */
-  html.rail-left .app-shell{
-    grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--sidebar-w);
-  }
-  
-  html.rail-left .nav-rail{ grid-column: 1; }
-  html.rail-left .app-main{ grid-column: 2; }
-  html.rail-left .app-sidebar{ grid-column: 3; }
-  
-  /* Responsive: hide rail on small screens (we’ll do mobile nav later) */
-  @media (max-width: 1024px){
-    .app-shell{
-      grid-template-columns: 1fr;
-    }
-    .nav-rail{
-      display: none;
-    }
-    .app-sidebar{
-      position: relative;
-      top: auto;
-    }
-  }
-  
+}

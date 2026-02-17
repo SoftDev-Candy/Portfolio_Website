@@ -30,6 +30,13 @@ function normalizeKey(s) {
   return String(s ?? "").trim().toLowerCase();
 }
 
+function unwrapPayload(payload, key) {
+  if (payload && typeof payload === "object" && !Array.isArray(payload) && key in payload) {
+    return payload[key];
+  }
+  return payload;
+}
+
 // -----------------------------
 // NAV + PAGE SWITCH
 // -----------------------------
@@ -71,7 +78,7 @@ function renderNav(nav) {
   });
 
   // initial active
-  setActivePage(nav?.active ?? items[0]?.page ?? "about");
+  setActivePage(nav?.active ?? nav?.defaultPage ?? items[0]?.page ?? "portfolio");
 }
 
 // -----------------------------
@@ -154,7 +161,7 @@ function renderProfile(profile) {
   const socials = el("social-list");
   if (socials) {
     socials.innerHTML = "";
-    (profile?.social ?? []).forEach((s) => {
+    (profile?.social ?? profile?.socials ?? []).forEach((s) => {
       const li = document.createElement("li");
       li.className = "social-item";
       const a = document.createElement("a");
@@ -248,36 +255,35 @@ function wireReferenceModal() {
   overlay.addEventListener("click", close);
   closeBtn.addEventListener("click", close);
 
-  return {
-    open(ref) {
-      const avatar = el("ref-modal-avatar");
-      const name = el("ref-modal-name");
-      const body = el("ref-modal-body");
+    return {
+      open(ref) {
+        const avatar = el("ref-modal-avatar");
+        const name = el("ref-modal-name");
+        const body = el("ref-modal-body");
 
-      if (avatar && ref.avatar) avatar.src = ref.avatar;
-      safeText(name, ref.name);
+        if (avatar && ref.avatar) avatar.src = ref.avatar;
+        safeText(name, ref?.modal?.title ?? ref?.name);
 
-      if (body) {
-        body.innerHTML = "";
+        if (body) {
+          body.innerHTML = "";
 
-        if (ref.role) {
-          const p = document.createElement("p");
-          p.textContent = ref.role;
-          body.appendChild(p);
+          if (Array.isArray(ref?.modal?.lines) && ref.modal.lines.length) {
+            ref.modal.lines.forEach((line) => {
+              const p = document.createElement("p");
+              p.textContent = line;
+              body.appendChild(p);
+            });
+          } else if (ref.role) {
+            const p = document.createElement("p");
+            p.textContent = ref.role;
+            body.appendChild(p);
+            (ref.contacts ?? []).forEach((c) => {
+              const row = document.createElement("p");
+              row.textContent = c.value ?? "";
+              body.appendChild(row);
+            });
+          }
         }
-
-        if (ref.phone) {
-          const row = document.createElement("p");
-          row.innerHTML = `<strong>Phone:</strong> ${ref.phone}`;
-          body.appendChild(row);
-        }
-
-        if (ref.email) {
-          const row = document.createElement("p");
-          row.innerHTML = `<strong>Email:</strong> ${ref.email}`;
-          body.appendChild(row);
-        }
-      }
 
       overlay.classList.add("active");
       container.classList.add("active");
@@ -354,7 +360,7 @@ function renderResume(resume) {
 
       li.innerHTML = `
         <h4 class="h4 timeline-item-title">${it.title ?? ""}</h4>
-        <span>${it.range ?? ""}</span>
+        <span>${it.range ?? it.date ?? ""}</span>
         <p class="timeline-text">${it.text ?? ""}</p>
       `;
       edu.appendChild(li);
@@ -370,7 +376,7 @@ function renderResume(resume) {
 
       li.innerHTML = `
         <h4 class="h4 timeline-item-title">${it.title ?? ""}</h4>
-        <span>${it.range ?? ""}</span>
+        <span>${it.range ?? it.date ?? ""}</span>
         <p class="timeline-text">${it.text ?? ""}</p>
       `;
       exp.appendChild(li);
@@ -474,11 +480,11 @@ function renderPortfolio(portfolio, projects) {
 
   // build projects
   if (projectsList) {
-    (projects?.items ?? []).forEach((p) => {
+    (projects?.items ?? projects?.projects ?? []).forEach((p) => {
       const li = document.createElement("li");
       li.className = "project-item";
       li.dataset.filterItem = "";
-      li.dataset.category = parseCategories(p.categories ?? p.category).join(",");
+      li.dataset.category = parseCategories(p.categories ?? p.category ?? p.tags ?? p.categoryLabel).join(",");
 
       li.innerHTML = `
         <a href="${p.href ?? "#"}" target="_blank" rel="noreferrer">
@@ -486,10 +492,14 @@ function renderPortfolio(portfolio, projects) {
             <div class="project-item-icon-box">
               <ion-icon name="eye-outline"></ion-icon>
             </div>
-            <img src="${p.image ?? ""}" alt="${p.title ?? "project"}" loading="lazy">
+            <img src="${p.image ?? ""}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">
           </figure>
           <h3 class="project-title">${p.title ?? ""}</h3>
-          <p class="project-category">${p.label ?? p.categoryLabel ?? (p.category ?? "")}</p>
+          <p class="project-category">${
+            p.label ??
+            p.categoryLabel ??
+            (Array.isArray(p.tags) ? p.tags[0] : (p.category ?? ""))
+          }</p>
         </a>
       `;
 
@@ -519,10 +529,19 @@ function renderContact(contact) {
   safeText(el("contact-form-title"), contact?.formTitle ?? "Contact Form");
 
   const map = el("contact-map");
-  if (map && contact?.mapEmbed) map.src = contact.mapEmbed;
+  if (map && (contact?.mapEmbed || contact?.mapEmbedSrc)) {
+    map.src = contact.mapEmbed ?? contact.mapEmbedSrc;
+  }
 
   const form = el("contact-form");
   if (form && contact?.formAction) form.action = contact.formAction;
+
+  const submit = el("contact-submit");
+  if (submit && contact?.submitText) {
+    const label = submit.querySelector(".form-btn-label");
+    if (label) label.textContent = contact.submitText;
+    else submit.textContent = contact.submitText;
+  }
 
   // enable submit when fields filled
   const inputs = document.querySelectorAll("[data-form-input]");
@@ -567,17 +586,35 @@ async function init() {
     loadJSON(DATA.contact),
   ]);
 
-  if (site?.title) document.title = site.title;
-  if (site?.theme) document.documentElement.dataset.theme = site.theme;
+  const siteData = unwrapPayload(site, "site");
+  const profileData = unwrapPayload(profile, "profile");
+  const navData = unwrapPayload(nav, "nav");
+  const aboutData = unwrapPayload(about, "about");
+  const servicesData = unwrapPayload(services, "services");
+  const referencesData = unwrapPayload(references, "references");
+  const resumeData = unwrapPayload(resume, "resume");
+  const portfolioData = unwrapPayload(portfolio, "portfolio");
+  const contactData = unwrapPayload(contact, "contact");
 
-  renderProfile(profile);
-  renderNav(nav);
-  renderAbout(about);
-  renderServices(services);
-  renderReferences(references);
-  renderResume(resume);
-  renderPortfolio(portfolio, projects);
-  renderContact(contact);
+  if (siteData?.title) document.title = siteData.title;
+  if (siteData?.theme) document.documentElement.dataset.theme = siteData.theme;
+  if (siteData?.favicon) {
+    const fav = document.querySelector("link[rel='shortcut icon']");
+    if (fav) fav.href = siteData.favicon;
+  }
+  if (siteData?.cvUrl) {
+    const cv = el("cv-link");
+    if (cv) cv.href = siteData.cvUrl;
+  }
+
+  renderProfile(profileData);
+  renderNav(navData);
+  renderAbout(aboutData);
+  renderServices(servicesData);
+  renderReferences(referencesData);
+  renderResume(resumeData);
+  renderPortfolio(portfolioData, projects);
+  renderContact(contactData);
 
   console.log("[app] render ok");
 }
