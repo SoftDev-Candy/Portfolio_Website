@@ -1,0 +1,45 @@
+{
+  "profile": {
+    "name": "Swastik Toprani",
+    "avatar": "./assets/images/avatar.png",
+    "roles": [
+      "🖥️ Systems Engineer",
+      "🛰️ Network Engineer",
+      "🎮 Game Developer"
+    ],
+    "contacts": [
+      {
+        "icon": "mail-outline",
+        "title": "Email",
+        "value": "swastiktoprani@gmail.com",
+        "href": "mailto:swastiktoprani@gmail.com",
+        "type": "link"
+      },
+      {
+        "icon": "phone-portrait-outline",
+        "title": "Phone",
+        "value": "+48 698 861 971",
+        "href": "tel:+48698861971",
+        "type": "link"
+      },
+      {
+        "icon": "location-outline",
+        "title": "Location",
+        "value": "Warsaw, Poland",
+        "type": "text"
+      }
+    ],
+    "social": [
+      {
+        "icon": "logo-linkedin",
+        "href": "https://www.linkedin.com/in/swastik-t-8aa131168/",
+        "label": "LinkedIn"
+      },
+      {
+        "icon": "logo-github",
+        "href": "https://github.com/SoftDev-Candy",
+        "label": "GitHub"
+      }
+    ]
+  }
+}

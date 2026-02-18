@@ -1,0 +1,342 @@
+/* =========================================================
+   10-LAYOUT.CSS — V3 RAIL LAYOUT 
+   Goals
+   - Left rail FLUSH to left edge
+   - Rail split into 2 square blocks
+   - Big negative space in the middle (future "chamber" idea)
+   - Main window on the right
+   - Uses your tokens (theme swappable)
+========================================================= */
+
+/* --- Safety: if tokens fail to load, we still don't go white --- */
+:root{
+  --layout-bg-fallback: #07080b;
+
+  /* Layout surfaces (theme-safe: derived from your neutral tokens) */
+  --layout-bg: var(--base-bg, var(--smoky-black));
+  --panel-bg: rgba(255,255,255,0.06);
+  --panel-border: rgba(255,255,255,0.12);
+  --panel-shadow: 0 20px 60px rgba(0,0,0,0.40);
+
+  /* Accent glow (theme-safe) */
+  --panel-glow: var(--accent-glow);
+
+  /* Text */
+  --text-strong: var(--white-2);
+  --text-muted: var(--light-gray-70);
+}
+
+html, body { height: 100%; }
+
+body{
+  margin: 0;
+  color: var(--text-strong);
+
+  /* fallback first, then token-based */
+  background: var(--layout-bg-fallback);
+  background:
+    radial-gradient(1200px 900px at 20% 10%, color-mix(in srgb, var(--panel-glow) 45%, transparent), transparent 55%),
+    radial-gradient(900px 700px at 80% 30%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 60%),
+    var(--layout-bg, var(--layout-bg-fallback));
+}
+
+/* --- Put FX canvas behind everything (prevents "white overlay" disasters) --- */
+#fx-dust{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* --- Main shell: rail + content --- */
+main{
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  margin: 0;
+
+  /* FLUSH left edge, give breathing room on the right */
+  padding: 0 32px 0 0;
+
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+
+  min-height: 100vh;
+}
+
+/* --- Main content placeholder (big "window" like your sketch) --- */
+.main-content{
+  min-height: calc(100vh - 64px);
+  margin: 32px 0;
+
+  /* big framed window vibe */
+  border: 3px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.02);
+}
+
+/* =========================================================
+   LEFT RAIL (your .sidebar)
+   - No rounding
+   - Full height
+   - Split into 2 blocks with a huge gap
+========================================================= */
+.sidebar{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+
+  /* rail itself is just a container */
+  padding: 24px 16px 24px 16px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* the TWO blocks */
+.sidebar-info,
+.sidebar-info_more{
+  border-radius: 0; /* square */
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+
+  /* keep it crisp */
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
+/* TOP CARD LAYOUT */
+.sidebar-info{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+/* Avatar circle in the middle */
+.avatar-box{
+  width: 150px;
+  height: 150px;
+  border-radius: 999px;
+  overflow: hidden;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 0 26px var(--accent-glow, rgba(214,241,255,0.16));
+  background: rgba(0,0,0,0.18);
+}
+
+.avatar-box img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Name */
+.info-content{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-content .name{
+  margin: 8px 0 4px 0;
+  font-size: 30px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text-1, var(--white-2));
+}
+
+/* Kill your JS inline margins cleanly */
+.role-stack .title{ margin: 0 !important; }
+
+/* Role pills (outlined, not filled) */
+.role-stack{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.role-stack > *{
+  width: fit-content;
+  padding: 10px 18px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  color: var(--text-2, rgba(255,255,255,0.85));
+  background: transparent; /* IMPORTANT: no grey fill */
+  border: 1px solid rgba(255,255,255,0.28);
+
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.12) inset;
+}
+
+/* kill the inline margins your JS adds */
+.role-stack .title{ margin: 0 !important; }
+
+/* role pills -> more like small labels */
+.role-stack > *{
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 0; /* square */
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--text-strong);
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+/* toggle button (desktop hidden, mobile used) */
+.info_more-btn{
+  display: none;
+}
+
+/* BOTTOM BLOCK (contacts/social) */
+.sidebar-info_more{
+  margin-top: auto;   /* <-- creates the BIG negative space gap */
+  padding: 16px;
+}
+
+/* divider */
+.separator{
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 14px 0;
+}
+
+.contacts-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-box{
+  width: 36px;
+  height: 36px;
+  border-radius: 0; /* square */
+  display: grid;
+  place-items: center;
+
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.contact-info{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contact-title{
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.contact-link,
+.contact-info address,
+.contact-info time{
+  font-size: 13px;
+  color: var(--text-strong);
+  text-decoration: none;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-link:hover{ text-decoration: underline; }
+
+.social-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  gap: 12px;
+}
+
+.social-link{
+  width: 38px;
+  height: 38px;
+  border-radius: 0; /* square */
+  display: grid;
+  place-items: center;
+
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--text-strong);
+  text-decoration: none;
+}
+
+.social-link:hover{
+  border-color: rgba(255,255,255,0.22);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--panel-glow) 55%, transparent);
+}
+
+/* =========================================================
+   Responsive: stack on smaller screens
+========================================================= */
+@media (max-width: 1024px){
+  main{
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 18px;
+  }
+
+  .sidebar{
+    position: relative;
+    height: auto;
+    padding: 0;
+  }
+
+  .sidebar-info_more{
+    margin-top: 18px;
+  }
+
+  .main-content{
+    margin: 0;
+    min-height: 60vh;
+  }
+
+  .info_more-btn{
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 0;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text-strong);
+    cursor: pointer;
+  }
+}

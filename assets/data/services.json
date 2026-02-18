@@ -1,0 +1,34 @@
+{
+    "title": "What i'm doing",
+    "items": [
+      {
+        "icon": "./assets/images/icon-design.svg",
+        "iconAlt": "design icon",
+        "iconWidth": 55,
+        "title": "Backend Development",
+        "text": "Building reliable and scalable systems with C++ and modern tools, focusing on performance and clean architecture."
+      },
+      {
+        "icon": "./assets/images/icon-dev.svg",
+        "iconAlt": "Networking Icon",
+        "iconWidth": 55,
+        "title": "Networking",
+        "text": "Learning and developing socket-based applications, exploring protocols, and building secure, efficient client-server solutions."
+      },
+      {
+        "icon": "./assets/images/icon-app.svg",
+        "iconAlt": "Game Engine Icon",
+        "iconWidth": 66,
+        "title": "Game Engine Fundamentals",
+        "text": "Studying the internals of game engines, from rendering and physics to memory management and real-time systems."
+      },
+      {
+        "icon": "./assets/images/icon-photo.svg",
+        "iconAlt": "Hackathon-icon",
+        "iconWidth": 58,
+        "title": "Hackathons & Volunteering",
+        "text": "Participating in hackathons and volunteering for tech events, gaining hands-on experience while collaborating with others."
+      }
+    ]
+  }
+  

@@ -1,0 +1,6 @@
+{
+    "title": "Portfolio",
+    "defaultFilter": "Highlighted Projects",
+    "filters": ["All", "Highlighted Projects", "Game Development", "Backend", "Networking"]
+  }
+  

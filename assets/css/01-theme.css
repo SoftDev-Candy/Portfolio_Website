@@ -1,0 +1,459 @@
+/* =========================================================
+   THEME OVERRIDES (one-click swap)
+   Put this AFTER your base :root block
+========================================================= */
+@layer themes;
+@layer themes {
+
+/* Default = your current molten (we'll call it spring for now) */
+:root[data-theme="Beachspring"] {
+  /* Light Spring (Pastel Spring) accent palette */
+--accent-1: hsl(190, 85%, 70%); /* light aqua */
+--accent-2: hsl(150, 55%, 70%); /* mint green */
+--accent-3: hsl(35, 95%, 75%);  /* buttery warm yellow */
+--accent-4: hsl(330, 80%, 80%); /* pale pink */
+
+--accent-glow: hsla(190, 85%, 70%, 0.28);
+
+/* neutrals for spring glass (dove-grey leaning) */
+--base-bg: hsl(220, 16%, 10%);          /* deep cool base */
+--surface-1: hsla(220, 14%, 16%, 0.55);  /* glass surface */
+--surface-2: hsla(220, 14%, 14%, 0.35);  /* softer surface */
+
+--border-soft: hsla(0, 0%, 100%, 0.10);  /* subtle rim */
+--text-1: hsl(0, 0%, 98%);
+--text-2: hsla(0, 0%, 92%, 0.75);
+
+}
+
+/* ===========================
+   TRUE SPRING (Violet primary)
+   Palette reference:
+   Ivory         #ECF2E6
+   Lemonade      #E8E9B5
+   Aqua Surf     #A8F5F9
+   Bright Navy   #33366D
+   Apple         #9AF2C7
+   Flamingo Pink #DC6274
+   Red Coral     #DA4957
+   Violet        #69398F
+=========================== */
+
+:root[data-theme="trueSpring"] {
+  /* --- the ONLY 3 colors --- */
+  --accent-1: #69398F; /* Violet (PRIMARY) */
+  --accent-2: #DC6274; /* Flamingo Pink (SECONDARY) */
+  --accent-3: #33366D; /* Bright Navy (DEPTH) */
+
+  /* --- glow (no white) --- */
+  --accent-glow: rgba(105, 57, 143, 0.32);
+
+  /* --- gradients (ONLY these 3 colors) --- */
+  --border-accent: linear-gradient(
+    135deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 55%,
+    var(--accent-3) 100%
+  );
+
+  --text-gradient-accent: linear-gradient(
+    90deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 60%,
+    var(--accent-3) 100%
+  );
+
+  /* optional subtle panel tint (still only 3 colors) */
+  --glass-tint: linear-gradient(
+    135deg,
+    rgba(51, 54, 109, 0.40) 0%,
+    rgba(105, 57, 143, 0.22) 55%,
+    rgba(220, 98, 116, 0.10) 100%
+  );
+
+  /* --- map into your existing lava tokens so everything updates automatically --- */
+  --lava-1: var(--accent-1);
+  --lava-2: var(--accent-2);
+  --lava-3: var(--accent-3);
+  --lava-glow: var(--accent-glow);
+
+  --border-lava: var(--border-accent);
+  --text-gradient-lava: var(--text-gradient-accent);
+  --text-gradient-yellow: var(--text-gradient-accent);
+
+  /* Replace any “gold” usage with Flamingo so it stays springy (no pale/white) */
+  --vegas-gold: var(--accent-2);
+
+  /* selection/focus accent */
+  --orange-yellow-crayola: var(--accent-2);
+}
+
+
+/*
+  WINTER THEME
+  1) <html lang="en" data-theme="winter">
+  2) Paste this block AFTER your base :root (so it overrides tokens)
+*/
+/*
+  WINTER THEME (minimal)
+  <html lang="en" data-theme="winter">
+*/
+/* ===========================
+   WINTER THEME (TOKENS + UI OVERRIDES)
+   Put inside: @layer themes { ... }
+=========================== */
+
+/* --- WINTER TOKENS --- */
+:root[data-theme="winter"] {
+    /* --- 4 colors (winter needs this) --- */
+    --accent-1: #EEF3FF; /* Moon Snow (soft white with cool tint) */
+    --accent-2: #A9B6C8; /* Cold Steel (borders/lines) */
+    --accent-3: #1c59f3; /* Midnight Navy (depth) */
+    --accent-4: #9FEFFF; /* Arctic Ice (hero highlight) */
+  
+    /* --- glow --- */
+    --accent-glow: rgba(214, 241, 255, 0.20);
+  
+    /* --- gradients --- */
+    --border-accent: linear-gradient(
+      135deg,
+      var(--accent-4) 0%,
+      var(--accent-2) 55%,
+      var(--accent-3) 100%
+    );
+  
+    --text-gradient-accent: linear-gradient(
+      90deg,
+      var(--accent-4) 0%,
+      var(--accent-1) 55%,
+      var(--accent-2) 100%
+    );
+  
+    --glass-tint: linear-gradient(
+      135deg,
+      rgba(214, 241, 255, 0.08) 0%,
+      rgba(185, 190, 199, 0.10) 22%,
+      rgba(11, 12, 16, 0.22) 100%
+    );
+  
+    /* --- map into your existing lava tokens --- */
+    --lava-1: var(--accent-4); /* “hot” highlight becomes icy */
+    --lava-2: var(--accent-2); /* borders MUST stay visible */
+    --lava-3: var(--accent-3);
+    --lava-glow: var(--accent-glow);
+  
+    --border-lava: var(--border-accent);
+    --text-gradient-lava: var(--text-gradient-accent);
+    --text-gradient-yellow: var(--text-gradient-accent);
+  
+    /* “gold text” becomes icy blue-white */
+    --vegas-gold: var(--accent-4);
+  
+    /* selection/focus */
+    --orange-yellow-crayola: var(--accent-4);
+  
+    /* OPTIONAL: tone down default whites so not everything screams white */
+    --white-1: var(--accent-1);
+    --white-2: rgba(230, 232, 238, 0.92);
+    --light-gray: rgba(230, 232, 238, 0.78);
+    --light-gray-70: rgba(230, 232, 238, 0.60);
+  
+    /* ===========================
+       WINTER GLASS TUNING (from your overrides)
+       =========================== */
+  
+    /* transparency (lower = more see-through snow) */
+    --glass-alpha: 0.10;
+    --glass-inner-alpha: 0.06;
+  
+    /* icy glass tint (NOT grey/black) */
+    --glass-rgb: 232, 242, 255; /* very light icy white-blue */
+    --glass-rim-alpha: 0.14;    /* thin rim visibility */
+  
+    /* blur (lower = less muddy/grey) */
+    --glass-blur: 1.5px;
+    --glass-inner-blur: 1.2px;
+  
+    /* UI chip alpha (you referenced this earlier; defining so it works) */
+    --glass-ui-alpha: 0.10;
+  
+    /* text tweaks so it doesn’t look washed out */
+    --text-1: rgba(255,255,255,0.96);
+    --text-2: rgba(255,255,255,0.72);
+    --text-muted: rgba(255,255,255,0.62);
+  }
+  
+  /* --- WINTER v2 TOKENS (you had this too, keeping it untouched) --- */
+  :root[data-theme="winterTwo"] {
+    /* ============================================
+       WINTER v2 — Cinematic Arctic (moonlit + ice)
+    ============================================ */
+  
+    /* --- 4 core colors --- */
+    --accent-1: #E6E8EE; /* Soft Snow (PRIMARY text/highlight, not pure white) */
+    --accent-2: #B9BEC7; /* Graphite (BORDERS / lines) */
+    --accent-3: #0B0C10; /* Deep Black (DEPTH) */
+    --accent-4: #D6F1FF; /* Icy Blue-White (SPECIAL accents / “gold” replacement) */
+  
+    /* --- glow --- */
+    --accent-glow: rgba(159, 239, 255, 0.22);
+  
+    /* --- gradients (still only these accents) --- */
+    --border-accent: linear-gradient(
+      135deg,
+      var(--accent-4) 0%,
+      var(--accent-1) 38%,
+      var(--accent-2) 72%,
+      var(--accent-3) 100%
+    );
+  
+    --text-gradient-accent: linear-gradient(
+      90deg,
+      var(--accent-4) 0%,
+      var(--accent-1) 52%,
+      var(--accent-2) 100%
+    );
+  
+    /* glass tint (icy, not muddy) */
+    --glass-tint: linear-gradient(
+      135deg,
+      rgba(159, 239, 255, 0.10) 0%,
+      rgba(238, 243, 255, 0.08) 28%,
+      rgba(6, 10, 20, 0.24) 100%
+    );
+  
+    /* --- map into your existing lava tokens (site-wide) --- */
+    --lava-1: var(--accent-4);
+    --lava-2: var(--accent-2);
+    --lava-3: var(--accent-3);
+    --lava-glow: var(--accent-glow);
+  
+    --border-lava: var(--border-accent);
+    --text-gradient-lava: var(--text-gradient-accent);
+    --text-gradient-yellow: var(--text-gradient-accent);
+  
+    /* “gold text” becomes arctic ice */
+    --vegas-gold: var(--accent-4);
+  
+    /* selection/focus */
+    --orange-yellow-crayola: var(--accent-4);
+  
+    /* whites tuned so UI stays readable (not blasting) */
+    --white-1: var(--accent-1);
+    --white-2: rgba(238, 243, 255, 0.92);
+    --light-gray: rgba(238, 243, 255, 0.78);
+    --light-gray-70: rgba(238, 243, 255, 0.62);
+  
+    /* OPTIONAL: if you want winterTwo to inherit the same glass behavior as winter */
+    --glass-alpha: 0.10;
+    --glass-inner-alpha: 0.06;
+    --glass-rgb: 232, 242, 255;
+    --glass-rim-alpha: 0.14;
+    --glass-blur: 1.5px;
+    --glass-inner-blur: 1.2px;
+    --glass-ui-alpha: 0.10;
+  
+    --text-1: rgba(255,255,255,0.96);
+    --text-2: rgba(255,255,255,0.72);
+    --text-muted: rgba(255,255,255,0.62);
+  }
+  
+  /* ===========================
+     WINTER UI OVERRIDES (scoped)
+     (applies to winter + winterTwo)
+  =========================== */
+  
+  /* main panels: make them light + subtle */
+  :root[data-theme="winter"] .sidebar,
+  :root[data-theme="winter"] article,
+  :root[data-theme="winterTwo"] .sidebar,
+  :root[data-theme="winterTwo"] article {
+    background: rgba(var(--glass-rgb), var(--glass-alpha)) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
+    border: 1px solid rgba(var(--glass-rgb), var(--glass-rim-alpha));
+  }
+  
+  /* inner layers: keep them super light (no dark overlay) */
+  :root[data-theme="winter"] .content-card::before,
+  :root[data-theme="winter"] .service-item::before,
+  :root[data-theme="winter"] .blog-post-item > a::before,
+  :root[data-theme="winterTwo"] .content-card::before,
+  :root[data-theme="winterTwo"] .service-item::before,
+  :root[data-theme="winterTwo"] .blog-post-item > a::before {
+    background: rgba(var(--glass-rgb), var(--glass-inner-alpha)) !important;
+    backdrop-filter: blur(var(--glass-inner-blur)) saturate(120%);
+    -webkit-backdrop-filter: blur(var(--glass-inner-blur)) saturate(120%);
+  }
+  
+  /* Navbar: make it bright “frost glass”, not dark */
+  :root[data-theme="winter"] .navbar,
+  :root[data-theme="winterTwo"] .navbar {
+    background: rgba(var(--glass-rgb), 0.10) !important;
+    backdrop-filter: blur(3px) saturate(125%);
+    -webkit-backdrop-filter: blur(3px) saturate(125%);
+    border: 1px solid rgba(var(--glass-rgb), 0.14) !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18) !important;
+  }
+  
+  /* Navbar links: slightly brighter for winter */
+  :root[data-theme="winter"] .navbar-link,
+  :root[data-theme="winterTwo"] .navbar-link {
+    color: rgba(255,255,255,0.78) !important;
+  }
+  
+  :root[data-theme="winter"] .navbar-link:hover,
+  :root[data-theme="winter"] .navbar-link:focus,
+  :root[data-theme="winterTwo"] .navbar-link:hover,
+  :root[data-theme="winterTwo"] .navbar-link:focus {
+    color: rgba(255,255,255,0.90) !important;
+  }
+  
+  /* Active link: icy glow instead of “lava” */
+  :root[data-theme="winter"] .navbar-link.active,
+  :root[data-theme="winterTwo"] .navbar-link.active {
+    color: var(--accent-4) !important;
+    text-shadow: 0 0 10px rgba(214,241,255,0.35) !important;
+  }
+  
+  /* Title pills under your name: make them frosty */
+  :root[data-theme="winter"] .info-content .title,
+  :root[data-theme="winterTwo"] .info-content .title {
+    background: rgba(var(--glass-rgb), var(--glass-ui-alpha)) !important;
+    border: 1px solid rgba(var(--glass-rgb), 0.16) !important;
+    box-shadow: 0 0 10px rgba(214,241,255,0.14) !important;
+    backdrop-filter: blur(2px) saturate(120%);
+    -webkit-backdrop-filter: blur(2px) saturate(120%);
+    color: rgba(255,255,255,0.86) !important;
+  }
+  
+  /* The little “Show Contacts” corner button often stays dark */
+  :root[data-theme="winter"] .info_more-btn,
+  :root[data-theme="winterTwo"] .info_more-btn {
+    background: rgba(var(--glass-rgb), 0.10) !important;
+    border: 1px solid rgba(var(--glass-rgb), 0.14) !important;
+  }
+  
+  :root[data-theme="winter"] .info_more-btn::before,
+  :root[data-theme="winterTwo"] .info_more-btn::before {
+    background: rgba(var(--glass-rgb), 0.06) !important;
+  }
+  
+  /* Optional: separators + small labels so it feels less grey */
+  :root[data-theme="winter"] .separator,
+  :root[data-theme="winterTwo"] .separator {
+    background: rgba(var(--glass-rgb), 0.14) !important;
+  }
+  
+  :root[data-theme="winter"] .contact-title,
+  :root[data-theme="winterTwo"] .contact-title {
+    color: rgba(255,255,255,0.55) !important;
+  }
+  
+  :root[data-theme="winter"] .social-item .social-link,
+  :root[data-theme="winterTwo"] .social-item .social-link {
+    color: rgba(255,255,255,0.65) !important;
+  }
+  
+  :root[data-theme="winter"] .social-item .social-link:hover,
+  :root[data-theme="winterTwo"] .social-item .social-link:hover {
+    color: rgba(255,255,255,0.90) !important;
+  }
+  
+  :root[data-theme="winter"]{
+    --project-glass: rgba(4, 4, 4, 0.832);
+    --project-glass-hover: rgba(214,241,255,0.11);
+    --project-inner: rgba(11,12,16,0.22);
+    --project-border-thin: rgba(214,241,255,0.22);
+    --project-border-thin-hover: rgba(214,241,255,0.46);
+    --project-ring-1: rgba(214,241,255,0.95);
+    --project-ring-2: rgba(230,232,238,0.38);
+    --project-halo-1: rgba(214,241,255,0.22);
+    --project-halo-2: rgba(230,232,238,0.10);
+  }
+  
+  /* Optional: winter active fill slightly more icy (subtle) */
+  :root[data-theme="winter"] .filter-item button.active{
+    background: rgba(214,241,255,0.18);
+  }
+  
+
+
+/* ===========================
+   TRUE AUTUMN (3 colors max)
+   Rust + Orange Ochre + Rich Chocolate
+=========================== */
+
+:root[data-theme="trueAutumn"] {
+  /* --- accents (ONLY 3) --- */
+  --accent-1: hsl(10, 70%, 45%);  /* Rust */
+  --accent-2: hsl(32, 85%, 45%);  /* Orange Ochre */
+  --accent-3: hsl(20, 35%, 18%);  /* Rich Chocolate */
+  --accent-glow: hsla(10, 70%, 45%, 0.32);
+
+    /* optional 4th accent (use sparingly) */
+    --moss: hsl(85, 30%, 34%);                 /* Moss */
+    --moss-glow: hsla(85, 45%, 55%, 0.22);     /* soft green glow */
+  
+
+  /* gradients (only these 3) */
+  --border-accent: linear-gradient(
+    135deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 55%,
+    var(--accent-3) 100%
+  );
+
+  --text-gradient-accent: linear-gradient(
+    90deg,
+    var(--accent-2) 0%,
+    var(--accent-1) 55%,
+    var(--accent-3) 100%
+  );
+
+  
+  /* --- supporting neutrals (NOT accents) --- */
+  --base-bg: hsl(20, 25%, 6%);                 /* warm near-black */
+  --surface-1: hsla(20, 30%, 12%, 0.55);       /* main glass */
+  --surface-2: hsla(20, 28%, 10%, 0.35);       /* secondary glass */
+  --border-soft: hsla(32, 40%, 85%, 0.10);     /* warm rim border */
+
+  /* text (warm whites so it matches autumn) */
+  --text-1: hsl(40, 30%, 96%);
+  --text-2: hsla(40, 20%, 92%, 0.75);
+
+  /* warm shadowing */
+  --shadow-warm: 0 18px 45px hsla(20, 60%, 5%, 0.45);
+
+  /* optional subtle tint for cards (still derived vibe) */
+  --glass-tint: linear-gradient(
+    135deg,
+    hsla(20, 35%, 18%, 0.45) 0%,
+    hsla(10, 70%, 45%, 0.10) 55%,
+    hsla(32, 85%, 45%, 0.06) 100%
+  );
+
+  /* --- map into your existing lava tokens so everything updates --- */
+  --lava-1: var(--accent-1);
+  --lava-2: var(--accent-2);
+  --lava-3: var(--accent-3);
+  --lava-glow: var(--accent-glow);
+
+  --border-lava: var(--border-accent);
+  --text-gradient-lava: var(--text-gradient-accent);
+  --text-gradient-yellow: var(--text-gradient-accent);
+
+  /* "gold" token replacement */
+  --vegas-gold: var(--accent-2);
+
+  /* selection/focus */
+  --orange-yellow-crayola: var(--accent-1);
+}
+
+
+
+/* (optional placeholder for later)
+:root[data-theme="summer"] { ... }
+*/
+
+}

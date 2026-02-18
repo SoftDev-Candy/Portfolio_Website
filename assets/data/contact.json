@@ -1,0 +1,10 @@
+{
+    "contact": {
+      "title": "Contact",
+      "mapEmbedSrc": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8212.322924347149!2d21.02112040499714!3d52.26993022763472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471ecc103b236a29%3A0x95cd2b718c7463c3!2sCD%20PROJEKT%20S.A.!5e0!3m2!1sen!2sin!4v1758825046426!5m2!1sen!2sin",
+      "formTitle": "Contact Form",
+      "formAction": "https://formspree.io/f/xrbybwrb",
+      "submitText": "Send Message"
+    }
+  }
+  
