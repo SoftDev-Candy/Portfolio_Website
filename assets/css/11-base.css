@@ -1,0 +1,54 @@
+@layer base;
+@layer base {
+  :root {
+    --site-scale: 1.1;
+  }
+
+  html,
+  body {
+    font-family: var(--ff-body);
+  }
+
+  body,
+  button,
+  input,
+  textarea,
+  select {
+    font-family: var(--ff-body);
+    letter-spacing: 0.01em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .article-title,
+  .info-content .name,
+  .project-title,
+  .service-item-title,
+  .skills-title {
+    font-family: var(--ff-display);
+    letter-spacing: 0.02em;
+  }
+
+  .role-stack > *,
+  .project-category,
+  .contact-title,
+  .filter-item button,
+  .select-item button {
+    font-family: var(--ff-mono);
+    letter-spacing: 0.05em;
+  }
+
+  @media (min-width: 1101px) {
+    html {
+      zoom: var(--site-scale);
+    }
+  }
+}

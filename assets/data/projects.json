@@ -4,6 +4,7 @@
       {
         "title": "Mini Database",
         "categoryLabel": "Backend",
+        "description": "A lightweight CLI database engine with indexing, file-backed storage, and query operations.",
         "tags": ["backend"],
         "href": "https://github.com/SoftDev-Candy/MiniDB",
         "image": "./assets/images/portfolio/MiniDbSim.gif",
@@ -12,6 +13,7 @@
       {
         "title": "Travel Guardian",
         "categoryLabel": "Backend",
+        "description": "Backend service for trip safety workflows with modular APIs, auth handling, and alerting paths.",
         "tags": ["backend", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
         "image": "./assets/images/portfolio/TG_3SIXO.gif",
@@ -20,7 +22,8 @@
       {
         "title": "ToDoCli",
         "categoryLabel": "Backend",
-        "tags": ["backend", "highlighted projects"],
+        "description": "Terminal-first task manager focused on speed, commands, and clean local data persistence.",
+        "tags": ["backend"],
         "href": "https://github.com/SoftDev-Candy/ToDo_ListCli",
         "image": "./assets/images/portfolio/ToD0_CLI.gif",
         "alt": "ToDoCli"
@@ -28,6 +31,7 @@
       {
         "title": "ServerHandShake",
         "categoryLabel": "Networking",
+        "description": "Socket programming project implementing handshake flow and connection reliability.",
         "tags": ["networking", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/NetworkProgramming",
         "image": "./assets/images/portfolio/ServerHandShake.gif",
@@ -36,14 +40,16 @@
       {
         "title": "JourneyRadar - HackYeah",
         "categoryLabel": "Networking",
+        "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
         "tags": ["networking", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
         "image": "./assets/images/portfolio/JourneyRadar-gif.gif",
         "alt": "Journey Radar-HackYeah"
       },
       {
-        "title": "Tic Tac Toe",
+        "title": "Tic-Tac-Toe(X & 0)",
         "categoryLabel": "Game Development",
+        "description": "Classic grid-based game with turn logic, win detection, and responsive UI interactions.",
         "tags": ["game development"],
         "href": "https://github.com/SoftDev-Candy/TicTacToe",
         "image": "./assets/images/portfolio/TicTacToeSim.gif",
@@ -52,6 +58,7 @@
       {
         "title": "TomTheDragon",
         "categoryLabel": "Game Development",
+        "description": "3D game experience built around state-driven gameplay, movement loops, and collision behavior.",
         "tags": ["game development", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/TomTheDragon",
         "image": "./assets/images/portfolio/Tomthedragon.gif",
@@ -60,6 +67,7 @@
       {
         "title": "Secrets Of the Mansion",
         "categoryLabel": "Game Development",
+        "description": "Story-driven exploration game prototype with scene progression, puzzles, and event triggers.",
         "tags": ["game development", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/CodenameMansion",
         "image": "./assets/images/portfolio/Mansion.gif",

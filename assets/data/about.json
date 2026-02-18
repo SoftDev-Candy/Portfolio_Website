@@ -2,9 +2,8 @@
   "about": {
     "title": "About Me",
     "paragraphs": [
-      "I'm Swastik, a developer focused on backend systems, networking, and game engine technology. I enjoy working close to the system, building tools and services while understanding low-level concepts such as sockets, concurrency, and performance.",
-      "I'm driven by solving challenging problems and learning through real-world constraints. I regularly participate in team projects, hackathons, and community initiatives where collaboration, ownership, and clear communication matter as much as technical skill.",
-      "I'm continuously strengthening my foundation in modern C++, Linux, and CMake, while expanding into cloud and DevOps practices through ongoing EPAM certification programs. I value steady improvement, reliability, and software that scales beyond prototypes."
+      "I'm Swastik Toprani, a backend-focused developer building reliable C++ services and networked systems. I enjoy turning complex requirements into maintainable software with strong fundamentals in performance, sockets, concurrency, and clean architecture.",
+      "Right now, I'm actively working on backend development, networking projects, and game engine fundamentals while strengthening my Linux, CMake, and cloud/DevOps skills. I bring ownership, fast execution, and clear communication in team environments."
     ],
     "servicesTitle": "What I'm doing",
     "services": [

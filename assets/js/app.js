@@ -5,7 +5,6 @@ const el = (id) => document.getElementById(id);
 const DATA = {
   site: "./assets/data/site.json",
   profile: "./assets/data/profile.json",
-  nav: "./assets/data/nav.json",
   about: "./assets/data/about.json",
   services: "./assets/data/services.json",
   references: "./assets/data/references.json",
@@ -193,6 +192,108 @@ function renderAbout(about) {
     para.textContent = p;
     wrap.appendChild(para);
   });
+}
+
+const svgSourceCache = new Map();
+
+function pickThemeStopColor(offsetRaw) {
+  const value = parseFloat(String(offsetRaw ?? "0").replace("%", ""));
+  const normalized = String(offsetRaw ?? "").includes("%") ? value / 100 : value;
+  const stop = Number.isFinite(normalized) ? normalized : 0;
+
+  if (stop <= 0.34) return "var(--accent-1)";
+  if (stop <= 0.67) return "var(--accent-2)";
+  return "var(--accent-3)";
+}
+
+function isSpecialPaintValue(value) {
+  const v = String(value ?? "").trim().toLowerCase();
+  return (
+    !v ||
+    v === "none" ||
+    v.startsWith("url(") ||
+    v.startsWith("var(") ||
+    v === "currentcolor" ||
+    v === "context-fill" ||
+    v === "context-stroke"
+  );
+}
+
+function applyThemeToInlineSvg(svg) {
+  svg.querySelectorAll("linearGradient stop, radialGradient stop").forEach((stop) => {
+    stop.setAttribute("stop-color", pickThemeStopColor(stop.getAttribute("offset")));
+  });
+
+  svg.querySelectorAll("[fill]").forEach((node) => {
+    const fill = node.getAttribute("fill");
+    if (isSpecialPaintValue(fill)) return;
+
+    const value = String(fill).trim().toLowerCase();
+    if (value === "black" || value === "#000" || value === "#000000") return;
+    node.setAttribute("fill", "var(--accent-2)");
+  });
+
+  svg.querySelectorAll("[stroke]").forEach((node) => {
+    const stroke = node.getAttribute("stroke");
+    if (isSpecialPaintValue(stroke)) return;
+
+    const value = String(stroke).trim().toLowerCase();
+    if (value === "black" || value === "#000" || value === "#000000") return;
+    node.setAttribute("stroke", "var(--text-2)");
+  });
+}
+
+async function getSvgSource(src) {
+  const key = String(src ?? "");
+  if (svgSourceCache.has(key)) return svgSourceCache.get(key);
+
+  const pending = fetch(key, { cache: "force-cache" }).then((res) => {
+    if (!res.ok) throw new Error(`Failed to fetch SVG (${res.status})`);
+    return res.text();
+  });
+
+  svgSourceCache.set(key, pending);
+  return pending;
+}
+
+async function inlineThemeSvgImage(img) {
+  const src = img.getAttribute("src") ?? img.currentSrc ?? "";
+  if (!/\.svg(\?|#|$)/i.test(src)) return;
+
+  try {
+    const text = await getSvgSource(src);
+    const doc = new DOMParser().parseFromString(text, "image/svg+xml");
+    const svg = doc.querySelector("svg");
+    if (!svg) return;
+
+    const cls = img.getAttribute("class");
+    if (cls) svg.setAttribute("class", cls);
+    svg.classList.add("theme-svg-icon");
+
+    if (img.id) svg.id = img.id;
+    if (img.getAttribute("width")) svg.setAttribute("width", img.getAttribute("width"));
+    if (img.getAttribute("height")) svg.setAttribute("height", img.getAttribute("height"));
+
+    const alt = String(img.getAttribute("alt") ?? "").trim();
+    if (alt) {
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", alt);
+    } else {
+      svg.setAttribute("aria-hidden", "true");
+    }
+
+    applyThemeToInlineSvg(svg);
+    img.replaceWith(svg);
+  } catch (err) {
+    console.warn("[app] svg theme inline failed:", src, err);
+  }
+}
+
+async function inlineThemeableSvgs(root = document) {
+  const images = Array.from(
+    root.querySelectorAll('img[src$=".svg"], img[src*=".svg?"], img[src*=".svg#"]')
+  );
+  await Promise.all(images.map((img) => inlineThemeSvgImage(img)));
 }
 
 function renderServices(services) {
@@ -415,11 +516,25 @@ function parseCategories(cat) {
     .filter(Boolean);
 }
 
+function canonicalFilterKey(value) {
+  const key = normalizeKey(value);
+  if (key === "featured") return "highlighted projects";
+  return key;
+}
+
+function presentFilterLabel(value) {
+  const key = normalizeKey(value);
+  if (key === "highlighted projects" || key === "featured") {
+    return "Featured";
+  }
+  return String(value ?? "");
+}
+
 function renderPortfolio(portfolio, projects) {
   safeText(el("portfolio-title"), portfolio?.title ?? "Portfolio");
 
   const filters = portfolio?.filters ?? ["All"];
-  const defaultFilter = normalizeKey(portfolio?.defaultFilter ?? "all");
+  const defaultFilter = portfolio?.defaultFilter ?? "all";
 
   const filtersList = el("filters-list");
   const filtersSelectList = el("filters-select-list");
@@ -431,17 +546,17 @@ function renderPortfolio(portfolio, projects) {
   if (projectsList) projectsList.innerHTML = "";
 
   function applyFilter(filterKey) {
-    const key = normalizeKey(filterKey);
-    if (selectValue) selectValue.textContent = filterKey;
+    const key = canonicalFilterKey(filterKey);
+    if (selectValue) selectValue.textContent = presentFilterLabel(filterKey);
 
     // desktop buttons active state
     document.querySelectorAll("#filters-list button[data-filter]").forEach((b) => {
-      b.classList.toggle("active", normalizeKey(b.dataset.filter) === key);
+      b.classList.toggle("active", canonicalFilterKey(b.dataset.filter) === key);
     });
 
     // project show/hide
     document.querySelectorAll("#projects-list .project-item[data-filter-item]").forEach((li) => {
-      const cats = parseCategories(li.dataset.category);
+      const cats = parseCategories(li.dataset.category).map(canonicalFilterKey);
       const show = key === "all" || cats.includes(key);
       li.classList.toggle("active", show);
     });
@@ -456,7 +571,7 @@ function renderPortfolio(portfolio, projects) {
       btn.type = "button";
       btn.dataset.filterBtn = "";
       btn.dataset.filter = f;
-      btn.textContent = f;
+      btn.textContent = presentFilterLabel(f);
       btn.addEventListener("click", () => applyFilter(f));
       li.appendChild(btn);
       filtersList.appendChild(li);
@@ -471,7 +586,7 @@ function renderPortfolio(portfolio, projects) {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.dataset.selectItem = "";
-      btn.textContent = f;
+      btn.textContent = presentFilterLabel(f);
       btn.addEventListener("click", () => applyFilter(f));
       li.appendChild(btn);
       filtersSelectList.appendChild(li);
@@ -484,7 +599,19 @@ function renderPortfolio(portfolio, projects) {
       const li = document.createElement("li");
       li.className = "project-item";
       li.dataset.filterItem = "";
-      li.dataset.category = parseCategories(p.categories ?? p.category ?? p.tags ?? p.categoryLabel).join(",");
+      li.dataset.category = parseCategories(p.categories ?? p.category ?? p.tags ?? p.categoryLabel)
+        .map((cat) => (canonicalFilterKey(cat) === "highlighted projects" ? "featured" : cat))
+        .join(",");
+
+      const rawLabel =
+        p.label ??
+        p.categoryLabel ??
+        (Array.isArray(p.tags) ? p.tags[0] : (p.category ?? ""));
+      const displayLabel = presentFilterLabel(rawLabel);
+      const description = String(p.description ?? p.desc ?? "").trim();
+      const descriptionHtml = description
+        ? `<p class="project-description">${description}</p>`
+        : "";
 
       li.innerHTML = `
         <a href="${p.href ?? "#"}" target="_blank" rel="noreferrer">
@@ -495,11 +622,8 @@ function renderPortfolio(portfolio, projects) {
             <img src="${p.image ?? ""}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">
           </figure>
           <h3 class="project-title">${p.title ?? ""}</h3>
-          <p class="project-category">${
-            p.label ??
-            p.categoryLabel ??
-            (Array.isArray(p.tags) ? p.tags[0] : (p.category ?? ""))
-          }</p>
+          ${descriptionHtml}
+          <p class="project-category">${displayLabel}</p>
         </a>
       `;
 
@@ -518,7 +642,7 @@ function renderPortfolio(portfolio, projects) {
   }
 
   // initial filter
-  applyFilter(filters.find((f) => normalizeKey(f) === defaultFilter) ?? "All");
+  applyFilter(filters.find((f) => canonicalFilterKey(f) === canonicalFilterKey(defaultFilter)) ?? "All");
 }
 
 // -----------------------------
@@ -565,7 +689,6 @@ async function init() {
   const [
     site,
     profile,
-    nav,
     about,
     services,
     references,
@@ -576,7 +699,6 @@ async function init() {
   ] = await Promise.all([
     loadJSON(DATA.site),
     loadJSON(DATA.profile),
-    loadJSON(DATA.nav),
     loadJSON(DATA.about),
     loadJSON(DATA.services),
     loadJSON(DATA.references),
@@ -588,7 +710,6 @@ async function init() {
 
   const siteData = unwrapPayload(site, "site");
   const profileData = unwrapPayload(profile, "profile");
-  const navData = unwrapPayload(nav, "nav");
   const aboutData = unwrapPayload(about, "about");
   const servicesData = unwrapPayload(services, "services");
   const referencesData = unwrapPayload(references, "references");
@@ -597,7 +718,9 @@ async function init() {
   const contactData = unwrapPayload(contact, "contact");
 
   if (siteData?.title) document.title = siteData.title;
-  if (siteData?.theme) document.documentElement.dataset.theme = siteData.theme;
+  if (siteData?.theme && !document.documentElement.dataset.theme) {
+    document.documentElement.dataset.theme = siteData.theme;
+  }
   if (siteData?.favicon) {
     const fav = document.querySelector("link[rel='shortcut icon']");
     if (fav) fav.href = siteData.favicon;
@@ -608,13 +731,13 @@ async function init() {
   }
 
   renderProfile(profileData);
-  renderNav(navData);
   renderAbout(aboutData);
   renderServices(servicesData);
   renderReferences(referencesData);
   renderResume(resumeData);
   renderPortfolio(portfolioData, projects);
   renderContact(contactData);
+  await inlineThemeableSvgs(document);
 
   console.log("[app] render ok");
 }
