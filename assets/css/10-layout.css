@@ -58,7 +58,12 @@ body::before{
   height: 100vh;
   z-index: 0;
   pointer-events: none;
-  filter: saturate(0.82) brightness(0.62);
+}
+
+#fx-fluid,
+#fx-dust{
+  filter: saturate(0.78) brightness(0.56);
+  opacity: 0.52;
 }
 
 /* --- Main shell: rail + content --- */
@@ -177,7 +182,7 @@ main{
 
 .info-content .name{
   margin: 0 0 10px;
-  font-size: var(--fs-3);
+  font-size: var(--fs-1);
   font-weight: var(--fw-500);
   letter-spacing: -0.25px;
   color: var(--text-1, var(--white-2));
@@ -194,7 +199,7 @@ main{
   flex-wrap: nowrap;
   justify-content: flex-start;
   gap: 8px;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -218,12 +223,22 @@ main{
 
 /* role pills -> more like small labels */
 .role-stack > *{
-  width: fit-content;
-  padding: 4px 14px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 999px;
   font-size: var(--fs-8);
   letter-spacing: normal;
   text-transform: none;
+  text-align: center;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   color: var(--text-strong);
   background: hsla(240, 10%, 10%, 0.55);
@@ -436,9 +451,13 @@ main{
 
   .sidebar{
     top: 0;
-    max-height: 100vh;
-    height: 100vh;
+    max-height: calc(100vh - 22px);
+    height: calc(100vh - 22px);
     margin-bottom: 0;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .sidebar-info{

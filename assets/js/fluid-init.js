@@ -8,14 +8,14 @@
     body.style.setProperty("background-color", "var(--base-bg, #0a0d14)", "important");
   }
 
-  const canvas = document.getElementById("fx-fluid") || document.getElementById("fx-dust");
-  if (canvas) {
-    canvas.style.position = "fixed";
-    canvas.style.inset = "0";
-    canvas.style.width = "100vw";
-    canvas.style.height = "100vh";
-    canvas.style.zIndex = "1";
-    canvas.style.pointerEvents = "none";
-    canvas.setAttribute("aria-hidden", "true");
+  const fluidCanvas = document.getElementById("fx-fluid") || document.getElementById("fx-dust");
+  if (fluidCanvas) {
+    fluidCanvas.style.position = "fixed";
+    fluidCanvas.style.inset = "0";
+    fluidCanvas.style.width = "100vw";
+    fluidCanvas.style.height = "100vh";
+    fluidCanvas.style.zIndex = "1";
+    fluidCanvas.style.pointerEvents = "none";
+    fluidCanvas.setAttribute("aria-hidden", "true");
   }
 })();

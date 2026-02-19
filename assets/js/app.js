@@ -414,8 +414,7 @@ function renderReferences(refs) {
     const img = document.createElement("img");
     img.src = r.avatar ?? "./assets/images/avatar-1.png";
     img.alt = r.name ?? "Reference";
-    img.width = 60;
-
+    img.width = 58;
     fig.appendChild(img);
 
     const h = document.createElement("h4");
@@ -608,6 +607,25 @@ function renderPortfolio(portfolio, projects) {
         p.categoryLabel ??
         (Array.isArray(p.tags) ? p.tags[0] : (p.category ?? ""));
       const displayLabel = presentFilterLabel(rawLabel);
+      if (displayLabel) li.dataset.categoryLabel = displayLabel;
+
+      const rawCapsules =
+        p.capsules ??
+        p.pills ??
+        p.badges ??
+        p.tiles ??
+        p.projectTiles;
+      const capsuleValues = Array.isArray(rawCapsules)
+        ? rawCapsules
+        : (typeof rawCapsules === "string" ? rawCapsules.split(",") : []);
+      const capsules = capsuleValues
+        .map((capsule) => String(capsule ?? "").trim())
+        .filter(Boolean);
+      if (capsules.length) li.classList.add("has-capsules");
+      const capsulesHtml = capsules.length
+        ? `<div class="project-capsules">${capsules.map((capsule) => `<span class="project-capsule">${capsule}</span>`).join("")}</div>`
+        : "";
+
       const description = String(p.description ?? p.desc ?? "").trim();
       const descriptionHtml = description
         ? `<p class="project-description">${description}</p>`
@@ -620,6 +638,7 @@ function renderPortfolio(portfolio, projects) {
               <ion-icon name="eye-outline"></ion-icon>
             </div>
             <img src="${p.image ?? ""}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">
+            ${capsulesHtml}
           </figure>
           <h3 class="project-title">${p.title ?? ""}</h3>
           ${descriptionHtml}
