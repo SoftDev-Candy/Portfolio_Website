@@ -2,67 +2,7 @@
     "filters": ["All", "Highlighted Projects", "Game Development", "System Development", "Network Development"],
     "projects": [
       {
-        "title": "Mini Database",
-        "categoryLabel": "System Development",
-        "capsules": ["C++", "CLI"],
-        "description": "A lightweight CLI database engine with indexing, file-backed storage, and query operations.",
-        "tags": ["system development"],
-        "href": "https://github.com/SoftDev-Candy/MiniDB",
-        "image": "./assets/images/portfolio/MiniDbSim.gif",
-        "alt": "MiniDbSim"
-      },
-      {
-        "title": "Travel Guardian",
-        "categoryLabel": "System Development",
-        "capsules": ["C++", "API"],
-        "description": "Backend service for trip safety workflows with modular APIs, auth handling, and alerting paths.",
-        "tags": ["system development", "highlighted projects"],
-        "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
-        "image": "./assets/images/portfolio/TG_3SIXO.gif",
-        "alt": "Travel Guardian"
-      },
-      {
-        "title": "ToDoCli",
-        "categoryLabel": "System Development",
-        "capsules": ["C++", "CLI"],
-        "description": "Terminal-first task manager focused on speed, commands, and clean local data persistence.",
-        "tags": ["system development"],
-        "href": "https://github.com/SoftDev-Candy/ToDo_ListCli",
-        "image": "./assets/images/portfolio/ToD0_CLI.gif",
-        "alt": "ToDoCli"
-      },
-      {
-        "title": "ServerHandShake",
-        "categoryLabel": "Network Development",
-        "capsules": ["Networking", "Sockets"],
-        "description": "Socket programming project implementing handshake flow and connection reliability.",
-        "tags": ["network development", "highlighted projects"],
-        "href": "https://github.com/SoftDev-Candy/NetworkProgramming",
-        "image": "./assets/images/portfolio/ServerHandShake.gif",
-        "alt": "ServerHandShake"
-      },
-      {
-        "title": "JourneyRadar - HackYeah",
-        "categoryLabel": "Network Development",
-        "capsules": ["Networking", "Hackathon"],
-        "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
-        "tags": ["network development", "highlighted projects"],
-        "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
-        "image": "./assets/images/portfolio/JourneyRadar-gif.gif",
-        "alt": "Journey Radar-HackYeah"
-      },
-      {
-        "title": "Tic-Tac-Toe(X & 0)",
-        "categoryLabel": "Game Development",
-        "capsules": ["C++ , CLI"],
-        "description": "Classic grid-based game with turn logic, win detection, and responsive UI interactions.",
-        "tags": ["game development"],
-        "href": "https://github.com/SoftDev-Candy/TicTacToe",
-        "image": "./assets/images/portfolio/TicTacToeSim.gif",
-        "alt": "TicTacToe"
-      },
-      {
-        "title": "TomTheDragon",
+        "title": "🐉 TomTheDragon",
         "categoryLabel": "Game Development",
         "capsules": ["C#","Unity","Platformer"],
         "description": "3D game experience built around state-driven gameplay, movement loops, and collision behavior.",
@@ -72,7 +12,7 @@
         "alt": "TomTheDragon"
       },
       {
-        "title": "Secrets Of the Mansion",
+        "title": "🕯️ Secrets of the Mansion",
         "categoryLabel": "Game Development",
         "capsules": ["C#","Unity", "Puzzle"],
         "description": "Story-driven exploration game prototype with scene progression, puzzles, and event triggers.",
@@ -80,7 +20,68 @@
         "href": "https://github.com/SoftDev-Candy/CodenameMansion",
         "image": "./assets/images/portfolio/Mansion.gif",
         "alt": "Secrets Of the Mansion"
+      },
+      {
+        "title": "🗄️ Mini Database Engine",
+        "categoryLabel": "System Development",
+        "capsules": ["C++", "CLI"],
+        "description": "A lightweight CLI database engine with indexing, file-backed storage, and query operations.",
+        "tags": ["system development"],
+        "href": "https://github.com/SoftDev-Candy/MiniDB",
+        "image": "./assets/images/portfolio/MiniDbSim.gif",
+        "alt": "MiniDbSim"
+      },
+      {
+        "title": "🛡️ Travel Guardian API",
+        "categoryLabel": "System Development",
+        "capsules": ["C++", "API"],
+        "description": "Backend service for trip safety workflows with modular APIs, auth handling, and alerting paths.",
+        "tags": ["system development", "highlighted projects"],
+        "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
+        "image": "./assets/images/portfolio/TG_3SIXO.gif",
+        "alt": "Travel Guardian"
+      },
+      {
+        "title": "🧾 ToDo CLI",
+        "categoryLabel": "System Development",
+        "capsules": ["C++", "CLI"],
+        "description": "Terminal-first task manager focused on speed, commands, and clean local data persistence.",
+        "tags": ["system development"],
+        "href": "https://github.com/SoftDev-Candy/ToDo_ListCli",
+        "image": "./assets/images/portfolio/ToD0_CLI.gif",
+        "alt": "ToDoCli"
+      },
+      {
+        "title": "🤝 Server Handshake",
+        "categoryLabel": "Network Development",
+        "capsules": ["Networking", "Sockets"],
+        "description": "Socket programming project implementing handshake flow and connection reliability.",
+        "tags": ["network development", "highlighted projects"],
+        "href": "https://github.com/SoftDev-Candy/NetworkProgramming",
+        "image": "./assets/images/portfolio/ServerHandShake.gif",
+        "alt": "ServerHandShake"
+      },
+      {
+        "title": "🧭 JourneyRadar | HackYeah",
+        "categoryLabel": "Network Development",
+        "capsules": ["Networking", "Hackathon"],
+        "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
+        "tags": ["network development", "highlighted projects"],
+        "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
+        "image": "./assets/images/portfolio/JourneyRadar-gif.gif",
+        "alt": "Journey Radar-HackYeah"
+      },
+      {
+        "title": "❌⭕ Tic-Tac-Toe ",
+        "categoryLabel": "Game Development",
+        "capsules": ["C++" , "CLI"],
+        "description": "Classic grid-based game with turn logic, win detection, and responsive UI interactions.",
+        "tags": ["game development"],
+        "href": "https://github.com/SoftDev-Candy/TicTacToe",
+        "image": "./assets/images/portfolio/TicTacToeSim.gif",
+        "alt": "TicTacToe"
       }
+      
     ]
   }
   

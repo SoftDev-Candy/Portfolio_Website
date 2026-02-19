@@ -180,6 +180,20 @@ function renderProfile(profile) {
 // -----------------------------
 // ABOUT + SERVICES
 // -----------------------------
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatAboutParagraph(value) {
+  const safe = escapeHtml(value);
+  return safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+
 function renderAbout(about) {
   safeText(el("about-title"), about?.title ?? "About");
 
@@ -187,11 +201,16 @@ function renderAbout(about) {
   if (!wrap) return;
 
   wrap.innerHTML = "";
-  (about?.paragraphs ?? []).forEach((p) => {
-    const para = document.createElement("p");
-    para.textContent = p;
-    wrap.appendChild(para);
-  });
+  const merged = (about?.paragraphs ?? [])
+    .map((p) => String(p ?? "").trim())
+    .filter(Boolean)
+    .join(" ");
+
+  if (!merged) return;
+
+  const para = document.createElement("p");
+  para.innerHTML = formatAboutParagraph(merged);
+  wrap.appendChild(para);
 }
 
 const svgSourceCache = new Map();
@@ -486,15 +505,48 @@ function renderResume(resume) {
   const tech = el("skills-technical");
   if (tech) {
     tech.innerHTML = "";
-    (resume?.skills?.technical ?? []).forEach((s) => {
-      const li = document.createElement("li");
-      li.textContent = s;
-      tech.appendChild(li);
-    });
+    const groups = Array.isArray(resume?.skills?.technicalGroups)
+      ? resume.skills.technicalGroups
+      : [];
+
+    if (groups.length > 0) {
+      tech.className = "skills-group-grid";
+
+      groups.forEach((group) => {
+        const groupCard = document.createElement("li");
+        groupCard.className = "skills-group-card";
+
+        const title = document.createElement("h4");
+        title.className = "skills-group-title";
+        title.textContent = group?.title ?? "Technical";
+
+        const items = document.createElement("ul");
+        items.className = "skills-group-items";
+
+        (group?.items ?? []).forEach((item) => {
+          const chip = document.createElement("li");
+          chip.className = "skills-chip";
+          chip.textContent = item;
+          items.appendChild(chip);
+        });
+
+        groupCard.appendChild(title);
+        groupCard.appendChild(items);
+        tech.appendChild(groupCard);
+      });
+    } else {
+      tech.className = "skills-tags";
+      (resume?.skills?.technical ?? []).forEach((s) => {
+        const li = document.createElement("li");
+        li.textContent = s;
+        tech.appendChild(li);
+      });
+    }
   }
 
   const prof = el("skills-professional");
   if (prof) {
+    prof.className = "skills-tags skills-prof-list";
     prof.innerHTML = "";
     (resume?.skills?.professional ?? []).forEach((s) => {
       const li = document.createElement("li");
