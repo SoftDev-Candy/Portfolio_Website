@@ -3,9 +3,10 @@
     "name": "Swastik Toprani",
     "avatar": "./assets/images/avatar.png",
     "roles": [
+      "🎮 Game Developer",
       "🖥️ Systems Engineer",
-      "🛰️ Network Engineer",
-      "🎮 Game Developer"
+      "🛰️ Network Engineer"
+      
     ],
     "contacts": [
       {

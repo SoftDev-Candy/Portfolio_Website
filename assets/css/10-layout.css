@@ -14,8 +14,8 @@
 
   /* Layout surfaces (theme-safe: derived from your neutral tokens) */
   --layout-bg: var(--base-bg, var(--smoky-black));
-  --panel-bg: rgba(255,255,255,0.06);
-  --panel-border: rgba(255,255,255,0.12);
+  --panel-bg: #000;
+  --panel-border: rgba(255,255,255,0.14);
   --panel-shadow: 0 20px 60px rgba(0,0,0,0.40);
 
   /* Accent glow (theme-safe) */
@@ -40,28 +40,46 @@ body{
     var(--layout-bg, var(--layout-bg-fallback));
 }
 
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* --- Put FX canvas behind everything (prevents "white overlay" disasters) --- */
+#fx-fluid,
 #fx-dust{
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
   pointer-events: none;
+}
+
+#fx-fluid,
+#fx-dust{
+  filter: saturate(0.78) brightness(0.56);
+  opacity: 0.52;
 }
 
 /* --- Main shell: rail + content --- */
 main{
   position: relative;
-  z-index: 1;
+  z-index: 2;
 
   width: 100%;
   margin: 0;
 
-  /* FLUSH left edge, give breathing room on the right */
-  padding: 0 32px 0 0;
+  /* FLUSH left edge, tuned right breathing room */
+  padding: 0 clamp(22px, 2.6vw, 40px) 0 0;
 
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: 36px;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: clamp(36px, 3.8vw, 62px);
   align-items: start;
 
   min-height: 100vh;
@@ -70,11 +88,21 @@ main{
 /* --- Main content placeholder (big "window" like your sketch) --- */
 .main-content{
   min-height: calc(100vh - 64px);
-  margin: 32px 0;
+  margin: clamp(24px, 2.4vw, 38px) 0 clamp(28px, 2.6vw, 42px);
+  width: min(100%, 1480px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 2.2vw, 34px);
+  padding: 0 clamp(12px, 1.6vw, 24px);
 
-  /* big framed window vibe */
-  border: 3px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.02);
+  /* clean canvas, no border/background */
+  border: none;
+  background: transparent;
+}
+
+.main-content > .page-section{
+  margin: 0;
+  padding-block: clamp(8px, 1vw, 14px);
 }
 
 /* =========================================================
@@ -87,37 +115,39 @@ main{
   position: sticky;
   top: 0;
   height: 100vh;
-
-  /* rail itself is just a container */
-  padding: 24px 16px 24px 16px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  max-height: 100vh;
+  margin-bottom: 15px;
+  padding: 15px;
+  background: #000;
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  box-shadow: var(--panel-shadow);
+  overflow: hidden;
+  transition: var(--transition-2);
 
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
-/* the TWO blocks */
+.sidebar.active { max-height: 100vh; }
+
+/* joined sidebar internals */
 .sidebar-info,
 .sidebar-info_more{
-  border-radius: 0; /* square */
-  background: var(--panel-bg);
-  border: 2px solid var(--panel-border);
-  box-shadow: var(--panel-shadow);
-
-  /* keep it crisp */
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 /* TOP CARD LAYOUT */
 .sidebar-info{
   position: relative;
   display: flex;
-  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
-  text-align: center;
-  gap: 14px;
+  gap: 15px;
 }
 
 /* Avatar circle in the middle */
@@ -145,17 +175,16 @@ main{
 
 /* Name */
 .info-content{
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .info-content .name{
-  margin: 8px 0 4px 0;
-  font-size: 30px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+  font-size: var(--fs-1);
+  font-weight: var(--fw-500);
+  letter-spacing: -0.25px;
   color: var(--text-1, var(--white-2));
 }
 
@@ -164,11 +193,14 @@ main{
 
 /* Role pills (outlined, not filled) */
 .role-stack{
-  margin-top: 10px;
+  margin-top: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: center;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
 }
 
 .role-stack > *{
@@ -191,27 +223,81 @@ main{
 
 /* role pills -> more like small labels */
 .role-stack > *{
-  width: fit-content;
-  padding: 6px 10px;
-  border-radius: 0; /* square */
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  width: 100%;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: var(--fs-8);
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: center;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   color: var(--text-strong);
-  background: rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.14);
+  background: hsla(240, 10%, 10%, 0.55);
+  border: 1px solid var(--lava-2);
+  box-shadow: 0 0 6px var(--lava-glow);
 }
 
-/* toggle button (desktop hidden, mobile used) */
+/* toggle button */
 .info_more-btn{
-  display: none;
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 15px;
+  font-size: 13px;
+  color: var(--orange-yellow-crayola);
+  background: var(--border-gradient-onyx);
+  padding: 10px;
+  box-shadow: var(--shadow-2);
+  transition: var(--transition-1);
+  z-index: 1;
 }
 
-/* BOTTOM BLOCK (contacts/social) */
+.info_more-btn span { display: none; }
+
+.info_more-btn::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: var(--bg-gradient-jet);
+  transition: var(--transition-1);
+  z-index: -1;
+}
+
+.info_more-btn:hover,
+.info_more-btn:focus { background: var(--bg-gradient-yellow-1); }
+
+.info_more-btn:hover::before,
+.info_more-btn:focus::before { background: var(--bg-gradient-yellow-2); }
+
 .sidebar-info_more{
-  margin-top: auto;   /* <-- creates the BIG negative space gap */
-  padding: 16px;
+  margin-top: 0;
+  padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  max-height: 0;
+  overflow: hidden;
+  transition: var(--transition-2);
+}
+
+.sidebar.active .sidebar-info_more{
+  opacity: 1;
+  visibility: visible;
+  max-height: 520px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 /* divider */
@@ -225,16 +311,15 @@ main{
   list-style: none;
   margin: 0;
   padding: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
 }
 
 .contact-item{
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .icon-box{
@@ -279,10 +364,11 @@ main{
 .social-list{
   list-style: none;
   margin: 0;
-  padding: 0;
-
+  padding: 0 0 4px 7px;
   display: flex;
-  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 15px;
 }
 
 .social-link{
@@ -315,17 +401,26 @@ main{
 
   .sidebar{
     position: relative;
+    top: auto;
     height: auto;
-    padding: 0;
+    max-height: 112px;
+    padding: 15px;
+    gap: 0;
   }
 
   .sidebar-info_more{
-    margin-top: 18px;
+    margin-top: 0;
   }
 
   .main-content{
     margin: 0;
     min-height: 60vh;
+    padding: 0;
+    gap: 22px;
+  }
+
+  .main-content > .page-section{
+    padding-block: 0;
   }
 
   .info_more-btn{
@@ -339,4 +434,54 @@ main{
     color: var(--text-strong);
     cursor: pointer;
   }
+}
+
+@media (min-width: 1101px){
+  main{
+    padding-right: clamp(32px, 3.6vw, 56px);
+    gap: clamp(44px, 4.4vw, 74px);
+  }
+
+  .main-content{
+    margin-top: clamp(24px, 2.4vw, 40px);
+    margin-bottom: clamp(30px, 2.8vw, 46px);
+    gap: clamp(28px, 2.4vw, 40px);
+    padding-inline: clamp(18px, 2vw, 30px);
+  }
+
+  .sidebar{
+    top: 0;
+    max-height: calc(100vh - 22px);
+    height: calc(100vh - 22px);
+    margin-bottom: 0;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar-info{
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    text-align: center;
+  }
+
+  .info-content{
+    align-items: center;
+  }
+
+  .info_more-btn { display: none; }
+
+  .sidebar-info_more{
+    opacity: 1;
+    visibility: visible;
+    max-height: none;
+    overflow: visible;
+    margin-top: auto;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .social-list { justify-content: center; }
 }

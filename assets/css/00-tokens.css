@@ -107,7 +107,10 @@
     /* =========================================================
        5) TYPOGRAPHY
     ========================================================== */
-    --ff-poppins: 'Poppins', sans-serif;
+    --ff-body: "Sora", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --ff-display: "Oxanium", "Space Grotesk", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --ff-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --ff-poppins: var(--ff-body);
   
     --fs-1: 24px;
     --fs-2: 18px;
@@ -119,6 +122,7 @@
     --fs-8: 11px;
   
     --fw-300: 300;
+    --fw-3: var(--fw-300);
     --fw-400: 400;
     --fw-500: 500;
     --fw-600: 600;
@@ -165,10 +169,25 @@
 --radius-card: var(--card-radius, 26px);
 --radius-soft: 14px;
 --radius-pill: var(--pill-radius, 999px);
+--project-card-radius: 14px;
+--grid-gap: 24px;
 
 --ui-bg: var(--surface-1, rgba(255,255,255,0.06));
 --ui-border: var(--border-soft, rgba(255,255,255,0.14));
 --ui-shadow: var(--shadow-2, 0 16px 30px rgba(0,0,0,0.25));
+
+/* Project card token API (modular replacement for legacy style.css-only values) */
+--project-glass: color-mix(in srgb, var(--base-bg) 92%, var(--accent-3) 8%);
+--project-glass-hover: color-mix(in srgb, var(--base-bg) 82%, var(--accent-1) 18%);
+--project-inner: color-mix(in srgb, var(--base-bg) 90%, black);
+--project-border-thin: color-mix(in srgb, var(--accent-2) 34%, rgba(255,255,255,0.20));
+--project-border-thin-hover: color-mix(in srgb, var(--accent-2) 60%, rgba(255,255,255,0.28));
+--project-ring-1: color-mix(in srgb, var(--accent-1) 72%, white);
+--project-ring-2: color-mix(in srgb, var(--accent-2) 40%, transparent);
+--project-halo-1: color-mix(in srgb, var(--accent-glow) 70%, transparent);
+--project-halo-2: color-mix(in srgb, var(--accent-glow) 42%, transparent);
+--project-card-shadow: 0 18px 36px rgba(0,0,0,0.32);
+--project-card-shadow-hover: 0 22px 48px rgba(0,0,0,0.42);
 
   
   }

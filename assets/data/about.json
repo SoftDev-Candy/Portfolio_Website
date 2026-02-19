@@ -1,12 +1,10 @@
 {
   "about": {
-    "title": "About Me",
+    "title": "<Lorebook/>",
     "paragraphs": [
-      "I'm Swastik, a developer focused on backend systems, networking, and game engine technology. I enjoy working close to the system, building tools and services while understanding low-level concepts such as sockets, concurrency, and performance.",
-      "I'm driven by solving challenging problems and learning through real-world constraints. I regularly participate in team projects, hackathons, and community initiatives where collaboration, ownership, and clear communication matter as much as technical skill.",
-      "I'm continuously strengthening my foundation in modern C++, Linux, and CMake, while expanding into cloud and DevOps practices through ongoing EPAM certification programs. I value steady improvement, reliability, and software that scales beyond prototypes."
+      "HeyO !  **Swastik**, a **C++ backend and systems engineer** building robust software across **networked services** and **real-time gameplay systems**. I enjoy owning the full loop from architecture and implementation to profiling and debugging, with a strong focus on **performance**, **clean code**, and **reliable multiplayer/backend flows**. Right now I am deepening **Linux**, **CMake**, **engine fundamentals**, and **system design** while shipping projects that balance technical depth with real player impact."
     ],
-    "servicesTitle": "What I'm doing",
+    "servicesTitle": "<ActiveQuestline>",
     "services": [
       {
         "title": "Backend Development",

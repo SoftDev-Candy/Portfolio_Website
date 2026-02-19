@@ -1,6 +1,6 @@
 {
   "resume": {
-    "title": "Resume",
+    "title": "<Career Chronicle/>",
     "education": [
       {
         "title": "Future Games",
@@ -21,6 +21,32 @@
       }
     ],
     "skills": {
+      "technicalGroups": [
+        {
+          "title": "Languages",
+          "items": ["C++", "C#"]
+        },
+        {
+          "title": "Game Engines",
+          "items": ["Unreal Engine 5", "Unity"]
+        },
+        {
+          "title": "Core Programming",
+          "items": ["OOP / OOD", "STL", "Boost", "Unit Testing"]
+        },
+        {
+          "title": "Build & Collaboration",
+          "items": ["CMake", "Perforce", "Git"]
+        },
+        {
+          "title": "Graphics Stack",
+          "items": ["OpenGL", "SDL", "GLFW", "GLAD", "GLM"]
+        },
+        {
+          "title": "Platforms & Networking",
+          "items": ["Linux", "Windows", "5G" , "RAN"]
+        }
+      ],
       "technical": [
         "C++",
         "C#",
