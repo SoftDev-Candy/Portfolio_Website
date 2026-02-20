@@ -24,6 +24,12 @@
   /* Text */
   --text-strong: var(--white-2);
   --text-muted: var(--light-gray-70);
+
+  /* Background FX tuning (keep visible, reduce distraction) */
+  --fx-dim-overlay: 0.24;
+  --fx-fluid-sat: 0.72;
+  --fx-fluid-brightness: 0.48;
+  --fx-fluid-opacity: 0.44;
 }
 
 html, body { height: 100%; }
@@ -44,7 +50,7 @@ body::before{
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, var(--fx-dim-overlay));
   pointer-events: none;
   z-index: 1;
 }
@@ -62,8 +68,8 @@ body::before{
 
 #fx-fluid,
 #fx-dust{
-  filter: saturate(0.78) brightness(0.56);
-  opacity: 0.52;
+  filter: saturate(var(--fx-fluid-sat)) brightness(var(--fx-fluid-brightness));
+  opacity: var(--fx-fluid-opacity);
 }
 
 /* --- Main shell: rail + content --- */

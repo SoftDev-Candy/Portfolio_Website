@@ -581,6 +581,208 @@ function presentFilterLabel(value) {
   return String(value ?? "");
 }
 
+function getProjectLogoKey(project, capsules) {
+  const rawParts = [
+    ...(Array.isArray(capsules) ? capsules : []),
+    ...(Array.isArray(project?.tags) ? project.tags : []),
+    project?.categoryLabel,
+    project?.category,
+    project?.title,
+  ].map((v) => String(v ?? "").toLowerCase());
+
+  const full = rawParts.join(" ");
+
+  const hasAny = (...needles) => needles.some((needle) => full.includes(needle));
+
+  if (hasAny("unreal", "ue5")) return "unreal";
+  if (hasAny("unity")) return "unity";
+  if (hasAny("network development", "network", "networking", "socket", "tcp", "udp", "ran")) return "network";
+  if (hasAny("system development", "backend", "api", "server", "system")) return "backend";
+  if (hasAny("game development", "game", "gameplay", "platformer", "puzzle", "engine")) return "game";
+  if (hasAny("python", "py")) return "python";
+  if (hasAny("javascript", " js ", " js,", " js.", "node")) return "javascript";
+  if (hasAny("c++", "cpp")) return "cpp";
+  if (hasAny("c#", "csharp")) return "csharp";
+  return "code";
+}
+
+function getProjectLogoMeta(project, capsules) {
+  const key = getProjectLogoKey(project, capsules);
+  const labels = {
+    unreal: "Unreal logo",
+    unity: "Unity logo",
+    cpp: "C++ logo",
+    csharp: "C# logo",
+    python: "Python logo",
+    javascript: "JavaScript logo",
+    network: "Network logo",
+    backend: "Backend logo",
+    game: "Game logo",
+    code: "Code logo",
+  };
+
+  return {
+    src: `./assets/images/project-logos/${key}.svg`,
+    alt: labels[key] ?? "Project logo",
+  };
+}
+
+function wireProjectCardTilt(root = document) {
+  const cards = root.querySelectorAll("#projects-list .project-item > a");
+  if (!cards.length) return;
+
+  const canUsePointerTilt =
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  cards.forEach((card, idx) => {
+    card.style.setProperty("--card-lean-y", idx % 2 === 0 ? "-1.1deg" : "1.1deg");
+    if (card.dataset.tiltBound === "1") return;
+    card.dataset.tiltBound = "1";
+
+    if (!canUsePointerTilt) return;
+
+    let rafId = 0;
+    const state = {
+      rx: 0,
+      ry: 0,
+      px: 0,
+      py: 0,
+      gx: 16,
+      gy: 14,
+    };
+
+    const applyState = () => {
+      rafId = 0;
+      card.style.setProperty("--tilt-rotate-x", `${state.rx.toFixed(2)}deg`);
+      card.style.setProperty("--tilt-rotate-y", `${state.ry.toFixed(2)}deg`);
+      card.style.setProperty("--parallax-x", `${state.px.toFixed(2)}px`);
+      card.style.setProperty("--parallax-y", `${state.py.toFixed(2)}px`);
+      card.style.setProperty("--parallax-x-icon", `${(state.px * -0.18).toFixed(2)}px`);
+      card.style.setProperty("--parallax-y-icon", `${(state.py * -0.18).toFixed(2)}px`);
+      card.style.setProperty("--glare-x", `${state.gx.toFixed(2)}%`);
+      card.style.setProperty("--glare-y", `${state.gy.toFixed(2)}%`);
+    };
+
+    const queueApply = () => {
+      if (!rafId) rafId = requestAnimationFrame(applyState);
+    };
+
+    const updateFromPointer = (event) => {
+      const rect = card.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const relX = event.clientX - rect.left;
+      const relY = event.clientY - rect.top;
+      const nx = (relX / rect.width) * 2 - 1;
+      const ny = (relY / rect.height) * 2 - 1;
+
+      state.rx = Math.max(-4.8, Math.min(4.8, -ny * 4.4));
+      state.ry = Math.max(-5.2, Math.min(5.2, nx * 5));
+      state.px = Math.max(-8, Math.min(8, -nx * 6.5));
+      state.py = Math.max(-6, Math.min(6, -ny * 4.5));
+      state.gx = Math.max(4, Math.min(96, (relX / rect.width) * 100));
+      state.gy = Math.max(4, Math.min(96, (relY / rect.height) * 100));
+      queueApply();
+    };
+
+    const resetTilt = () => {
+      state.rx = 0;
+      state.ry = 0;
+      state.px = 0;
+      state.py = 0;
+      state.gx = 16;
+      state.gy = 14;
+      queueApply();
+    };
+
+    card.addEventListener("pointerenter", updateFromPointer);
+    card.addEventListener("pointermove", updateFromPointer);
+    card.addEventListener("pointerleave", resetTilt);
+    card.addEventListener("blur", resetTilt, true);
+    resetTilt();
+  });
+}
+
+function wireLinkTilt(root = document) {
+  const links = root.querySelectorAll("a[href]:not(#projects-list .project-item > a)");
+  if (!links.length) return;
+
+  const canUsePointerTilt =
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  links.forEach((link) => {
+    if (link.dataset.linkTiltBound === "1") return;
+    link.dataset.linkTiltBound = "1";
+    link.classList.add("link-tilt-target");
+
+    if (!canUsePointerTilt) return;
+
+    let rafId = 0;
+    const state = {
+      rx: 0,
+      ry: 0,
+      tx: 0,
+      ty: 0,
+      gx: 50,
+      gy: 50,
+    };
+
+    const applyState = () => {
+      rafId = 0;
+      link.style.setProperty("--link-tilt-rx", `${state.rx.toFixed(2)}deg`);
+      link.style.setProperty("--link-tilt-ry", `${state.ry.toFixed(2)}deg`);
+      link.style.setProperty("--link-tilt-tx", `${state.tx.toFixed(2)}px`);
+      link.style.setProperty("--link-tilt-ty", `${state.ty.toFixed(2)}px`);
+      link.style.setProperty("--link-glare-x", `${state.gx.toFixed(2)}%`);
+      link.style.setProperty("--link-glare-y", `${state.gy.toFixed(2)}%`);
+    };
+
+    const queueApply = () => {
+      if (!rafId) rafId = requestAnimationFrame(applyState);
+    };
+
+    const updateFromPointer = (event) => {
+      const rect = link.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const relX = event.clientX - rect.left;
+      const relY = event.clientY - rect.top;
+      const nx = (relX / rect.width) * 2 - 1;
+      const ny = (relY / rect.height) * 2 - 1;
+
+      state.rx = Math.max(-2.3, Math.min(2.3, -ny * 2.2));
+      state.ry = Math.max(-3, Math.min(3, nx * 2.8));
+      state.tx = Math.max(-2, Math.min(2, nx * 1.6));
+      state.ty = Math.max(-1.8, Math.min(1.8, ny * 1.4));
+      state.gx = Math.max(6, Math.min(94, (relX / rect.width) * 100));
+      state.gy = Math.max(6, Math.min(94, (relY / rect.height) * 100));
+      queueApply();
+    };
+
+    const resetTilt = () => {
+      state.rx = 0;
+      state.ry = 0;
+      state.tx = 0;
+      state.ty = 0;
+      state.gx = 50;
+      state.gy = 50;
+      link.classList.remove("link-tilt-active");
+      queueApply();
+    };
+
+    link.addEventListener("pointerenter", (event) => {
+      link.classList.add("link-tilt-active");
+      updateFromPointer(event);
+    }, { passive: true });
+    link.addEventListener("pointermove", updateFromPointer, { passive: true });
+    link.addEventListener("pointerleave", resetTilt, { passive: true });
+    link.addEventListener("blur", resetTilt, true);
+    resetTilt();
+  });
+}
+
 function renderPortfolio(portfolio, projects) {
   safeText(el("portfolio-title"), portfolio?.title ?? "Portfolio");
 
@@ -677,6 +879,7 @@ function renderPortfolio(portfolio, projects) {
       const capsulesHtml = capsules.length
         ? `<div class="project-capsules">${capsules.map((capsule) => `<span class="project-capsule">${capsule}</span>`).join("")}</div>`
         : "";
+      const logo = getProjectLogoMeta(p, capsules);
 
       const description = String(p.description ?? p.desc ?? "").trim();
       const descriptionHtml = description
@@ -687,12 +890,12 @@ function renderPortfolio(portfolio, projects) {
         <a href="${p.href ?? "#"}" target="_blank" rel="noreferrer">
           <figure class="project-img">
             <div class="project-item-icon-box">
-              <ion-icon name="eye-outline"></ion-icon>
+              <img class="project-hover-logo" src="${logo.src}" alt="${logo.alt}" loading="lazy">
             </div>
             <img src="${p.image ?? ""}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">
-            ${capsulesHtml}
           </figure>
           <h3 class="project-title">${p.title ?? ""}</h3>
+          ${capsulesHtml}
           ${descriptionHtml}
           <p class="project-category">${displayLabel}</p>
         </a>
@@ -711,6 +914,8 @@ function renderPortfolio(portfolio, projects) {
       if (list) list.classList.toggle("active");
     });
   }
+
+  wireProjectCardTilt();
 
   // initial filter
   applyFilter(filters.find((f) => canonicalFilterKey(f) === canonicalFilterKey(defaultFilter)) ?? "All");
@@ -808,6 +1013,7 @@ async function init() {
   renderResume(resumeData);
   renderPortfolio(portfolioData, projects);
   renderContact(contactData);
+  wireLinkTilt();
   await inlineThemeableSvgs(document);
 
   console.log("[app] render ok");

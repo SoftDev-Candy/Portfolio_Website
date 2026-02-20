@@ -22,6 +22,16 @@
         "alt": "Secrets Of the Mansion"
       },
       {
+        "title": "🍄 Gnome Splash",
+        "categoryLabel": "Game Development",
+        "capsules": ["C++", "Unreal", "Local PvP"],
+        "description": "Local multiplayer split-screen PvP in Unreal with 4-player instances, damage and respawn systems.",
+        "tags": ["game development", "highlighted projects"],
+        "href": "https://futuregames.itch.io/gnome-splash",
+        "image": "./assets/images/portfolio/GnomeSplash.gif",
+        "alt": "Gnome Splash"
+      },
+      {
         "title": "🗄️ Mini Database Engine",
         "categoryLabel": "System Development",
         "capsules": ["C++", "CLI"],
@@ -34,7 +44,7 @@
       {
         "title": "🛡️ Travel Guardian API",
         "categoryLabel": "System Development",
-        "capsules": ["C++", "API"],
+        "capsules": ["C++","API","Server"],
         "description": "Backend service for trip safety workflows with modular APIs, auth handling, and alerting paths.",
         "tags": ["system development", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
@@ -54,7 +64,7 @@
       {
         "title": "🤝 Server Handshake",
         "categoryLabel": "Network Development",
-        "capsules": ["Networking", "Sockets"],
+        "capsules": ["C++", "Sockets"],
         "description": "Socket programming project implementing handshake flow and connection reliability.",
         "tags": ["network development", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/NetworkProgramming",
@@ -64,7 +74,7 @@
       {
         "title": "🧭 JourneyRadar | HackYeah",
         "categoryLabel": "Network Development",
-        "capsules": ["Networking", "Hackathon"],
+        "capsules": ["Python","JS", "Hackathon"],
         "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
         "tags": ["network development", "highlighted projects"],
         "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
