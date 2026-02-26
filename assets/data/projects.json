@@ -32,6 +32,16 @@
         "alt": "Gnome Splash"
       },
       {
+        "title": "🌋 Molten Engine",
+        "categoryLabel": "Game Development",
+        "capsules": ["C++", "OpenGL", "ImGui", "CMake"],
+        "description": "Custom C++ engine sandbox with OpenGL rendering, ImGui tooling, and a CMake-driven build pipeline.",
+        "tags": ["system development" , "highlighted projects"],
+        "href": "#",
+        "image": "./assets/images/portfolio/MoltenEngine.gif",
+        "alt": "Molten Engine"
+      },
+      {
         "title": "🗄️ Mini Database Engine",
         "categoryLabel": "System Development",
         "capsules": ["C++", "CLI"],

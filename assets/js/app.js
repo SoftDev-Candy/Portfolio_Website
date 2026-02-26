@@ -627,13 +627,20 @@ function getProjectLogoMeta(project, capsules) {
   };
 }
 
+function supportsPointerTilt() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+
+  return (
+    window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches ||
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
+}
+
 function wireProjectCardTilt(root = document) {
   const cards = root.querySelectorAll("#projects-list .project-item > a");
   if (!cards.length) return;
 
-  const canUsePointerTilt =
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canUsePointerTilt = supportsPointerTilt();
 
   cards.forEach((card, idx) => {
     card.style.setProperty("--card-lean-y", idx % 2 === 0 ? "-1.1deg" : "1.1deg");
@@ -708,9 +715,7 @@ function wireLinkTilt(root = document) {
   const links = root.querySelectorAll("a[href]:not(#projects-list .project-item > a)");
   if (!links.length) return;
 
-  const canUsePointerTilt =
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canUsePointerTilt = supportsPointerTilt();
 
   links.forEach((link) => {
     if (link.dataset.linkTiltBound === "1") return;
