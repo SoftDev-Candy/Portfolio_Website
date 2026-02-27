@@ -1,9 +1,23 @@
 {
-    "site": {
-      "title": "Swastik Toprani",
-      "theme": "winter",
-      "favicon": "./assets/images/Iconpng.ico",
-      "cvUrl": "/assets/Swastik.Toprani (1).pdf"
+  "site": {
+    "title": "Swastik Toprani",
+    "theme": "winter",
+    "favicon": "./assets/images/Iconpng.ico",
+    "cvUrl": "/assets/Swastik.Toprani (1).pdf",
+    "footer": {
+      "signature": "< Swastik.Toprani // Bug Buffet >",
+      "tagline": "I cast C++ spells, summon OpenGL dragons, and bribe bugs with coffee.",
+      "badges": [
+        "build: green-ish",
+        "bugs: in stealth mode",
+        "coffee: compiling"
+      ],
+      "counter": {
+        "provider": "countapi",
+        "namespace": "swastik-toprani-portfolio",
+        "key": "main",
+        "throttleHours": 12
+      }
     }
   }
-  
+}

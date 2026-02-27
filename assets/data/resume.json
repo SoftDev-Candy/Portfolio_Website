@@ -5,19 +5,26 @@
       {
         "title": "Future Games",
         "date": "2024 - 2026",
-        "text": "Diploma in Game Engine Specialization"
+        "text": "Diploma in Game Engine Specialization",
+        "website": "https://futuregames.se/",
+        "logo": "./assets/images/portfolio/Posters/futuregamespoland_logo.png",
+        "logoAlt": "Future Games logo"
       },
       {
         "title": "Chandigarh University",
         "date": "2020 - 2024",
-        "text": "Bachelor of Engineering in Computer Science"
+        "text": "Bachelor of Engineering in Computer Science",
+        "website": "https://www.cuchd.in/",
+        "logo": "./assets/images/education/chandigarh-university-logo.png",
+        "logoAlt": "Chandigarh University logo"
       }
     ],
     "experience": [
       {
         "title": "Future Games Warsaw",
         "date": "2024 - Present",
-        "text": "I've worked as a game programmer on diverse projects, specializing in tools, gameplay mechanics, and UI development. My experience includes building core systems and improving gameplay while collaborating with cross-functional teams in Sweden, Poland, and India."
+        "text": "I've worked as a game programmer on diverse projects, specializing in tools, gameplay mechanics, and UI development. My experience includes building core systems and improving gameplay while collaborating with cross-functional teams in Sweden, Poland, and India.",
+        "website": "https://futuregames.se/"
       }
     ],
     "skills": {

@@ -23,6 +23,8 @@
 --border-soft: hsla(0, 0%, 100%, 0.10);  /* subtle rim */
 --text-1: hsl(0, 0%, 98%);
 --text-2: hsla(0, 0%, 92%, 0.75);
+--vegas-gold: var(--accent-2);
+--orange-yellow-crayola: var(--accent-2);
 
 }
 

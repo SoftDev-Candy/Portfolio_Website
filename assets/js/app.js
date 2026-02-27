@@ -470,36 +470,113 @@ function renderResume(resume) {
   if (cvLink && resume?.cvUrl) cvLink.href = resume.cvUrl;
   safeText(el("cv-label"), resume?.cvLabel ?? "Curriculum Vitae");
 
+  function buildTimelineItem(item, options = {}) {
+    const title = String(item?.title ?? "").trim();
+    const dateText = String(item?.range ?? item?.date ?? "").trim();
+    const bodyText = String(item?.text ?? "").trim();
+    const website = String(item?.website ?? item?.url ?? "").trim();
+    const logo = String(item?.logo ?? "").trim();
+
+    const li = document.createElement("li");
+    li.className = `timeline-item ${options.education ? "timeline-item--education" : "timeline-item--experience"}`;
+
+    const head = document.createElement("div");
+    head.className = "timeline-item-head";
+
+    if (options.education) {
+      const media = document.createElement("div");
+      media.className = "timeline-item-media";
+
+      if (logo) {
+        const img = document.createElement("img");
+        img.className = "timeline-item-logo";
+        img.src = logo;
+        img.alt = item?.logoAlt ?? `${title || "School"} logo`;
+        img.loading = "lazy";
+        media.appendChild(img);
+      } else {
+        const fallback = document.createElement("span");
+        fallback.className = "timeline-item-logo-fallback";
+        fallback.textContent = (title.match(/[A-Za-z0-9]/g) || []).slice(0, 2).join("").toUpperCase() || "ED";
+        media.appendChild(fallback);
+      }
+
+      head.appendChild(media);
+    }
+
+    const body = document.createElement("div");
+    body.className = "timeline-item-body";
+
+    const h4 = document.createElement("h4");
+    h4.className = "h4 timeline-item-title";
+    h4.textContent = title;
+    body.appendChild(h4);
+
+    if (dateText) {
+      const date = document.createElement("span");
+      date.className = "timeline-date-pill";
+      date.textContent = dateText;
+      body.appendChild(date);
+    }
+
+    head.appendChild(body);
+    li.appendChild(head);
+
+    if (website) {
+      li.classList.add("timeline-item--clickable");
+      li.setAttribute("role", "link");
+      li.setAttribute("tabindex", "0");
+      li.setAttribute("aria-label", `Open ${title || "organization"} website`);
+
+      const marker = document.createElement("span");
+      marker.className = "timeline-item-link-mark";
+      marker.setAttribute("aria-hidden", "true");
+
+      const arrow = document.createElement("span");
+      arrow.className = "timeline-item-link-arrow";
+      arrow.textContent = "↗";
+      marker.appendChild(arrow);
+      li.appendChild(marker);
+
+      const openWebsite = () => {
+        window.open(website, "_blank", "noopener,noreferrer");
+      };
+
+      li.addEventListener("click", (event) => {
+        if (event.target.closest("a,button,input,textarea,select,label")) return;
+        openWebsite();
+      });
+
+      li.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openWebsite();
+        }
+      });
+    }
+
+    if (bodyText) {
+      const text = document.createElement("p");
+      text.className = "timeline-text";
+      text.textContent = bodyText;
+      li.appendChild(text);
+    }
+
+    return li;
+  }
+
   const edu = el("education-list");
   if (edu) {
+    edu.className = "timeline-list timeline-list--education";
     edu.innerHTML = "";
-    (resume?.education ?? []).forEach((it) => {
-      const li = document.createElement("li");
-      li.className = "timeline-item";
-
-      li.innerHTML = `
-        <h4 class="h4 timeline-item-title">${it.title ?? ""}</h4>
-        <span>${it.range ?? it.date ?? ""}</span>
-        <p class="timeline-text">${it.text ?? ""}</p>
-      `;
-      edu.appendChild(li);
-    });
+    (resume?.education ?? []).forEach((item) => edu.appendChild(buildTimelineItem(item, { education: true })));
   }
 
   const exp = el("experience-list");
   if (exp) {
+    exp.className = "timeline-list timeline-list--experience";
     exp.innerHTML = "";
-    (resume?.experience ?? []).forEach((it) => {
-      const li = document.createElement("li");
-      li.className = "timeline-item";
-
-      li.innerHTML = `
-        <h4 class="h4 timeline-item-title">${it.title ?? ""}</h4>
-        <span>${it.range ?? it.date ?? ""}</span>
-        <p class="timeline-text">${it.text ?? ""}</p>
-      `;
-      exp.appendChild(li);
-    });
+    (resume?.experience ?? []).forEach((item) => exp.appendChild(buildTimelineItem(item)));
   }
 
   const tech = el("skills-technical");
@@ -961,6 +1038,88 @@ function renderContact(contact) {
   update();
 }
 
+function formatCount(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "--";
+  return new Intl.NumberFormat("en-US").format(n);
+}
+
+function sanitizeCounterPart(value, fallback) {
+  const clean = String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return clean || fallback;
+}
+
+async function fetchVisitorCount(siteData) {
+  const counterCfg = siteData?.footer?.counter ?? {};
+  const namespace = sanitizeCounterPart(counterCfg.namespace, "swastik-portfolio");
+  const autoKey = `${window.location.hostname || "local"}${window.location.pathname || "/"}`;
+  const key = sanitizeCounterPart(counterCfg.key ?? autoKey, "home");
+  const throttleHours = Number(counterCfg.throttleHours ?? 12);
+  const throttleMs = Number.isFinite(throttleHours) ? Math.max(1, throttleHours) * 60 * 60 * 1000 : 12 * 60 * 60 * 1000;
+
+  const storageKey = `visitor-counter-hit:${namespace}:${key}`;
+  const lastHit = Number(localStorage.getItem(storageKey) || 0);
+  const shouldHit = !Number.isFinite(lastHit) || (Date.now() - lastHit) > throttleMs;
+  const endpointType = shouldHit ? "hit" : "get";
+
+  const endpoint = `https://api.countapi.xyz/${endpointType}/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
+  const response = await fetch(endpoint, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`counter request failed (${response.status})`);
+  }
+
+  const payload = await response.json();
+  if (shouldHit) localStorage.setItem(storageKey, String(Date.now()));
+  return payload?.value;
+}
+
+async function renderFooter(siteData) {
+  const signature = el("footer-signature");
+  const tagline = el("footer-tagline");
+  const badges = el("footer-badges");
+  const visitorCount = el("visitor-count");
+  const year = el("footer-year");
+
+  if (signature) {
+    signature.textContent = siteData?.footer?.signature ?? "< Swastik.Toprani // Bug Buffet >";
+  }
+  if (tagline) {
+    tagline.textContent = siteData?.footer?.tagline ?? "I cast C++ spells, summon OpenGL dragons, and bribe bugs with coffee.";
+  }
+  if (year) {
+    year.textContent = String(new Date().getFullYear());
+  }
+
+  if (badges) {
+    badges.innerHTML = "";
+    const badgeItems = Array.isArray(siteData?.footer?.badges)
+      ? siteData.footer.badges
+      : ["build: green-ish", "bugs: in stealth mode", "coffee: compiling"];
+    badgeItems.slice(0, 4).forEach((label) => {
+      const chip = document.createElement("span");
+      chip.className = "site-footer__badge";
+      chip.textContent = String(label ?? "").trim();
+      if (chip.textContent) badges.appendChild(chip);
+    });
+  }
+
+  if (!visitorCount) return;
+  visitorCount.textContent = "...";
+
+  try {
+    const count = await fetchVisitorCount(siteData);
+    visitorCount.textContent = formatCount(count);
+  } catch (err) {
+    visitorCount.textContent = "--";
+    console.warn("[app] visitor counter unavailable:", err);
+  }
+}
+
 // -----------------------------
 // INIT
 // -----------------------------
@@ -1018,6 +1177,7 @@ async function init() {
   renderResume(resumeData);
   renderPortfolio(portfolioData, projects);
   renderContact(contactData);
+  await renderFooter(siteData);
   wireLinkTilt();
   await inlineThemeableSvgs(document);
 
