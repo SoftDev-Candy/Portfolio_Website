@@ -2,16 +2,12 @@
   "site": {
     "title": "Swastik Toprani",
     "theme": "winter",
+    "motionMode": "auto",
     "favicon": "./assets/images/Iconpng.ico",
     "cvUrl": "/assets/Swastik.Toprani (1).pdf",
     "footer": {
-      "signature": "< Swastik.Toprani // Bug Buffet >",
-      "tagline": "I cast C++ spells, summon OpenGL dragons, and bribe bugs with coffee.",
-      "badges": [
-        "build: green-ish",
-        "bugs: in stealth mode",
-        "coffee: compiling"
-      ],
+      "signature": "Debug Tavern/>",
+      "tagline": "Powered by C++ and poor life choices",
       "counter": {
         "provider": "countapi",
         "namespace": "swastik-toprani-portfolio",

@@ -38,11 +38,13 @@ let config = {
     CAPTURE_RESOLUTION: 512,
     DENSITY_DISSIPATION: 1,
     VELOCITY_DISSIPATION: 0.2,
-    PRESSURE: 0.8,
+    PRESSURE: 0.3,
     PRESSURE_ITERATIONS: 20,
     CURL: 30,
     SPLAT_RADIUS: 0.25,
     SPLAT_FORCE: 6000,
+    SIMULATION_SPEED: 0.6,
+    CURSOR_BRIGHTNESS: 0.8,
     SHADING: true,
     COLORFUL: true,
     COLOR_UPDATE_SPEED: 10,
@@ -57,7 +59,7 @@ let config = {
     BLOOM_SOFT_KNEE: 0.7,
     SUNRAYS: true,
     SUNRAYS_RESOLUTION: 196,
-    SUNRAYS_WEIGHT: 0.85,
+    SUNRAYS_WEIGHT: 0.7,
     SOUND_SENSITIVITY: 0.25,
     FREQ_RANGE: 8,
 }
@@ -1257,6 +1259,7 @@ function calcDeltaTime () {
     let now = Date.now();
     let dt = (now - lastUpdateTime) / 1000;
     dt = Math.min(dt, 0.016666);
+    dt *= config.SIMULATION_SPEED;
     lastUpdateTime = now;
     return dt;
 }
@@ -1499,7 +1502,13 @@ function blur (target, temp, iterations) {
 function splatPointer (pointer) {
     let dx = pointer.deltaX * config.SPLAT_FORCE;
     let dy = pointer.deltaY * config.SPLAT_FORCE;
-    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color);
+    const sourceColor = pointer.color || generateColor();
+    const cursorColor = {
+        r: sourceColor.r * config.CURSOR_BRIGHTNESS,
+        g: sourceColor.g * config.CURSOR_BRIGHTNESS,
+        b: sourceColor.b * config.CURSOR_BRIGHTNESS
+    };
+    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, cursorColor);
 }
 
 function multipleSplats (amount) {

@@ -30,9 +30,59 @@
   --fx-fluid-sat: 0.72;
   --fx-fluid-brightness: 0.48;
   --fx-fluid-opacity: 0.44;
+
+  /* custom scrollbar palette */
+  --scroll-track: rgba(255,255,255,0.04);
+  --scroll-thumb: color-mix(in srgb, var(--accent-2) 68%, rgba(255,255,255,0.30));
+  --scroll-thumb-hover: color-mix(in srgb, var(--accent-1) 72%, rgba(255,255,255,0.40));
 }
 
 html, body { height: 100%; }
+
+html{
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+body,
+.sidebar{
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+body::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar{
+  width: 12px;
+  height: 12px;
+}
+
+body::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track{
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+body::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb{
+  border-radius: 999px;
+  border: 2px solid rgba(0,0,0,0.62);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent-2) 86%, rgba(255,255,255,0.42)),
+    color-mix(in srgb, var(--accent-3) 82%, rgba(255,255,255,0.32))
+  );
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-glow) 32%, transparent);
+}
+
+body::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover{
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent-1) 88%, rgba(255,255,255,0.48)),
+    color-mix(in srgb, var(--accent-2) 86%, rgba(255,255,255,0.40))
+  );
+}
 
 body{
   margin: 0;
@@ -119,10 +169,10 @@ main{
 ========================================================= */
 .sidebar{
   position: sticky;
-  top: 0;
-  height: 100vh;
-  max-height: 100vh;
-  margin-bottom: 15px;
+  top: 8px;
+  height: calc(100dvh - 16px);
+  max-height: calc(100dvh - 16px);
+  margin-bottom: 0;
   padding: 15px;
   background: #000;
   border: 1px solid var(--panel-border);
@@ -136,7 +186,7 @@ main{
   gap: 0;
 }
 
-.sidebar.active { max-height: 100vh; }
+.sidebar.active { max-height: calc(100dvh - 16px); }
 
 /* joined sidebar internals */
 .sidebar-info,
@@ -154,6 +204,10 @@ main{
   justify-content: flex-start;
   align-items: center;
   gap: 15px;
+}
+
+.sidebar-quest{
+  display: none;
 }
 
 /* Avatar circle in the middle */
@@ -378,21 +432,46 @@ main{
 }
 
 .social-link{
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 38px;
   height: 38px;
-  border-radius: 0; /* square */
+  border-radius: 999px;
   display: grid;
   place-items: center;
 
-  background: rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.14);
+  background: #000;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 44%, rgba(255,255,255,0.2));
   color: var(--text-strong);
   text-decoration: none;
+  transition: transform var(--transition-1), border-color var(--transition-1), box-shadow var(--transition-1), color var(--transition-1);
+}
+
+.social-link::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent-glow) 42%, transparent) 0%, transparent 70%);
+  transform: scale(0.62);
+  opacity: 0;
+  transition: transform var(--transition-1), opacity var(--transition-1);
 }
 
 .social-link:hover{
-  border-color: rgba(255,255,255,0.22);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--panel-glow) 55%, transparent);
+  color: color-mix(in srgb, var(--accent-2) 84%, white);
+  border-color: color-mix(in srgb, var(--accent-2) 68%, rgba(255,255,255,0.24));
+  transform: translateY(-2px) scale(1.08);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent-2) 35%, rgba(255,255,255,0.2)) inset,
+    0 0 18px color-mix(in srgb, var(--panel-glow) 55%, transparent);
+}
+
+.social-link:hover::before{
+  transform: scale(1);
+  opacity: 1;
 }
 
 /* =========================================================
@@ -449,6 +528,7 @@ main{
   }
 
   .main-content{
+    grid-column: 2;
     margin-top: clamp(24px, 2.4vw, 40px);
     margin-bottom: clamp(30px, 2.8vw, 46px);
     gap: clamp(28px, 2.4vw, 40px);
@@ -456,9 +536,13 @@ main{
   }
 
   .sidebar{
-    top: 0;
-    max-height: calc(100vh - 22px);
-    height: calc(100vh - 22px);
+    position: fixed;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 270px;
+    max-height: none;
+    height: auto;
     margin-bottom: 0;
     padding-top: 18px;
     padding-bottom: 18px;
@@ -484,10 +568,21 @@ main{
     visibility: visible;
     max-height: none;
     overflow: visible;
-    margin-top: auto;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    margin-top: clamp(4px, 0.7vh, 10px);
+    padding-top: 12px;
+    padding-bottom: 8px;
   }
 
-  .social-list { justify-content: center; }
+  .sidebar-quest{
+    display: block;
+    margin-top: clamp(6px, 1vh, 12px);
+  }
+
+  .contacts-list { gap: 12px; }
+
+  .social-list {
+    justify-content: center;
+    margin-top: 8px;
+    padding: 0;
+  }
 }

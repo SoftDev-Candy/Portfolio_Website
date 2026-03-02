@@ -50,6 +50,8 @@
         <ul class="contacts-list" id="contacts-list"></ul>
         <div class="separator"></div>
         <ul class="social-list" id="social-list"></ul>
+        <div class="separator"></div>
+        <section class="sidebar-quest" id="sidebar-quest" aria-live="polite"></section>
       </div>
     </aside>
 
@@ -105,7 +107,7 @@
           target="_blank"
           rel="noreferrer"
         >
-          <ion-icon name="document-text-outline"></ion-icon>
+          <ion-icon name="arrow-forward-outline"></ion-icon>
           <span id="cv-label">Curriculum Vitae</span>
         </a>
 
@@ -122,7 +124,16 @@
             <div class="icon-box"><ion-icon name="briefcase-outline"></ion-icon></div>
             <h3 class="h3">Experience</h3>
           </div>
-          <ol class="timeline-list" id="experience-list"></ol>
+          <div class="experience-columns">
+            <div class="experience-column" id="experience-prof-column">
+              <h4 class="experience-column-title" id="experience-prof-title">Professional Experience</h4>
+              <ol class="timeline-list timeline-list--experience" id="experience-list"></ol>
+            </div>
+            <div class="experience-column" id="experience-project-column">
+              <h4 class="experience-column-title" id="experience-project-title">Professional Projects</h4>
+              <div class="experience-project-groups" id="project-experience-list"></div>
+            </div>
+          </div>
         </section>
 
         <section class="skills">
@@ -202,7 +213,7 @@
         </div>
         <div class="site-footer__badges" id="footer-badges"></div>
         <div class="site-footer__right">
-          <p class="site-footer__counter-label">Visitors</p>
+          <p class="site-footer__counter-label" id="footer-counter-label">Visitors</p>
           <p class="site-footer__counter-value" id="visitor-count">--</p>
           <p class="site-footer__meta"><span id="footer-year"></span></p>
         </div>

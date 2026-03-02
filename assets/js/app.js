@@ -164,7 +164,7 @@ function renderProfile(profile) {
       const li = document.createElement("li");
       li.className = "social-item";
       const a = document.createElement("a");
-      a.className = "social-link";
+      a.className = "social-link outline-grow-social";
       a.target = "_blank";
       a.rel = "noreferrer";
       a.href = s.href ?? "#";
@@ -175,6 +175,239 @@ function renderProfile(profile) {
       socials.appendChild(li);
     });
   }
+}
+
+function extractGithubUsername(raw) {
+  const match = String(raw ?? "").match(/github\.com\/([A-Za-z0-9-]+)/i);
+  return match ? match[1] : "";
+}
+
+function resolveGithubUsername(profile, siteData) {
+  const preferred = String(
+    siteData?.github?.username ??
+    siteData?.external?.githubUsername ??
+    ""
+  )
+    .trim()
+    .replace(/^@+/, "");
+
+  if (preferred) return preferred;
+
+  const socials = profile?.social ?? profile?.socials ?? [];
+  for (const social of socials) {
+    const username = extractGithubUsername(social?.href);
+    if (username) return username;
+  }
+
+  return "";
+}
+
+function getSidebarQuestCopy(siteData) {
+  const cfg = siteData?.sidebarQuest ?? {};
+  return {
+    kicker: String(cfg.kicker ?? "Commit Reactor"),
+    levelPrefix: String(cfg.levelPrefix ?? "Lv."),
+    subtitleSuffix: String(cfg.subtitleSuffix ?? "core branch"),
+    xpUnit: String(cfg.xpUnit ?? "XP"),
+    xpToNextSuffix: String(cfg.xpToNextSuffix ?? "to next level"),
+    reposLabel: String(cfg.reposLabel ?? "Repos"),
+    starsLabel: String(cfg.starsLabel ?? "Stars"),
+    followersLabel: String(cfg.followersLabel ?? "Followers"),
+    reposBarLabel: String(cfg.reposBarLabel ?? "Repo Forge"),
+    starsBarLabel: String(cfg.starsBarLabel ?? "Star Power"),
+    comboBarLabel: String(cfg.comboBarLabel ?? "Push Combo"),
+    loadingText: String(cfg.loadingText ?? "Calibrating mission feed..."),
+    fallbackText: String(cfg.fallbackText ?? "Live relay is cooling down. Open the mission log directly."),
+    linkLabel: String(cfg.linkLabel ?? "Inspect Mission Log"),
+  };
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function formatCompactNumber(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "--";
+  return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+}
+
+function getCachedGithubQuestStats(username) {
+  try {
+    const raw = localStorage.getItem(`github-quest-cache:${username}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.timestamp || !parsed?.data) return null;
+
+    const ttlMs = 30 * 60 * 1000;
+    if ((Date.now() - Number(parsed.timestamp)) > ttlMs) return null;
+    return parsed.data;
+  } catch (_) {
+    return null;
+  }
+}
+
+function setCachedGithubQuestStats(username, data) {
+  try {
+    localStorage.setItem(
+      `github-quest-cache:${username}`,
+      JSON.stringify({ timestamp: Date.now(), data })
+    );
+  } catch (_) {
+    // storage may be unavailable in private mode; ignore safely
+  }
+}
+
+async function fetchGithubQuestStats(username) {
+  const cached = getCachedGithubQuestStats(username);
+  if (cached) return cached;
+
+  const headers = { Accept: "application/vnd.github+json" };
+  const encoded = encodeURIComponent(username);
+
+  const [userRes, reposRes, eventsRes] = await Promise.all([
+    fetch(`https://api.github.com/users/${encoded}`, { headers, cache: "no-store" }),
+    fetch(`https://api.github.com/users/${encoded}/repos?per_page=100&sort=updated`, { headers, cache: "no-store" }),
+    fetch(`https://api.github.com/users/${encoded}/events/public?per_page=100`, { headers, cache: "no-store" }),
+  ]);
+
+  if (!userRes.ok) {
+    throw new Error(`GitHub user request failed (${userRes.status})`);
+  }
+
+  const user = await userRes.json();
+  const repos = reposRes.ok ? await reposRes.json() : [];
+  const events = eventsRes.ok ? await eventsRes.json() : [];
+
+  const totalStars = repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count ?? 0), 0);
+  const languageCounts = repos.reduce((acc, repo) => {
+    const language = String(repo?.language ?? "").trim();
+    if (!language) return acc;
+    acc[language] = (acc[language] ?? 0) + 1;
+    return acc;
+  }, {});
+  const topLanguage = Object.entries(languageCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Mixed Stack";
+
+  const pushEvents = events.filter((event) => event?.type === "PushEvent").length;
+  const prEvents = events.filter((event) => event?.type === "PullRequestEvent").length;
+
+  const score = Math.max(
+    1,
+    Math.round(
+      Number(user?.public_repos ?? 0) * 18 +
+      totalStars * 11 +
+      Number(user?.followers ?? 0) * 14 +
+      Number(user?.public_gists ?? 0) * 8 +
+      pushEvents * 16 +
+      prEvents * 20
+    )
+  );
+
+  const levelScale = 40;
+  const level = Math.max(1, Math.floor(Math.sqrt(score / levelScale)));
+  const floorXP = level * level * levelScale;
+  const ceilingXP = (level + 1) * (level + 1) * levelScale;
+  const levelProgress = clampNumber(((score - floorXP) / Math.max(1, (ceilingXP - floorXP))) * 100, 0, 100);
+
+  const data = {
+    username: String(user?.login ?? username),
+    profileUrl: String(user?.html_url ?? `https://github.com/${username}`),
+    repoCount: Number(user?.public_repos ?? 0),
+    followerCount: Number(user?.followers ?? 0),
+    starCount: totalStars,
+    pushCombo: pushEvents,
+    topLanguage,
+    score,
+    level,
+    levelProgress,
+    xpToNext: Math.max(0, ceilingXP - score),
+    bars: {
+      repos: clampNumber((Number(user?.public_repos ?? 0) / 45) * 100, 0, 100),
+      stars: clampNumber((totalStars / 80) * 100, 0, 100),
+      combo: clampNumber((pushEvents / 24) * 100, 0, 100),
+    },
+  };
+
+  setCachedGithubQuestStats(username, data);
+  return data;
+}
+
+function renderSidebarQuestMarkup(stats, copy) {
+  return `
+    <article class="gh-quest-card">
+      <p class="gh-quest-kicker">${escapeHtml(copy.kicker)}</p>
+      <h3 class="gh-quest-title">${escapeHtml(copy.levelPrefix)}${stats.level} ${escapeHtml(stats.username)}</h3>
+      <p class="gh-quest-subtitle">${escapeHtml(stats.topLanguage)} ${escapeHtml(copy.subtitleSuffix)}</p>
+
+      <div class="gh-quest-meter" role="progressbar" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(stats.levelProgress)}">
+        <span style="width:${stats.levelProgress.toFixed(2)}%"></span>
+      </div>
+      <p class="gh-quest-xp">${formatCompactNumber(stats.score)} ${escapeHtml(copy.xpUnit)} <span>${formatCompactNumber(stats.xpToNext)} ${escapeHtml(copy.xpToNextSuffix)}</span></p>
+
+      <ul class="gh-quest-stat-grid">
+        <li><strong>${formatCompactNumber(stats.repoCount)}</strong><span>${escapeHtml(copy.reposLabel)}</span></li>
+        <li><strong>${formatCompactNumber(stats.starCount)}</strong><span>${escapeHtml(copy.starsLabel)}</span></li>
+        <li><strong>${formatCompactNumber(stats.followerCount)}</strong><span>${escapeHtml(copy.followersLabel)}</span></li>
+      </ul>
+
+      <div class="gh-quest-bars">
+        <div class="gh-quest-bar">
+          <span>${escapeHtml(copy.reposBarLabel)}</span>
+          <i style="--fill:${stats.bars.repos.toFixed(2)}%"></i>
+        </div>
+        <div class="gh-quest-bar">
+          <span>${escapeHtml(copy.starsBarLabel)}</span>
+          <i style="--fill:${stats.bars.stars.toFixed(2)}%"></i>
+        </div>
+        <div class="gh-quest-bar">
+          <span>${escapeHtml(copy.comboBarLabel)} (${formatCompactNumber(stats.pushCombo)})</span>
+          <i style="--fill:${stats.bars.combo.toFixed(2)}%"></i>
+        </div>
+      </div>
+
+      <a class="gh-quest-link" href="${stats.profileUrl}" target="_blank" rel="noreferrer">${escapeHtml(copy.linkLabel)}</a>
+    </article>
+  `;
+}
+
+async function renderSidebarQuest(profile, siteData) {
+  const wrap = el("sidebar-quest");
+  if (!wrap) return;
+
+  const copy = getSidebarQuestCopy(siteData);
+  const username = resolveGithubUsername(profile, siteData);
+  if (!username) {
+    wrap.innerHTML = "";
+    wrap.hidden = true;
+    return;
+  }
+
+  wrap.hidden = false;
+  wrap.innerHTML = `
+    <article class="gh-quest-card is-loading">
+      <p class="gh-quest-kicker">${escapeHtml(copy.kicker)}</p>
+      <h3 class="gh-quest-title">Loading ${escapeHtml(username)}...</h3>
+      <div class="gh-quest-meter"><span style="width:36%"></span></div>
+      <p class="gh-quest-xp">${escapeHtml(copy.loadingText)}</p>
+    </article>
+  `;
+
+  try {
+    const stats = await fetchGithubQuestStats(username);
+    wrap.innerHTML = renderSidebarQuestMarkup(stats, copy);
+  } catch (err) {
+    wrap.innerHTML = `
+      <article class="gh-quest-card is-fallback">
+        <p class="gh-quest-kicker">${escapeHtml(copy.kicker)}</p>
+        <h3 class="gh-quest-title">${escapeHtml(username)}</h3>
+        <p class="gh-quest-xp">${escapeHtml(copy.fallbackText)}</p>
+        <a class="gh-quest-link" href="https://github.com/${encodeURIComponent(username)}" target="_blank" rel="noreferrer">${escapeHtml(copy.linkLabel)}</a>
+      </article>
+    `;
+    console.warn("[app] sidebar quest unavailable:", err);
+  }
+
+  wireLinkTilt(wrap);
 }
 
 // -----------------------------
@@ -463,22 +696,29 @@ function renderReferences(refs) {
 // -----------------------------
 // RESUME
 // -----------------------------
-function renderResume(resume) {
+function renderResume(resume, projectsData = null) {
   safeText(el("resume-title"), resume?.title ?? "Resume");
 
   const cvLink = el("cv-link");
   if (cvLink && resume?.cvUrl) cvLink.href = resume.cvUrl;
   safeText(el("cv-label"), resume?.cvLabel ?? "Curriculum Vitae");
 
+  safeText(el("experience-prof-title"), resume?.experienceColumns?.professional ?? "Professional Experience");
+  safeText(el("experience-project-title"), resume?.experienceColumns?.projects ?? "Project Experience");
+
   function buildTimelineItem(item, options = {}) {
     const title = String(item?.title ?? "").trim();
     const dateText = String(item?.range ?? item?.date ?? "").trim();
     const bodyText = String(item?.text ?? "").trim();
+    const metaText = String(item?.meta ?? item?.stack ?? "").trim();
     const website = String(item?.website ?? item?.url ?? "").trim();
     const logo = String(item?.logo ?? "").trim();
+    const highlights = Array.isArray(item?.highlights)
+      ? item.highlights.map((line) => String(line ?? "").trim()).filter(Boolean)
+      : [];
 
     const li = document.createElement("li");
-    li.className = `timeline-item ${options.education ? "timeline-item--education" : "timeline-item--experience"}`;
+    li.className = `timeline-item ${options.education ? "timeline-item--education" : "timeline-item--experience"}${options.project ? " timeline-item--project" : ""}`;
 
     const head = document.createElement("div");
     head.className = "timeline-item-head";
@@ -519,8 +759,12 @@ function renderResume(resume) {
       body.appendChild(date);
     }
 
-    head.appendChild(body);
-    li.appendChild(head);
+    if (metaText) {
+      const meta = document.createElement("p");
+      meta.className = "timeline-meta";
+      meta.textContent = metaText;
+      body.appendChild(meta);
+    }
 
     if (website) {
       li.classList.add("timeline-item--clickable");
@@ -534,7 +778,6 @@ function renderResume(resume) {
 
       const arrow = document.createElement("span");
       arrow.className = "timeline-item-link-arrow";
-      arrow.textContent = "↗";
       marker.appendChild(arrow);
       li.appendChild(marker);
 
@@ -555,6 +798,9 @@ function renderResume(resume) {
       });
     }
 
+    head.appendChild(body);
+    li.appendChild(head);
+
     if (bodyText) {
       const text = document.createElement("p");
       text.className = "timeline-text";
@@ -562,7 +808,54 @@ function renderResume(resume) {
       li.appendChild(text);
     }
 
+    if (highlights.length) {
+      const list = document.createElement("ul");
+      list.className = "timeline-points";
+      highlights.forEach((point) => {
+        const pointItem = document.createElement("li");
+        pointItem.textContent = point;
+        list.appendChild(pointItem);
+      });
+      li.appendChild(list);
+    }
+
     return li;
+  }
+
+  function deriveProjectExperience() {
+    const source = Array.isArray(projectsData?.projects)
+      ? projectsData.projects
+      : (Array.isArray(projectsData?.items) ? projectsData.items : []);
+    if (!source.length) return [];
+
+    const featured = source.filter((project) => {
+      const tags = Array.isArray(project?.tags) ? project.tags : [];
+      return tags.some((tag) => {
+        const key = normalizeKey(tag);
+        return key === "highlighted projects" || key === "featured";
+      });
+    });
+
+    const picked = (featured.length ? featured : source).slice(0, 6);
+
+    return picked.map((project) => {
+      const capsules = Array.isArray(project?.capsules)
+        ? project.capsules.map((item) => String(item ?? "").trim()).filter(Boolean)
+        : [];
+      const categoryKey = normalizeKey(project?.categoryLabel ?? project?.category ?? "");
+      const group =
+        categoryKey === "game development"
+          ? "Future Games Warsaw"
+          : (categoryKey === "system development" ? "Systems Projects" : "Network Projects");
+      return {
+        title: project?.title ?? "",
+        date: String(project?.date ?? "").trim(),
+        text: String(project?.description ?? "").trim(),
+        website: String(project?.href ?? project?.url ?? "").trim(),
+        meta: capsules.slice(0, 4).join(" • "),
+        group,
+      };
+    });
   }
 
   const edu = el("education-list");
@@ -572,11 +865,49 @@ function renderResume(resume) {
     (resume?.education ?? []).forEach((item) => edu.appendChild(buildTimelineItem(item, { education: true })));
   }
 
+  const professionalItems = Array.isArray(resume?.experience) ? resume.experience : [];
   const exp = el("experience-list");
   if (exp) {
     exp.className = "timeline-list timeline-list--experience";
     exp.innerHTML = "";
-    (resume?.experience ?? []).forEach((item) => exp.appendChild(buildTimelineItem(item)));
+    professionalItems.forEach((item) => exp.appendChild(buildTimelineItem(item)));
+  }
+
+  const explicitProjectItems = Array.isArray(resume?.projectExperience)
+    ? resume.projectExperience
+    : [];
+  const projectItems = explicitProjectItems.length ? explicitProjectItems : deriveProjectExperience();
+  const projectListWrap = el("project-experience-list");
+  const projectColumn = el("experience-project-column");
+  if (projectListWrap) {
+    projectListWrap.innerHTML = "";
+
+    const groups = new Map();
+    projectItems.forEach((item) => {
+      const key = String(item?.group ?? item?.organization ?? "Selected Projects").trim() || "Selected Projects";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    });
+
+    groups.forEach((items, label) => {
+      const groupSection = document.createElement("section");
+      groupSection.className = "experience-project-group";
+
+      const groupTitle = document.createElement("h5");
+      groupTitle.className = "experience-project-group-title";
+      groupTitle.textContent = label;
+      groupSection.appendChild(groupTitle);
+
+      const list = document.createElement("ol");
+      list.className = "timeline-list timeline-list--projects";
+      items.forEach((item) => list.appendChild(buildTimelineItem(item, { project: true })));
+      groupSection.appendChild(list);
+
+      projectListWrap.appendChild(groupSection);
+    });
+  }
+  if (projectColumn) {
+    projectColumn.hidden = projectItems.length === 0;
   }
 
   const tech = el("skills-technical");
@@ -705,12 +1036,34 @@ function getProjectLogoMeta(project, capsules) {
 }
 
 function supportsPointerTilt() {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  const motionMode = normalizeKey(document.documentElement.dataset.motion);
+  if (motionMode === "reduce") return false;
 
-  return (
-    window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches ||
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  const canMatchMedia = typeof window.matchMedia === "function";
+  if (
+    motionMode !== "force" &&
+    canMatchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return false;
+  }
+
+  const canHover = canMatchMedia && (
+    window.matchMedia("(any-hover: hover)").matches ||
+    window.matchMedia("(hover: hover)").matches
   );
+  const finePointer = canMatchMedia && (
+    window.matchMedia("(any-pointer: fine)").matches ||
+    window.matchMedia("(pointer: fine)").matches
+  );
+
+  if (canHover && finePointer) return true;
+
+  // Fallback for school/work managed browsers that misreport hover/pointer media features.
+  const touchPoints = Number(navigator.maxTouchPoints || 0);
+  const hasTouch = touchPoints > 0 || ("ontouchstart" in window);
+  const likelyDesktop = window.innerWidth >= 1024;
+  return !hasTouch && likelyDesktop;
 }
 
 function wireProjectCardTilt(root = document) {
@@ -718,6 +1071,10 @@ function wireProjectCardTilt(root = document) {
   if (!cards.length) return;
 
   const canUsePointerTilt = supportsPointerTilt();
+  const hasPointerEvents = typeof window.PointerEvent !== "undefined";
+  const enterEvent = hasPointerEvents ? "pointerenter" : "mouseenter";
+  const moveEvent = hasPointerEvents ? "pointermove" : "mousemove";
+  const leaveEvent = hasPointerEvents ? "pointerleave" : "mouseleave";
 
   cards.forEach((card, idx) => {
     card.style.setProperty("--card-lean-y", idx % 2 === 0 ? "-1.1deg" : "1.1deg");
@@ -780,9 +1137,9 @@ function wireProjectCardTilt(root = document) {
       queueApply();
     };
 
-    card.addEventListener("pointerenter", updateFromPointer);
-    card.addEventListener("pointermove", updateFromPointer);
-    card.addEventListener("pointerleave", resetTilt);
+    card.addEventListener(enterEvent, updateFromPointer, { passive: true });
+    card.addEventListener(moveEvent, updateFromPointer, { passive: true });
+    card.addEventListener(leaveEvent, resetTilt, { passive: true });
     card.addEventListener("blur", resetTilt, true);
     resetTilt();
   });
@@ -793,6 +1150,10 @@ function wireLinkTilt(root = document) {
   if (!links.length) return;
 
   const canUsePointerTilt = supportsPointerTilt();
+  const hasPointerEvents = typeof window.PointerEvent !== "undefined";
+  const enterEvent = hasPointerEvents ? "pointerenter" : "mouseenter";
+  const moveEvent = hasPointerEvents ? "pointermove" : "mousemove";
+  const leaveEvent = hasPointerEvents ? "pointerleave" : "mouseleave";
 
   links.forEach((link) => {
     if (link.dataset.linkTiltBound === "1") return;
@@ -854,12 +1215,12 @@ function wireLinkTilt(root = document) {
       queueApply();
     };
 
-    link.addEventListener("pointerenter", (event) => {
+    link.addEventListener(enterEvent, (event) => {
       link.classList.add("link-tilt-active");
       updateFromPointer(event);
     }, { passive: true });
-    link.addEventListener("pointermove", updateFromPointer, { passive: true });
-    link.addEventListener("pointerleave", resetTilt, { passive: true });
+    link.addEventListener(moveEvent, updateFromPointer, { passive: true });
+    link.addEventListener(leaveEvent, resetTilt, { passive: true });
     link.addEventListener("blur", resetTilt, true);
     resetTilt();
   });
@@ -979,7 +1340,10 @@ function renderPortfolio(portfolio, projects) {
           <h3 class="project-title">${p.title ?? ""}</h3>
           ${capsulesHtml}
           ${descriptionHtml}
-          <p class="project-category">${displayLabel}</p>
+          <p class="project-category arrow-right-inline">
+            <span class="arrow-right-inline__label">${displayLabel}</span>
+            <span class="arrow-right-inline__icon" aria-hidden="true"></span>
+          </p>
         </a>
       `;
 
@@ -1059,22 +1423,13 @@ async function fetchVisitorCount(siteData) {
   const namespace = sanitizeCounterPart(counterCfg.namespace, "swastik-portfolio");
   const autoKey = `${window.location.hostname || "local"}${window.location.pathname || "/"}`;
   const key = sanitizeCounterPart(counterCfg.key ?? autoKey, "home");
-  const throttleHours = Number(counterCfg.throttleHours ?? 12);
-  const throttleMs = Number.isFinite(throttleHours) ? Math.max(1, throttleHours) * 60 * 60 * 1000 : 12 * 60 * 60 * 1000;
-
-  const storageKey = `visitor-counter-hit:${namespace}:${key}`;
-  const lastHit = Number(localStorage.getItem(storageKey) || 0);
-  const shouldHit = !Number.isFinite(lastHit) || (Date.now() - lastHit) > throttleMs;
-  const endpointType = shouldHit ? "hit" : "get";
-
-  const endpoint = `https://api.countapi.xyz/${endpointType}/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
+  const endpoint = `https://api.countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
   const response = await fetch(endpoint, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`counter request failed (${response.status})`);
   }
 
   const payload = await response.json();
-  if (shouldHit) localStorage.setItem(storageKey, String(Date.now()));
   return payload?.value;
 }
 
@@ -1082,14 +1437,19 @@ async function renderFooter(siteData) {
   const signature = el("footer-signature");
   const tagline = el("footer-tagline");
   const badges = el("footer-badges");
+  const counterLabel = el("footer-counter-label");
   const visitorCount = el("visitor-count");
   const year = el("footer-year");
+  const footerCfg = siteData?.footer ?? {};
 
   if (signature) {
-    signature.textContent = siteData?.footer?.signature ?? "< Swastik.Toprani // Bug Buffet >";
+    signature.textContent = footerCfg.signature ?? "< Swastik.Toprani // Bug Buffet >";
   }
   if (tagline) {
-    tagline.textContent = siteData?.footer?.tagline ?? "I cast C++ spells, summon OpenGL dragons, and bribe bugs with coffee.";
+    tagline.textContent = footerCfg.tagline ?? "I cast C++ spells, summon OpenGL dragons, and bribe bugs with coffee.";
+  }
+  if (counterLabel) {
+    counterLabel.textContent = footerCfg.counterLabel ?? "Visitors";
   }
   if (year) {
     year.textContent = String(new Date().getFullYear());
@@ -1097,8 +1457,8 @@ async function renderFooter(siteData) {
 
   if (badges) {
     badges.innerHTML = "";
-    const badgeItems = Array.isArray(siteData?.footer?.badges)
-      ? siteData.footer.badges
+    const badgeItems = Array.isArray(footerCfg.badges)
+      ? footerCfg.badges
       : ["build: green-ish", "bugs: in stealth mode", "coffee: compiling"];
     badgeItems.slice(0, 4).forEach((label) => {
       const chip = document.createElement("span");
@@ -1109,13 +1469,13 @@ async function renderFooter(siteData) {
   }
 
   if (!visitorCount) return;
-  visitorCount.textContent = "...";
+  visitorCount.textContent = footerCfg.counterLoadingText ?? "...";
 
   try {
     const count = await fetchVisitorCount(siteData);
     visitorCount.textContent = formatCount(count);
   } catch (err) {
-    visitorCount.textContent = "--";
+    visitorCount.textContent = footerCfg.counterUnavailableText ?? "--";
     console.warn("[app] visitor counter unavailable:", err);
   }
 }
@@ -1161,6 +1521,12 @@ async function init() {
   if (siteData?.theme && !document.documentElement.dataset.theme) {
     document.documentElement.dataset.theme = siteData.theme;
   }
+  const motionMode = normalizeKey(siteData?.motionMode ?? "auto");
+  if (motionMode === "force" || motionMode === "reduce") {
+    document.documentElement.dataset.motion = motionMode;
+  } else {
+    delete document.documentElement.dataset.motion;
+  }
   if (siteData?.favicon) {
     const fav = document.querySelector("link[rel='shortcut icon']");
     if (fav) fav.href = siteData.favicon;
@@ -1171,10 +1537,11 @@ async function init() {
   }
 
   renderProfile(profileData);
+  renderSidebarQuest(profileData, siteData);
   renderAbout(aboutData);
   renderServices(servicesData);
   renderReferences(referencesData);
-  renderResume(resumeData);
+  renderResume(resumeData, projects);
   renderPortfolio(portfolioData, projects);
   renderContact(contactData);
   await renderFooter(siteData);

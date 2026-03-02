@@ -1,4 +1,4 @@
-{
+﻿{
   "resume": {
     "title": "<Career Chronicle/>",
     "education": [
@@ -23,15 +23,99 @@
       {
         "title": "Future Games Warsaw",
         "date": "2024 - Present",
-        "text": "I've worked as a game programmer on diverse projects, specializing in tools, gameplay mechanics, and UI development. My experience includes building core systems and improving gameplay while collaborating with cross-functional teams in Sweden, Poland, and India.",
+        "meta": "Game Programmer | Team Pipeline | Jira | Perforce",
+        "text": "Worked on team-based game development projects using a full production pipeline from prototype to release while collaborating across Sweden, Poland, and India.",
+        "highlights": [
+          "Followed complete game development lifecycle: prototype, iteration, playtesting, polish, and release.",
+          "Used Jira for sprint planning, task tracking, and milestone delivery.",
+          "Used Perforce for source control, asset sync, and team collaboration across disciplines."
+        ],
         "website": "https://futuregames.se/"
+      },
+      {
+        "title": "Gnome Splash - Local Multiplayer PvP",
+        "date": "Future Games Team Project",
+        "meta": "C++ | Unreal Engine | Local Multiplayer",
+        "text": "Directed gameplay programming for a split-screen local PvP project with multiplayer game flow systems.",
+        "highlights": [
+          "Built 4-player instances with spawning, damage, and respawn loops.",
+          "Designed HUD and UI elements including health bars, cooldowns, and menus.",
+          "Delivered from prototype to final build in a 7-week production cycle."
+        ],
+        "website": "https://futuregames.itch.io/gnome-splash"
+      },
+      {
+        "title": "Secrets of the Mansion",
+        "date": "Future Games Team Project",
+        "meta": "C# | Unity | Puzzle",
+        "text": "Created a story-driven exploration prototype with scene progression, puzzle logic, and event triggers.",
+        "website": "https://github.com/SoftDev-Candy/CodenameMansion"
+      },
+      {
+        "title": "TomTheDragon",
+        "date": "Future Games Team Project",
+        "meta": "C# | Unity | Platformer",
+        "text": "Developed gameplay systems around state-driven movement, platforming loops, and collision behavior.",
+        "website": "https://github.com/SoftDev-Candy/TomTheDragon"
+      },
+      {
+        "title": "Molten Engine",
+        "date": "Future Games Solo Project",
+        "meta": "C++ | OpenGL | ImGui | CMake",
+        "text": "Built a custom engine sandbox focused on rendering foundations, tooling, and build-system structure.",
+        "highlights": [
+          "Implemented rendering flow with OpenGL and reusable graphics modules.",
+          "Added ImGui-based debug tooling for rapid iteration and testing.",
+          "Maintained modular architecture using a CMake-driven project structure."
+        ],
+        "website": "https://github.com/SoftDev-Candy/MoltenEngine"
+      }
+    ],
+    "experienceColumns": {
+      "professional": "Professional Experience",
+      "projects": "Professional Projects"
+    },
+    "projectExperience": [
+      {
+        "group": "Solo Projects",
+        "title": "Molten Engine",
+        "meta": "C++ | OpenGL | ImGui | CMake",
+        "text": "Built a custom engine sandbox focused on rendering foundations, tooling, and build-system architecture.",
+        "highlights": [
+          "Implemented rendering flow with OpenGL and reusable graphics modules.",
+          "Added ImGui-driven debugging and tooling for fast iteration.",
+          "Maintained a modular codebase with a CMake-based build pipeline."
+        ],
+        "website": "https://github.com/SoftDev-Candy/MoltenEngine"
+      },
+      {
+        "group": "Solo Projects",
+        "title": "SOUL (Secure Orbital Uplink Layer)",
+        "meta": "Backend | Networking | Systems | Defense",
+        "text": "Designed a secure satellite telemetry backend and uplink-layer architecture for defense-oriented communication workflows.",
+        "highlights": [
+          "Defined secure telemetry ingestion and processing flow for orbital data streams.",
+          "Focused on resilient networking patterns for uplink/downlink communication paths.",
+          "Structured the system with modular backend services and systems-level reliability goals."
+        ]
+      },
+      {
+        "group": "HackYeah Hackathon",
+        "title": "Travel Guardian API",
+        "meta": "C++ | API | Backend Systems",
+        "text": "Built the backend component for the hackathon project, focused on modular APIs and service workflows.",
+        "highlights": [
+          "Designed API surfaces for safety and alerting paths.",
+          "Implemented request validation and authentication-aware handlers."
+        ],
+        "website": "https://github.com/SoftDev-Candy/TG_3SIX_O"
       }
     ],
     "skills": {
       "technicalGroups": [
         {
           "title": "Languages",
-          "items": ["C++", "C#"]
+          "items": ["C++", "C#", "Rust"]
         },
         {
           "title": "Game Engines",
@@ -51,7 +135,7 @@
         },
         {
           "title": "Platforms & Networking",
-          "items": ["Linux", "Windows", "5G" , "RAN"]
+          "items": ["Linux", "Windows", "5G", "RAN"]
         }
       ],
       "technical": [
