@@ -46,12 +46,20 @@
       </div>
 
       <div class="sidebar-info_more">
-        <div class="separator"></div>
-        <ul class="contacts-list" id="contacts-list"></ul>
-        <div class="separator"></div>
-        <ul class="social-list" id="social-list"></ul>
-        <div class="separator"></div>
-        <section class="sidebar-quest" id="sidebar-quest" aria-live="polite"></section>
+        <section class="sidebar-section sidebar-section--contacts" aria-label="Contact details">
+          <h2 class="sidebar-section-title">Signal Desk</h2>
+          <ul class="contacts-list" id="contacts-list"></ul>
+        </section>
+
+        <section class="sidebar-section sidebar-section--quest" aria-label="GitHub status">
+          <h2 class="sidebar-section-title">Mission Telemetry</h2>
+          <section class="sidebar-quest" id="sidebar-quest" aria-live="polite"></section>
+        </section>
+
+        <section class="sidebar-section sidebar-section--social" aria-label="Social links">
+          <h2 class="sidebar-section-title">Signal Links</h2>
+          <ul class="social-list" id="social-list"></ul>
+        </section>
       </div>
     </aside>
 

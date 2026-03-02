@@ -109,7 +109,6 @@ function renderProfile(profile) {
     (profile?.roles ?? []).forEach((r) => {
       const p = document.createElement("p");
       p.className = "title";
-      p.style.marginBottom = "10px";
       p.textContent = r;
       rolesWrap.appendChild(p);
     });
@@ -168,6 +167,9 @@ function renderProfile(profile) {
       a.target = "_blank";
       a.rel = "noreferrer";
       a.href = s.href ?? "#";
+      const socialLabel = String(s.label ?? "Social link");
+      a.setAttribute("aria-label", socialLabel);
+      a.title = socialLabel;
       const icon = document.createElement("ion-icon");
       icon.setAttribute("name", s.icon ?? "logo-github");
       a.appendChild(icon);
@@ -1418,19 +1420,63 @@ function sanitizeCounterPart(value, fallback) {
   return clean || fallback;
 }
 
-async function fetchVisitorCount(siteData) {
+function getCounterIdentity(siteData) {
   const counterCfg = siteData?.footer?.counter ?? {};
   const namespace = sanitizeCounterPart(counterCfg.namespace, "swastik-portfolio");
   const autoKey = `${window.location.hostname || "local"}${window.location.pathname || "/"}`;
   const key = sanitizeCounterPart(counterCfg.key ?? autoKey, "home");
-  const endpoint = `https://api.countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
-  const response = await fetch(endpoint, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`counter request failed (${response.status})`);
+  return { namespace, key };
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      cache: "no-store",
+      mode: "cors",
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`request failed (${response.status})`);
+    }
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchVisitorCount(siteData) {
+  const { namespace, key } = getCounterIdentity(siteData);
+  const stamp = `_=${Date.now()}`;
+  const candidates = [
+    {
+      url: `https://api.countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}?${stamp}`,
+      read: (payload) => payload?.value,
+    },
+    {
+      url: `https://countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}?${stamp}`,
+      read: (payload) => payload?.value,
+    },
+    {
+      url: `https://api.counterapi.dev/v1/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}/up?${stamp}`,
+      read: (payload) => payload?.count,
+    },
+  ];
+
+  let lastError = null;
+  for (const candidate of candidates) {
+    try {
+      const payload = await fetchJsonWithTimeout(candidate.url);
+      const value = Number(candidate.read(payload));
+      if (Number.isFinite(value)) return value;
+      throw new Error("counter payload missing numeric value");
+    } catch (err) {
+      lastError = err;
+    }
   }
 
-  const payload = await response.json();
-  return payload?.value;
+  throw lastError ?? new Error("counter providers unavailable");
 }
 
 async function renderFooter(siteData) {
@@ -1475,8 +1521,21 @@ async function renderFooter(siteData) {
     const count = await fetchVisitorCount(siteData);
     visitorCount.textContent = formatCount(count);
   } catch (err) {
-    visitorCount.textContent = footerCfg.counterUnavailableText ?? "--";
-    console.warn("[app] visitor counter unavailable:", err);
+    const { namespace, key } = getCounterIdentity(siteData);
+    const pageId = `${namespace}.${key}`;
+    const label = footerCfg.counterLabel ?? "Visitors";
+    const badge = document.createElement("img");
+    badge.alt = `${label} counter`;
+    badge.src = `https://visitor-badge.laobi.icu/badge?page_id=${encodeURIComponent(pageId)}&left_text=${encodeURIComponent(" ")}&left_color=111111&right_color=025a5f`;
+    badge.loading = "lazy";
+    badge.style.maxWidth = "100%";
+    badge.style.height = "22px";
+    badge.style.borderRadius = "8px";
+    badge.style.border = "1px solid rgba(255,255,255,0.14)";
+
+    visitorCount.textContent = "";
+    visitorCount.appendChild(badge);
+    console.warn("[app] visitor counter providers unavailable, using badge fallback:", err);
   }
 }
 
