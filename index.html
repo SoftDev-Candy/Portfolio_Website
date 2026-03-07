@@ -46,10 +46,20 @@
       </div>
 
       <div class="sidebar-info_more">
-        <div class="separator"></div>
-        <ul class="contacts-list" id="contacts-list"></ul>
-        <div class="separator"></div>
-        <ul class="social-list" id="social-list"></ul>
+        <section class="sidebar-section sidebar-section--contacts" aria-label="Contact details">
+          <h2 class="sidebar-section-title">Signal Desk</h2>
+          <ul class="contacts-list" id="contacts-list"></ul>
+        </section>
+
+        <section class="sidebar-section sidebar-section--quest" aria-label="GitHub status">
+          <h2 class="sidebar-section-title">Mission Telemetry</h2>
+          <section class="sidebar-quest" id="sidebar-quest" aria-live="polite"></section>
+        </section>
+
+        <section class="sidebar-section sidebar-section--social" aria-label="Social links">
+          <h2 class="sidebar-section-title">Signal Links</h2>
+          <ul class="social-list" id="social-list"></ul>
+        </section>
       </div>
     </aside>
 
@@ -105,7 +115,7 @@
           target="_blank"
           rel="noreferrer"
         >
-          <ion-icon name="document-text-outline"></ion-icon>
+          <ion-icon name="arrow-forward-outline"></ion-icon>
           <span id="cv-label">Curriculum Vitae</span>
         </a>
 
@@ -122,7 +132,16 @@
             <div class="icon-box"><ion-icon name="briefcase-outline"></ion-icon></div>
             <h3 class="h3">Experience</h3>
           </div>
-          <ol class="timeline-list" id="experience-list"></ol>
+          <div class="experience-columns">
+            <div class="experience-column" id="experience-prof-column">
+              <h4 class="experience-column-title" id="experience-prof-title">Professional Experience</h4>
+              <ol class="timeline-list timeline-list--experience" id="experience-list"></ol>
+            </div>
+            <div class="experience-column" id="experience-project-column">
+              <h4 class="experience-column-title" id="experience-project-title">Professional Projects</h4>
+              <div class="experience-project-groups" id="project-experience-list"></div>
+            </div>
+          </div>
         </section>
 
         <section class="skills">
@@ -194,6 +213,19 @@
           </form>
         </section>
       </section>
+
+      <footer class="site-footer" id="site-footer" aria-live="polite">
+        <div class="site-footer__left">
+          <p class="site-footer__signature" id="footer-signature">&lt; Swastik.Toprani // Bug Buffet &gt;</p>
+          <p class="site-footer__tagline" id="footer-tagline">I cast C++ spells, summon OpenGL dragons, and bribe bugs with coffee.</p>
+        </div>
+        <div class="site-footer__badges" id="footer-badges"></div>
+        <div class="site-footer__right">
+          <p class="site-footer__counter-label" id="footer-counter-label">Visitors</p>
+          <p class="site-footer__counter-value" id="visitor-count">--</p>
+          <p class="site-footer__meta"><span id="footer-year"></span></p>
+        </div>
+      </footer>
     </div>
   </main>
 

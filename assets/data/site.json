@@ -1,9 +1,19 @@
 {
-    "site": {
-      "title": "Swastik Toprani",
-      "theme": "winter",
-      "favicon": "./assets/images/Iconpng.ico",
-      "cvUrl": "/assets/Swastik.Toprani (1).pdf"
+  "site": {
+    "title": "Swastik Toprani",
+    "theme": "winter",
+    "motionMode": "auto",
+    "favicon": "./assets/images/Iconpng.ico",
+    "cvUrl": "/assets/Swastik.Toprani (1).pdf",
+    "footer": {
+      "signature": "Debug Tavern/>",
+      "tagline": "Powered by C++ and poor life choices",
+      "counter": {
+        "provider": "countapi",
+        "namespace": "swastik-toprani-portfolio",
+        "key": "main",
+        "throttleHours": 12
+      }
     }
   }
-  
+}
