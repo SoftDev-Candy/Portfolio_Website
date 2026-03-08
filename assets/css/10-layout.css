@@ -144,6 +144,12 @@ main{
 
 /* --- Main content placeholder (big "window" like your sketch) --- */
 .main-content{
+  /* Main-window-only text palette: less gray, more theme-aware contrast */
+  --text-2: color-mix(in srgb, var(--white-2) 76%, var(--accent-1) 24%);
+  --light-gray: color-mix(in srgb, var(--white-2) 72%, var(--accent-2) 28%);
+  --light-gray-70: color-mix(in srgb, var(--white-2) 68%, var(--accent-3) 32%);
+  --text-muted: var(--light-gray-70);
+
   min-height: calc(100vh - 64px);
   margin: clamp(24px, 2.4vw, 38px) 0 clamp(28px, 2.6vw, 42px);
   width: min(100%, 1480px);
@@ -346,24 +352,16 @@ main{
 
 .sidebar-info_more{
   margin-top: 0;
-  padding: 0;
-  opacity: 0;
-  visibility: hidden;
-  max-height: 0;
-  overflow: hidden;
+  padding: 14px 0 10px;
+  opacity: 1;
+  visibility: visible;
+  max-height: none;
+  overflow: visible;
   display: grid;
   width: 100%;
   justify-items: stretch;
   gap: 12px;
   transition: var(--transition-2);
-}
-
-.sidebar.active .sidebar-info_more{
-  opacity: 1;
-  visibility: visible;
-  max-height: 860px;
-  padding-top: 14px;
-  padding-bottom: 10px;
 }
 
 .sidebar-section{
@@ -586,7 +584,7 @@ main{
     position: relative;
     top: auto;
     height: auto;
-    max-height: 112px;
+    max-height: none;
     padding: 15px;
     gap: 0;
   }
@@ -594,12 +592,6 @@ main{
   .sidebar-info_more{
     margin-top: 0;
     gap: 10px;
-  }
-
-  .sidebar.active .sidebar-info_more{
-    max-height: min(74vh, 720px);
-    overflow-y: auto;
-    padding-right: 2px;
   }
 
   .sidebar-section{
@@ -622,15 +614,7 @@ main{
   }
 
   .info_more-btn{
-    display: inline-grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 0;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: var(--text-strong);
-    cursor: pointer;
+    display: none;
   }
 }
 

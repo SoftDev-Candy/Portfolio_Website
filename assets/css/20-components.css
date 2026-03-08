@@ -67,7 +67,7 @@
   .cv-button:hover::before { transform: scaleX(1); }
 
   .cv-button:hover ion-icon {
-    transform: translateX(5px) scaleX(1.14);
+    transform: scale(1.08) rotate(-6deg);
     color: color-mix(in srgb, var(--accent-2) 84%, white);
   }
 
@@ -906,7 +906,7 @@
 
 .timeline-item {
   position: relative;
-  padding: 16px 18px 16px 20px;
+  padding: 16px 18px 18px 20px;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.12);
   background: #000;
@@ -946,18 +946,27 @@
 .timeline-item--clickable::before {
   content: "";
   position: absolute;
-  inset: 0;
-  z-index: 0;
+  left: 20px;
+  right: 18px;
+  bottom: 9px;
+  height: 3px;
+  z-index: 2;
   pointer-events: none;
-  background: linear-gradient(
-    100deg,
-    rgba(255,255,255,0.01) 0%,
-    color-mix(in srgb, var(--accent-glow) 18%, transparent) 52%,
-    rgba(255,255,255,0.01) 100%
-  );
-  opacity: 0;
-  transform: scaleX(0.84);
-  transition: opacity var(--transition-1), transform var(--transition-1);
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent-2) 88%, white) 0%,
+      color-mix(in srgb, var(--accent-1) 88%, white) 52%,
+      color-mix(in srgb, var(--accent-3) 86%, white) 100%
+    ) 0 0 / 1% 100% no-repeat,
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent-2) 12%, rgba(255,255,255,0.16)) 0%,
+      rgba(255,255,255,0.04) 100%
+    ) 0 0 / 100% 100% no-repeat;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-glow) 28%, transparent);
+  transition: background-size 420ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow var(--transition-1);
 }
 
 .timeline-item--clickable:focus-visible {
@@ -967,8 +976,8 @@
 
 .timeline-item--clickable:hover::before,
 .timeline-item--clickable:focus-visible::before {
-  opacity: 1;
-  transform: scaleX(1);
+  background-size: 100% 100%, 100% 100%;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-glow) 42%, transparent);
 }
 
 .timeline-item-head {
@@ -1046,110 +1055,60 @@
   line-height: 1.3;
 }
 
-@keyframes timelineArrowSweep {
-  0%, 100% { transform: translateX(-1px); }
-  50% { transform: translateX(9px); }
-}
-
-.timeline-item-link-mark {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 50px;
-  height: 30px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--accent-2) 48%, rgba(255,255,255,0.2));
-  background:
-    linear-gradient(105deg, rgba(255,255,255,0.02) 0%, color-mix(in srgb, var(--accent-glow) 14%, transparent) 56%, rgba(255,255,255,0.01) 100%),
-    #000;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent-2);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-glow) 22%, transparent);
-  transition: transform var(--transition-1), border-color var(--transition-1), box-shadow var(--transition-1);
-}
-
-.timeline-item-link-mark::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  background: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--accent-glow) 34%, transparent) 0%, transparent 62%);
-  opacity: 0;
-  transition: opacity var(--transition-1);
-}
-
-.timeline-item-link-arrow {
-  position: relative;
-  width: 21px;
-  height: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  color: color-mix(in srgb, var(--accent-2) 84%, white);
-  transform: translateX(-4px);
-  transition: transform var(--transition-1), color var(--transition-1), filter var(--transition-1);
-}
-
-.timeline-item-link-arrow::before {
-  content: "";
-  width: 15px;
-  height: 1.8px;
-  border-radius: 2px;
-  background: currentColor;
-}
-
-.timeline-item-link-arrow::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 7.5px;
-  height: 7.5px;
-  border-top: 1.8px solid currentColor;
-  border-right: 1.8px solid currentColor;
-  transform: translateY(-50%) rotate(45deg);
-}
-
-.timeline-item--clickable:hover .timeline-item-link-mark,
-.timeline-item--clickable:focus-visible .timeline-item-link-mark {
-  border-color: color-mix(in srgb, var(--accent-2) 74%, rgba(255,255,255,0.24));
-  transform: scale(1.04);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent-2) 30%, rgba(255,255,255,0.2)) inset,
-    0 0 13px color-mix(in srgb, var(--accent-glow) 34%, transparent);
-}
-
-.timeline-item--clickable:hover .timeline-item-link-mark::before,
-.timeline-item--clickable:focus-visible .timeline-item-link-mark::before {
-  opacity: 1;
-}
-
-.timeline-item--clickable:hover .timeline-item-link-arrow,
-.timeline-item--clickable:focus-visible .timeline-item-link-arrow {
-  color: color-mix(in srgb, var(--accent-2) 86%, white);
-  transform: translateX(7px);
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent-glow) 42%, transparent));
-  animation: timelineArrowSweep 1s ease-in-out infinite;
-}
-
 .timeline-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin: 0 0 2px;
+  padding-bottom: 2px;
   color: var(--accent-2);
   text-decoration: none;
   font-family: var(--ff-mono);
   font-size: calc(var(--fs-7) + 1px);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent-2) 92%, white) 0%,
+    color-mix(in srgb, var(--accent-1) 84%, white) 100%
+  );
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: color var(--transition-1), text-shadow var(--transition-1), background-size 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timeline-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: color-mix(in srgb, var(--accent-2) 50%, rgba(255,255,255,0.3));
+  opacity: 0.56;
+  transform: scaleX(0.36);
+  transform-origin: left center;
+  transition: transform var(--transition-1), opacity var(--transition-1);
 }
 
 .timeline-link:hover {
   color: color-mix(in srgb, var(--accent-2) 82%, white);
   text-shadow: 0 0 8px color-mix(in srgb, var(--accent-glow) 34%, transparent);
+  background-size: 100% 1px;
+}
+
+.timeline-link:hover::before,
+.timeline-link:focus-visible::before {
+  opacity: 0;
+  transform: scaleX(1);
+}
+
+.timeline-link:focus-visible {
+  color: color-mix(in srgb, var(--accent-2) 82%, white);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent-glow) 34%, transparent);
+  background-size: 100% 1px;
 }
 
 .timeline-link::after {
@@ -1157,8 +1116,8 @@
 }
 
 .timeline-text {
-  color: var(--text-2);
-  font-weight: var(--fw-300);
+  color: color-mix(in srgb, var(--white-2) 76%, var(--accent-1) 24%);
+  font-weight: var(--fw-400);
   font-size: calc(var(--fs-6) + 1px);
   line-height: 1.62;
   margin: 0;
@@ -1184,7 +1143,7 @@
 .timeline-points li {
   position: relative;
   padding-left: 13px;
-  color: var(--text-2);
+  color: color-mix(in srgb, var(--white-2) 72%, var(--accent-2) 28%);
   font-size: calc(var(--fs-7) + 1px);
   line-height: 1.5;
 }
@@ -1743,6 +1702,9 @@
   --parallax-y-icon: 0px;
   --glare-x: 16%;
   --glare-y: 14%;
+  --project-text-main: color-mix(in srgb, var(--text-1) 90%, var(--accent-1) 10%);
+  --project-text-soft: color-mix(in srgb, var(--text-2) 68%, var(--accent-2) 32%);
+  --project-divider-color: color-mix(in srgb, var(--accent-2) 34%, rgba(255,255,255,0.18));
 
   position: relative;
   isolation: isolate;
@@ -1752,12 +1714,12 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 14px;
+  padding: 16px 16px 14px;
   background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 28%, rgba(255,255,255,0.2));
   border-radius: var(--project-card-radius);
   overflow: hidden;
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--project-card-shadow, 0 14px 30px rgba(0, 0, 0, 0.28));
   outline: 1px solid transparent;
   outline-offset: -1px;
   transition: transform var(--transition-1), border-color var(--transition-1), box-shadow var(--transition-1), background-color var(--transition-1);
@@ -1840,12 +1802,12 @@
 
 .project-img {
   position: relative;
-  width: calc(100% + 28px);
-  height: 200px;
-  flex: 0 0 200px;
+  width: calc(100% + 32px);
+  height: 208px;
+  flex: 0 0 208px;
   border-radius: calc(var(--project-card-radius) - 1px) calc(var(--project-card-radius) - 1px) 0 0;
   overflow: hidden;
-  margin: -14px -14px 12px;
+  margin: -16px -16px 14px;
   border: 0;
   background: #000;
 }
@@ -1943,12 +1905,14 @@
 }
 
 .project-title {
-  color: var(--white-2);
-  font-size: var(--fs-4);
-  font-weight: var(--fw-600);
+  color: var(--project-text-main);
+  font-size: clamp(1rem, 0.95rem + 0.22vw, 1.12rem);
+  font-weight: 700;
   text-transform: capitalize;
-  line-height: 1.32;
-  margin-bottom: 8px;
+  line-height: 1.28;
+  margin-bottom: 3px;
+  min-height: 0;
+  text-wrap: balance;
   display: -webkit-box;
   line-clamp: 2;
   -webkit-line-clamp: 2;
@@ -1962,11 +1926,11 @@
 }
 
 .project-description {
-  color: var(--text-2);
-  font-size: calc(var(--fs-6) - 1px);
-  font-weight: var(--fw-300);
-  line-height: 1.55;
-  margin-bottom: 10px;
+  color: var(--project-text-soft);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-400);
+  line-height: 1.6;
+  margin-bottom: 14px;
   display: -webkit-box;
   line-clamp: 3;
   -webkit-line-clamp: 3;
@@ -1975,17 +1939,17 @@
 }
 
 .project-item > a:hover .project-description {
-  color: color-mix(in srgb, var(--text-1) 78%, var(--text-2));
+  color: color-mix(in srgb, var(--text-1) 84%, var(--accent-2) 16%);
 }
 
 .project-category {
   margin-top: auto;
-  padding-top: 14px;
-  border-top: 1.5px solid rgba(255,255,255,0.16);
-  color: var(--text-2);
-  font-size: calc(var(--fs-6) - 1px);
-  font-weight: var(--fw-500);
-  letter-spacing: 0.04em;
+  padding-top: 13px;
+  border-top: 1.5px solid var(--project-divider-color);
+  color: var(--project-text-soft);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-600);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -2008,8 +1972,8 @@
 
 .arrow-right-inline__icon{
   flex: 0 0 auto;
-  width: 50px;
-  height: 28px;
+  width: 48px;
+  height: 26px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -2065,8 +2029,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  margin: 0 0 11px;
+  gap: 7px;
+  margin: 0 0 12px;
 }
 
 .project-capsule {
@@ -2077,9 +2041,9 @@
   padding: 4px 8px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--accent-2) 70%, rgba(255, 255, 255, 0.2));
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--text-1);
-  font-size: 0.58rem;
+  background: color-mix(in srgb, var(--accent-glow) 12%, rgba(255, 255, 255, 0.02));
+  color: color-mix(in srgb, var(--text-1) 92%, var(--accent-2) 8%);
+  font-size: 0.6rem;
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-weight: var(--fw-500);
   letter-spacing: 0.1em;
@@ -2101,6 +2065,28 @@
 .project-item > a:hover .project-capsule:nth-child(2) { animation-delay: 0.08s; }
 .project-item > a:hover .project-capsule:nth-child(3) { animation-delay: 0.16s; }
 .project-item > a:hover .project-capsule:nth-child(4) { animation-delay: 0.24s; }
+
+@media (max-width: 580px) {
+  .project-item > a {
+    padding: 14px 14px 13px;
+  }
+
+  .project-img {
+    width: calc(100% + 28px);
+    height: 194px;
+    flex-basis: 194px;
+    margin: -14px -14px 12px;
+  }
+
+  .project-title {
+    min-height: 0;
+    margin-bottom: 2px;
+  }
+
+  .project-description {
+    margin-bottom: 12px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion="force"]) .link-tilt-target,
@@ -2124,7 +2110,10 @@
   html:not([data-motion="force"]) .project-title,
   html:not([data-motion="force"]) .project-description,
   html:not([data-motion="force"]) .project-category,
-  html:not([data-motion="force"]) .project-capsule {
+  html:not([data-motion="force"]) .project-capsule,
+  html:not([data-motion="force"]) .timeline-item--clickable::before,
+  html:not([data-motion="force"]) .timeline-link,
+  html:not([data-motion="force"]) .timeline-link::before {
     animation: none !important;
     transition: none !important;
   }

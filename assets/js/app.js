@@ -774,15 +774,6 @@ function renderResume(resume, projectsData = null) {
       li.setAttribute("tabindex", "0");
       li.setAttribute("aria-label", `Open ${title || "organization"} website`);
 
-      const marker = document.createElement("span");
-      marker.className = "timeline-item-link-mark";
-      marker.setAttribute("aria-hidden", "true");
-
-      const arrow = document.createElement("span");
-      arrow.className = "timeline-item-link-arrow";
-      marker.appendChild(arrow);
-      li.appendChild(marker);
-
       const openWebsite = () => {
         window.open(website, "_blank", "noopener,noreferrer");
       };

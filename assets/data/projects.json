@@ -82,7 +82,7 @@
         "alt": "ServerHandShake"
       },
       {
-        "title": "🧭 JourneyRadar | HackYeah",
+        "title": "🧭 JourneyRadar ",
         "categoryLabel": "Network Development",
         "capsules": ["Python","JS", "Hackathon"],
         "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
