@@ -516,7 +516,16 @@ main{
   border: 1px solid color-mix(in srgb, var(--accent-2) 44%, rgba(255,255,255,0.2));
   color: var(--text-strong);
   text-decoration: none;
+  appearance: none;
+  cursor: pointer;
   transition: transform var(--transition-1), border-color var(--transition-1), box-shadow var(--transition-1), color var(--transition-1);
+}
+
+.social-link__logo{
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
 }
 
 .social-link::before{
@@ -552,6 +561,16 @@ main{
 .sidebar-section--social .social-link:hover{
   color: color-mix(in srgb, var(--accent-1) 86%, white);
   border-color: color-mix(in srgb, var(--accent-1) 68%, rgba(255,255,255,0.24));
+}
+
+.sidebar-section--social .social-link--music{
+  border-color: color-mix(in srgb, var(--accent-3) 52%, rgba(255,255,255,0.2));
+  color: color-mix(in srgb, var(--accent-3) 82%, var(--white-2));
+}
+
+.sidebar-section--social .social-link--music:hover{
+  color: color-mix(in srgb, var(--accent-1) 82%, white);
+  border-color: color-mix(in srgb, var(--accent-1) 58%, rgba(255,255,255,0.24));
 }
 
 .sidebar-section--quest .gh-quest-card{

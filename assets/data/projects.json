@@ -27,9 +27,19 @@
         "capsules": ["C++", "Unreal", "Local PvP"],
         "description": "Local multiplayer split-screen PvP in Unreal with 4-player instances, damage and respawn systems.",
         "tags": ["game development", "highlighted projects"],
-        "href": "https://futuregames.itch.io/gnome-splash",
+        "href": "https://github.com/SoftDev-Candy/Seasonofinflunece",
         "image": "./assets/images/portfolio/GnomeSplash.gif",
         "alt": "Gnome Splash"
+      },
+      {
+        "title": "🌙 Last Shift",
+        "categoryLabel": "Game Development",
+        "capsules": ["C++", "Unreal", "Perforce"],
+        "description": "Narrative-based night guard game where players inspect objects and recover memories through environmental storytelling.",
+        "tags": ["game development" , "highlighted projects"],
+        "href": "#",
+        "image": "./assets/images/portfolio/lastshift.gif",
+        "alt": "Last Shift"
       },
       {
         "title": "🌋 Molten Engine",
