@@ -37,6 +37,141 @@ function unwrapPayload(payload, key) {
   return payload;
 }
 
+function getLoaderConfig(siteData) {
+  const cfg = siteData?.loader ?? {};
+  return {
+    eyebrow: String(cfg.eyebrow ?? "// Booting spring build"),
+    title: String(cfg.title ?? siteData?.title ?? "Swastik Toprani"),
+    loadingText: String(cfg.loadingText ?? "Streaming interface assets..."),
+    readyText: String(cfg.readyText ?? "Launch sequence complete"),
+  };
+}
+
+function setLoaderCopy(config) {
+  safeText(el("site-loader-label"), config?.eyebrow);
+  safeText(el("site-loader-title"), config?.title);
+}
+
+function setLoaderStatus(text) {
+  safeText(el("site-loader-status"), text);
+}
+
+function setLoaderProgress(value) {
+  const clamped = Math.max(0, Math.min(1, Number(value) || 0));
+  const progressBar = el("site-loader-progress-bar");
+  const progressText = el("site-loader-progress-text");
+
+  if (progressBar) progressBar.style.transform = `scaleX(${clamped.toFixed(4)})`;
+  if (progressText) progressText.textContent = `${Math.round(clamped * 100)}%`;
+}
+
+function hideLoader() {
+  const loader = el("site-loader");
+  document.body?.classList.remove("is-loading");
+  document.body?.classList.add("is-ready");
+  if (!loader) return;
+
+  loader.classList.add("is-hidden");
+  window.setTimeout(() => {
+    loader.setAttribute("aria-hidden", "true");
+  }, 520);
+}
+
+function showLoaderFailure(message) {
+  setLoaderStatus(message ?? "Loader sync failed");
+  setLoaderProgress(1);
+  document.body?.classList.remove("is-loading");
+}
+
+function collectImageUrls(input, bag = new Set()) {
+  if (!input) return bag;
+
+  if (typeof input === "string") {
+    const value = input.trim();
+    if (/\.(png|jpe?g|webp|gif|svg|ico|avif)(\?|#|$)/i.test(value)) {
+      bag.add(value);
+    }
+    return bag;
+  }
+
+  if (Array.isArray(input)) {
+    input.forEach((item) => collectImageUrls(item, bag));
+    return bag;
+  }
+
+  if (typeof input === "object") {
+    Object.values(input).forEach((value) => collectImageUrls(value, bag));
+  }
+
+  return bag;
+}
+
+function preloadImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const finish = () => resolve(url);
+    img.decoding = "async";
+    img.onload = finish;
+    img.onerror = finish;
+    img.src = url;
+  });
+}
+
+async function warmupVisualAssets(payloads, onProgress = () => {}) {
+  const urls = Array.from(
+    payloads.reduce((bag, payload) => collectImageUrls(payload, bag), new Set())
+  );
+
+  if (!urls.length) {
+    onProgress(1, 0);
+    return [];
+  }
+
+  let completed = 0;
+  onProgress(0, urls.length);
+
+  await Promise.all(
+    urls.map(async (url) => {
+      await preloadImage(url);
+      completed += 1;
+      onProgress(completed / urls.length, urls.length);
+    })
+  );
+
+  return urls;
+}
+
+function waitForFluidReady(timeoutMs = 2200) {
+  if (document.documentElement.dataset.fluidReady === "true") {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const handleReady = () => {
+      cleanup();
+      resolve();
+    };
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      window.removeEventListener("fluid-ready", handleReady);
+    };
+
+    const timer = window.setTimeout(() => {
+      cleanup();
+      resolve();
+    }, timeoutMs);
+
+    window.addEventListener("fluid-ready", handleReady);
+  });
+}
+
+function nextPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
+}
+
 // -----------------------------
 // NAV + PAGE SWITCH
 // -----------------------------
@@ -200,7 +335,7 @@ function renderMusicPlayer(musicCfg) {
 
   const launcher = document.createElement("button");
   launcher.type = "button";
-  launcher.className = "social-link social-link--music";
+  launcher.className = "social-link social-link--music outline-grow-social";
   launcher.setAttribute("aria-label", musicCfg?.label ?? "Open music player");
   launcher.title = musicCfg?.label ?? "Open music player";
   launcher.setAttribute("aria-controls", "music-dock");
@@ -236,6 +371,9 @@ function renderMusicPlayer(musicCfg) {
   const dockVolUp = el("music-dock-vol-up");
   const dockVolDown = el("music-dock-vol-down");
   const dockViz = el("music-dock-viz");
+  const dockSeek = el("music-dock-seek");
+  const dockCurrentTime = el("music-dock-current-time");
+  const dockDuration = el("music-dock-duration");
 
   if (
     !dockCover ||
@@ -251,7 +389,10 @@ function renderMusicPlayer(musicCfg) {
     !dockPlayIcon ||
     !dockVolUp ||
     !dockVolDown ||
-    !dockViz
+    !dockViz ||
+    !dockSeek ||
+    !dockCurrentTime ||
+    !dockDuration
   ) {
     return;
   }
@@ -266,6 +407,7 @@ function renderMusicPlayer(musicCfg) {
     tracks,
     defaultLogo: String(musicCfg?.defaultLogo ?? "").trim(),
     volumeStep: 0.12,
+    isSeeking: false,
     visualizer: {
       canvas: dockViz,
       ctx: dockViz.getContext("2d", { alpha: true }),
@@ -285,6 +427,27 @@ function renderMusicPlayer(musicCfg) {
   };
 
   const viz = state.visualizer;
+
+  const formatPlaybackTime = (seconds) => {
+    const totalSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+  };
+
+  const syncTimelineState = (previewTime = null) => {
+    const duration = Number.isFinite(dockAudio.duration) ? dockAudio.duration : 0;
+    const time = previewTime ?? (Number.isFinite(dockAudio.currentTime) ? dockAudio.currentTime : 0);
+    const safeDuration = duration > 0 ? duration : 0;
+    const clampedTime = Math.max(0, Math.min(time, safeDuration || Math.max(time, 0)));
+    const progress = safeDuration > 0 ? clampedTime / safeDuration : 0;
+
+    dockCurrentTime.textContent = formatPlaybackTime(clampedTime);
+    dockDuration.textContent = safeDuration > 0 ? formatPlaybackTime(safeDuration) : "0:00";
+    dockSeek.disabled = !state.tracks.length || safeDuration <= 0;
+    dockSeek.value = String(Math.round(progress * 1000));
+    dockSeek.style.setProperty("--seek-progress", `${(progress * 100).toFixed(2)}%`);
+  };
 
   const getVisualizerPalette = () => {
     const styles = getComputedStyle(document.documentElement);
@@ -710,6 +873,7 @@ function renderMusicPlayer(musicCfg) {
     dockPlay.disabled = disabled;
     dockVolUp.disabled = disabled;
     dockVolDown.disabled = disabled;
+    dockSeek.disabled = disabled || !(Number.isFinite(dockAudio.duration) && dockAudio.duration > 0);
   };
 
   const syncVolumeState = () => {
@@ -763,6 +927,7 @@ function renderMusicPlayer(musicCfg) {
     syncControlAvailability();
     syncPlaybackState();
     syncVolumeState();
+    syncTimelineState(0);
 
     if (hasSource && autoPlay) {
       dockAudio.play().catch(() => {});
@@ -812,6 +977,33 @@ function renderMusicPlayer(musicCfg) {
   });
   dockVolUp.addEventListener("click", () => adjustVolume(state.volumeStep));
   dockVolDown.addEventListener("click", () => adjustVolume(-state.volumeStep));
+  dockSeek.addEventListener("pointerdown", () => {
+    state.isSeeking = true;
+  });
+  dockSeek.addEventListener("pointerup", () => {
+    state.isSeeking = false;
+    syncTimelineState();
+  });
+  dockSeek.addEventListener("change", () => {
+    state.isSeeking = false;
+    syncTimelineState();
+  });
+  dockSeek.addEventListener("blur", () => {
+    state.isSeeking = false;
+    syncTimelineState();
+  });
+  dockSeek.addEventListener("input", () => {
+    const duration = Number.isFinite(dockAudio.duration) ? dockAudio.duration : 0;
+    if (duration <= 0) {
+      syncTimelineState(0);
+      return;
+    }
+
+    const progress = Number(dockSeek.value) / 1000;
+    const nextTime = duration * progress;
+    dockAudio.currentTime = nextTime;
+    syncTimelineState(nextTime);
+  });
   dockHide.addEventListener("click", () => setOpen(false));
   dockClose.addEventListener("click", () => {
     dockAudio.pause();
@@ -825,20 +1017,35 @@ function renderMusicPlayer(musicCfg) {
 
   dockAudio.addEventListener("play", () => {
     syncPlaybackState();
+    syncTimelineState();
   });
 
   dockAudio.addEventListener("pause", () => {
     syncPlaybackState();
+    syncTimelineState();
   });
 
   dockAudio.addEventListener("emptied", () => {
     syncPlaybackState();
     syncVolumeState();
+    syncTimelineState(0);
   });
 
   dockAudio.addEventListener("volumechange", () => {
     syncPlaybackState();
     syncVolumeState();
+  });
+  dockAudio.addEventListener("loadedmetadata", () => {
+    syncControlAvailability();
+    syncTimelineState();
+  });
+  dockAudio.addEventListener("durationchange", () => {
+    syncControlAvailability();
+    syncTimelineState();
+  });
+  dockAudio.addEventListener("timeupdate", () => {
+    if (state.isSeeking) return;
+    syncTimelineState();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -863,6 +1070,7 @@ function renderMusicPlayer(musicCfg) {
   drawIdleVisualizer();
   setOpen(false);
   syncTrack();
+  syncTimelineState(0);
 }
 
 function extractGithubUsername(raw) {
@@ -1841,7 +2049,7 @@ function wireProjectCardTilt(root = document) {
 }
 
 function wireLinkTilt(root = document) {
-  const links = root.querySelectorAll("a[href]:not(#projects-list .project-item > a)");
+  const links = root.querySelectorAll("a[href]:not(#projects-list .project-item > a), button.social-link");
   if (!links.length) return;
 
   const canUsePointerTilt = supportsPointerTilt();
@@ -2021,6 +2229,21 @@ function renderPortfolio(portfolio, projects) {
         ? `<div class="project-capsules">${capsules.map((capsule) => `<span class="project-capsule">${capsule}</span>`).join("")}</div>`
         : "";
       const logo = getProjectLogoMeta(p, capsules);
+      const statusLabel = String(p.statusBadge ?? p.banner ?? p.status ?? "").trim();
+      const statusHtml = statusLabel
+        ? `<span class="project-status-badge">${statusLabel}</span>`
+        : "";
+      const imageSrc = String(p.image ?? "").trim();
+      if (!imageSrc) li.classList.add("project-item--no-cover");
+      const imageLabel = String(p.imageLabel ?? p.shortTitle ?? p.title ?? displayLabel ?? "Project").trim();
+      const coverHtml = imageSrc
+        ? `<img class="project-cover-image" src="${imageSrc}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">`
+        : `
+            <div class="project-img-fallback" aria-hidden="true">
+              <img class="project-img-fallback-logo" src="${logo.src}" alt="" loading="lazy">
+              <span class="project-img-fallback-text">${imageLabel}</span>
+            </div>
+          `;
 
       const description = String(p.description ?? p.desc ?? "").trim();
       const descriptionHtml = description
@@ -2030,10 +2253,11 @@ function renderPortfolio(portfolio, projects) {
       li.innerHTML = `
         <a href="${p.href ?? "#"}" target="_blank" rel="noreferrer">
           <figure class="project-img">
+            ${statusHtml}
             <div class="project-item-icon-box">
               <img class="project-hover-logo" src="${logo.src}" alt="${logo.alt}" loading="lazy">
             </div>
-            <img src="${p.image ?? ""}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">
+            ${coverHtml}
           </figure>
           <h3 class="project-title">${p.title ?? ""}</h3>
           ${capsulesHtml}
@@ -2274,6 +2498,53 @@ async function init() {
   const portfolioData = unwrapPayload(portfolio, "portfolio");
   const contactData = unwrapPayload(contact, "contact");
   const musicData = unwrapPayload(music, "music");
+  const loaderConfig = getLoaderConfig(siteData);
+  let imageRatio = 0;
+  let imageUnits = 0;
+  let fontsReady = 0;
+  let fluidReady = 0;
+  const syncLoaderProgress = () => {
+    const totalUnits = Math.max(1, imageUnits + 2);
+    const progress = ((imageRatio * imageUnits) + fontsReady + fluidReady) / totalUnits;
+    setLoaderProgress(progress);
+  };
+
+  setLoaderCopy(loaderConfig);
+  setLoaderStatus(loaderConfig.loadingText);
+  setLoaderProgress(0.04);
+
+  const assetWarmup = warmupVisualAssets(
+    [
+      siteData,
+      profileData,
+      aboutData,
+      servicesData,
+      referencesData,
+      resumeData,
+      portfolioData,
+      projects,
+      contactData,
+      musicData,
+    ],
+    (ratio, total) => {
+      imageRatio = ratio;
+      imageUnits = total;
+      syncLoaderProgress();
+    }
+  );
+
+  const fontWarmup = (document.fonts && "ready" in document.fonts
+    ? document.fonts.ready
+    : Promise.resolve()
+  ).then(() => {
+    fontsReady = 1;
+    syncLoaderProgress();
+  });
+
+  const fluidWarmup = waitForFluidReady().then(() => {
+    fluidReady = 1;
+    syncLoaderProgress();
+  });
 
   if (siteData?.title) document.title = siteData.title;
   if (siteData?.theme && !document.documentElement.dataset.theme) {
@@ -2294,6 +2565,7 @@ async function init() {
     if (cv) cv.href = siteData.cvUrl;
   }
 
+  setLoaderStatus("Hydrating interface modules...");
   renderProfile(profileData);
   renderMusicPlayer(musicData);
   renderSidebarQuest(profileData, siteData);
@@ -2303,15 +2575,26 @@ async function init() {
   renderResume(resumeData, projects);
   renderPortfolio(portfolioData, projects);
   renderContact(contactData);
-  await renderFooter(siteData);
+  renderFooter(siteData).catch((err) => {
+    console.warn("[app] footer render degraded:", err);
+  });
   wireLinkTilt();
+  setLoaderStatus("Inlining themed assets...");
   await inlineThemeableSvgs(document);
+  setLoaderStatus("Calibrating motion and media...");
+  await Promise.all([assetWarmup, fontWarmup, fluidWarmup]);
+  setLoaderStatus(loaderConfig.readyText);
+  setLoaderProgress(1);
+  await nextPaint();
+  await new Promise((resolve) => window.setTimeout(resolve, 220));
+  hideLoader();
 
   console.log("[app] render ok");
 }
 
 init().catch((err) => {
   console.error("[app] init failed:", err);
+  showLoaderFailure("Boot interrupted. Refresh and retry.");
 });
 
 

@@ -19,10 +19,10 @@ let config = {
     PRESSURE: 0.3,
     PRESSURE_ITERATIONS: 20,
     CURL: 30,
-    SPLAT_RADIUS: 0.25,
-    SPLAT_FORCE: 6000,
-    SIMULATION_SPEED: 0.7,
-    CURSOR_BRIGHTNESS: 0.8,
+    SPLAT_RADIUS: 0.38,
+    SPLAT_FORCE: 5400,
+    SIMULATION_SPEED: 0.62,
+    CURSOR_BRIGHTNESS: 0.62,
     SHADING: true,
     COLORFUL: true,
     COLOR_UPDATE_SPEED: 10,
@@ -32,12 +32,12 @@ let config = {
     BLOOM: true,
     BLOOM_ITERATIONS: 8,
     BLOOM_RESOLUTION: 256,
-    BLOOM_INTENSITY: 0.65,
+    BLOOM_INTENSITY: 0.46,
     BLOOM_THRESHOLD: 0.6,
     BLOOM_SOFT_KNEE: 0.7,
     SUNRAYS: true,
     SUNRAYS_RESOLUTION: 196,
-    SUNRAYS_WEIGHT: 0.7,
+    SUNRAYS_WEIGHT: 0.44,
     SOUND_SENSITIVITY: 0.25,
     FREQ_RANGE: 8,
 }
@@ -1216,6 +1216,10 @@ function updateKeywords () {
 updateKeywords();
 initFramebuffers();
 multipleSplats(parseInt(Math.random() * 20) + 5);
+requestAnimationFrame(() => {
+    document.documentElement.dataset.fluidReady = "true";
+    window.dispatchEvent(new CustomEvent("fluid-ready"));
+});
 
 let lastUpdateTime = Date.now();
 let colorUpdateTimer = 0.0;
@@ -1528,48 +1532,61 @@ function correctRadius (radius) {
     return radius;
 }
 
-// canvas.addEventListener('mousedown', e => {
-//     let posX = scaleByPixelRatio(e.offsetX);
-//     let posY = scaleByPixelRatio(e.offsetY);
-//     let pointer = pointers.find(p => p.id == -1);
-//     if (pointer == null)
-//         pointer = new pointerPrototype();
-//     updatePointerDownData(pointer, -1, posX, posY);
-// });
-let lastMove= -1;
-function checkLastMove(){
-  const currentMove=window.performance.now();
-  if(currentMove-lastMove > 1000){
-    lastMove=currentMove;
-    return true;
-  }
-  return false;
+function getPointerPosition (event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+    const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top));
+    return {
+        x: scaleByPixelRatio(x),
+        y: scaleByPixelRatio(y)
+    };
+}
+
+let pointerReleaseTimer = 0;
+function queuePointerRelease (pointer) {
+    clearTimeout(pointerReleaseTimer);
+    pointerReleaseTimer = window.setTimeout(() => {
+        updatePointerUpData(pointer);
+    }, 90);
 }
 
 window.addEventListener('pointermove', e => {
-    const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-    x = Math.max(0, Math.min(rect.width, x));
-    y = Math.max(0, Math.min(rect.height, y));
+    const pointer = pointers[0] ?? (pointers[0] = new pointerPrototype());
+    const { x: posX, y: posY } = getPointerPosition(e);
 
-    if(checkLastMove()){
-      let posX = scaleByPixelRatio(x);
-      let posY = scaleByPixelRatio(y);
-      let pointer = pointers.find(p => p.id == -1);
-      if (pointer == null)
-          pointer = new pointerPrototype();
-      updatePointerDownData(pointer, -1, posX, posY);
+    if (!pointer.down && pointer.id === -1 && pointer.texcoordX === 0 && pointer.texcoordY === 0) {
+        updatePointerDownData(pointer, -1, posX, posY);
+        const seedColor = {
+            r: pointer.color.r * (config.CURSOR_BRIGHTNESS * 0.65),
+            g: pointer.color.g * (config.CURSOR_BRIGHTNESS * 0.65),
+            b: pointer.color.b * (config.CURSOR_BRIGHTNESS * 0.65)
+        };
+        splat(pointer.texcoordX, pointer.texcoordY, 0, 0, seedColor);
+        queuePointerRelease(pointer);
+        return;
     }
 
-    let pointer = pointers[0];
-    if (!pointer.down) return;
-    let posX = scaleByPixelRatio(x);
-    let posY = scaleByPixelRatio(y);
+    if (!pointer.down) {
+        pointer.down = true;
+        pointer.id = -1;
+    }
+
     updatePointerMoveData(pointer, posX, posY);
-});
+    queuePointerRelease(pointer);
+}, { passive: true });
 
 window.addEventListener('mouseup', () => {
+    clearTimeout(pointerReleaseTimer);
+    updatePointerUpData(pointers[0]);
+});
+
+window.addEventListener('pointerleave', () => {
+    clearTimeout(pointerReleaseTimer);
+    updatePointerUpData(pointers[0]);
+});
+
+window.addEventListener('blur', () => {
+    clearTimeout(pointerReleaseTimer);
     updatePointerUpData(pointers[0]);
 });
 
