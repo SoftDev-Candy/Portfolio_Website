@@ -19,7 +19,19 @@
   <link rel="stylesheet" href="assets/css/90-effects.css" />
   <link rel="stylesheet" href="assets/css/99-overrides.css" />
 </head>
-<body>
+<body class="is-loading">
+  <div class="site-loader" id="site-loader" role="status" aria-live="polite" aria-hidden="false">
+    <div class="site-loader__panel">
+      <p class="site-loader__eyebrow" id="site-loader-label">// Booting spring build</p>
+      <h1 class="site-loader__title" id="site-loader-title">Swastik Toprani</h1>
+      <p class="site-loader__status" id="site-loader-status">Streaming interface assets...</p>
+      <div class="site-loader__progress" aria-hidden="true">
+        <span class="site-loader__progress-bar" id="site-loader-progress-bar"></span>
+      </div>
+      <p class="site-loader__percent" id="site-loader-progress-text">0%</p>
+    </div>
+  </div>
+
   <canvas id="fx-fluid" aria-hidden="true"></canvas>
 
   <main>
@@ -39,10 +51,6 @@
           <div id="profile-roles" class="role-stack"></div>
         </div>
 
-        <button class="info_more-btn" type="button" data-sidebar-btn aria-label="Toggle contacts">
-          <span>Show Contacts</span>
-          <ion-icon name="chevron-down"></ion-icon>
-        </button>
       </div>
 
       <div class="sidebar-info_more">
@@ -228,6 +236,77 @@
       </footer>
     </div>
   </main>
+
+  <section class="music-dock" id="music-dock" aria-hidden="true">
+    <button class="music-dock__close" id="music-dock-close" type="button" aria-label="Close music player">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+    <div class="music-dock__shell">
+      <div class="music-dock__screen">
+        <div class="music-dock__current">
+          <div class="music-dock__cover-wrap is-placeholder">
+            <img id="music-dock-cover" alt="" hidden />
+            <ion-icon name="musical-notes-outline" class="music-dock__cover-icon"></ion-icon>
+          </div>
+          <div class="music-dock__meta">
+            <p class="music-dock__track" id="music-dock-track">No track loaded</p>
+            <p class="music-dock__artist" id="music-dock-artist">Add title, artist, src, and logo in music.json.</p>
+          </div>
+        </div>
+
+        <p class="music-dock__empty" id="music-dock-empty">No tracks loaded yet. Add music in assets/data/music.json.</p>
+      </div>
+
+      <div class="music-dock__wheel-wrap">
+        <div class="music-dock__wheel" role="group" aria-label="Music player controls">
+          <button class="music-dock__wheel-btn music-dock__wheel-btn--top" id="music-dock-vol-up" type="button" aria-label="Increase volume">
+            +
+          </button>
+          <button class="music-dock__wheel-btn music-dock__wheel-btn--left" id="music-dock-prev" type="button" aria-label="Previous track">
+            <ion-icon name="play-skip-back-outline"></ion-icon>
+          </button>
+          <button class="music-dock__wheel-btn music-dock__wheel-btn--right" id="music-dock-next" type="button" aria-label="Next track">
+            <ion-icon name="play-skip-forward-outline"></ion-icon>
+          </button>
+          <button class="music-dock__wheel-btn music-dock__wheel-btn--bottom" id="music-dock-vol-down" type="button" aria-label="Decrease volume">
+            -
+          </button>
+          <button class="music-dock__wheel-center" id="music-dock-play" type="button" aria-label="Play or pause current track">
+            <ion-icon id="music-dock-play-icon" name="play-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="music-dock__timeline">
+      <span class="music-dock__time" id="music-dock-current-time">0:00</span>
+      <label class="music-dock__seek-wrap" for="music-dock-seek">
+        <span class="sr-only">Seek through current track</span>
+        <input
+          class="music-dock__seek"
+          id="music-dock-seek"
+          type="range"
+          min="0"
+          max="1000"
+          value="0"
+          step="1"
+          aria-label="Seek through current track"
+        />
+      </label>
+      <span class="music-dock__time music-dock__time--end" id="music-dock-duration">0:00</span>
+    </div>
+
+    <div class="music-dock__footer">
+      <div class="music-dock__viz" aria-hidden="true">
+        <canvas class="music-dock__viz-canvas" id="music-dock-viz" width="220" height="32"></canvas>
+      </div>
+      <button class="music-dock__hide" id="music-dock-hide" type="button" aria-label="Hide music player">
+        Hide
+      </button>
+    </div>
+    <audio class="music-dock__audio" id="music-dock-audio" preload="none" hidden></audio>
+  </section>
 
   <div class="modal-container" data-modal-container>
     <div class="overlay" data-overlay></div>

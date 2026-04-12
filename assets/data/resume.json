@@ -23,8 +23,8 @@
       {
         "title": "Future Games Warsaw",
         "date": "2024 - Present",
-        "meta": "Game Programmer | Team Pipeline | Jira | Perforce",
-        "text": "Worked on team-based game development projects using a full production pipeline from prototype to release while collaborating across Sweden, Poland, and India.",
+        "meta": "Game Programmer | Team Pipeline | Jira ",
+        "text": "Worked on team-based game development projects using a full production pipeline from prototype to release while collaborating from teams around the world.",
         "highlights": [
           "Followed complete game development lifecycle: prototype, iteration, playtesting, polish, and release.",
           "Used Jira for sprint planning, task tracking, and milestone delivery.",
@@ -36,11 +36,11 @@
         "title": "Gnome Splash - Local Multiplayer PvP",
         "date": "Future Games Team Project",
         "meta": "C++ | Unreal Engine | Local Multiplayer",
-        "text": "Directed gameplay programming for a split-screen local PvP project with multiplayer game flow systems.",
+        "text": "Led gameplay programming for a split-screen PvP prototype with a focus on complete match flow and shippable gameplay loops.",
         "highlights": [
-          "Built 4-player instances with spawning, damage, and respawn loops.",
-          "Designed HUD and UI elements including health bars, cooldowns, and menus.",
-          "Delivered from prototype to final build in a 7-week production cycle."
+          "Implemented up to 4-player gameplay systems including spawning, damage handling, respawn logic, and round flow.",
+          "Built HUD and UI features for readable gameplay, including health, cooldowns, menus, and match transitions.",
+          "Delivered a playable build from prototype to final in a structured 7-week production cycle with rapid iteration and testing."
         ],
         "website": "https://futuregames.itch.io/gnome-splash"
       },
@@ -49,24 +49,35 @@
         "date": "Future Games Team Project",
         "meta": "C# | Unity | Puzzle",
         "text": "Created a story-driven exploration prototype with scene progression, puzzle logic, and event triggers.",
+        "highlights": [
+          "Designed and implemented key UI systems with a focus on clarity and responsiveness.",
+          "Supported gameplay implementation by wiring UI elements to game state and refining interactions through playtesting feedback.",
+          "Collaborated in a 10 to 20 person team using Jira for sprint planning, task tracking, and milestone delivery.",
+          "Contributed to an immersive, narrative-first experience by prioritizing usability and smooth player flow."
+        ],
         "website": "https://github.com/SoftDev-Candy/CodenameMansion"
       },
       {
         "title": "TomTheDragon",
         "date": "Future Games Team Project",
         "meta": "C# | Unity | Platformer",
-        "text": "Developed gameplay systems around state-driven movement, platforming loops, and collision behavior.",
-        "website": "https://github.com/SoftDev-Candy/TomTheDragon"
+        "text": "Contributed to a team-built 3D platformer focused on clear progression, responsive controls, and a polished player flow from level start to win condition.",
+        "highlights": [
+          "Implemented player movement logic to ensure responsive, readable controls and a consistent platforming feel.",
+          "Built additional gameplay elements to enhance immersion and supported integration through playtesting-driven refinement.",
+          "Supported power-up and obstacle loops, including collectible buffs and hazard interactions, to strengthen pacing and challenge."
+        ],
+        "website": "https://futuregames.itch.io/tomthedragon"
       },
       {
         "title": "Molten Engine",
         "date": "Future Games Solo Project",
         "meta": "C++ | OpenGL | ImGui | CMake",
-        "text": "Built a custom engine sandbox focused on rendering foundations, tooling, and build-system structure.",
+        "text": "Building a modular engine focused on rendering foundations, tooling, and clean architecture.",
         "highlights": [
-          "Implemented rendering flow with OpenGL and reusable graphics modules.",
-          "Added ImGui-based debug tooling for rapid iteration and testing.",
-          "Maintained modular architecture using a CMake-driven project structure."
+          "Designed clear module boundaries to keep systems testable and maintainable.",
+          "Integrated ImGui-based editor tooling to inspect runtime state and speed up iteration during development.",
+          "Maintain a clean CMake project structure to support scalability, rebuild speed, and portability."
         ],
         "website": "https://github.com/SoftDev-Candy/MoltenEngine"
       }
@@ -80,33 +91,37 @@
         "group": "Solo Projects",
         "title": "Molten Engine",
         "meta": "C++ | OpenGL | ImGui | CMake",
-        "text": "Built a custom engine sandbox focused on rendering foundations, tooling, and build-system architecture.",
+        "text": "Building a modular engine focused on rendering foundations, tooling, and clean architecture.",
         "highlights": [
-          "Implemented rendering flow with OpenGL and reusable graphics modules.",
-          "Added ImGui-driven debugging and tooling for fast iteration.",
-          "Maintained a modular codebase with a CMake-based build pipeline."
+          "Designed clear module boundaries to keep systems testable and maintainable.",
+          "Integrated ImGui-based editor tooling to inspect runtime state and speed up iteration during development.",
+          "Maintain a clean CMake project structure to support scalability, rebuild speed, and portability."
         ],
         "website": "https://github.com/SoftDev-Candy/MoltenEngine"
       },
       {
         "group": "Solo Projects",
         "title": "SOUL (Secure Orbital Uplink Layer)",
-        "meta": "Backend | Networking | Systems | Defense",
+        "meta": " C++ | Boost | Asio | Networking | Systems ",
         "text": "Designed a secure satellite telemetry backend and uplink-layer architecture for defense-oriented communication workflows.",
         "highlights": [
           "Defined secure telemetry ingestion and processing flow for orbital data streams.",
           "Focused on resilient networking patterns for uplink/downlink communication paths.",
           "Structured the system with modular backend services and systems-level reliability goals."
-        ]
+        ],
+         "website": "https://github.com/SoftDev-Candy/SecureOribitalUplinkLayer"
       },
       {
         "group": "HackYeah Hackathon",
-        "title": "Travel Guardian API",
-        "meta": "C++ | API | Backend Systems",
-        "text": "Built the backend component for the hackathon project, focused on modular APIs and service workflows.",
+        "title": "TG360 - Travel Guardian 360",
+        "meta": "C++17 | Cpp-httplib | nlohmann::json | SSE | Dijkstra | FastAPI",
+        "text": "Led a 5-person HackYeah team and shipped a working real-time transit disruption demo from concept to live presentation.",
         "highlights": [
-          "Designed API surfaces for safety and alerting paths.",
-          "Implemented request validation and authentication-aware handlers."
+          "Built a C++17 backend with clear JSON endpoints for routing, incident reporting, prediction, and live client updates.",
+          "Implemented graph-based shortest-path routing and recomputed ETAs when incidents changed travel-time weights.",
+          "Streamed real-time updates using Server-Sent Events to keep the UI synced without polling.",
+          "Applied modern C++ concurrency with threads, mutexes, and condition variables to keep shared state safe and responsive.",
+          "Debugged and fixed a critical SSE lifetime and concurrency crash, then validated reliability with curl and PowerShell tests."
         ],
         "website": "https://github.com/SoftDev-Candy/TG_3SIX_O"
       }

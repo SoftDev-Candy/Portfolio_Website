@@ -12,6 +12,7 @@ const DATA = {
   portfolio: "./assets/data/portfolio.json",
   projects: "./assets/data/projects.json",
   contact: "./assets/data/contact.json",
+  music: "./assets/data/music.json",
 };
 
 async function loadJSON(path) {
@@ -34,6 +35,141 @@ function unwrapPayload(payload, key) {
     return payload[key];
   }
   return payload;
+}
+
+function getLoaderConfig(siteData) {
+  const cfg = siteData?.loader ?? {};
+  return {
+    eyebrow: String(cfg.eyebrow ?? "// Booting spring build"),
+    title: String(cfg.title ?? siteData?.title ?? "Swastik Toprani"),
+    loadingText: String(cfg.loadingText ?? "Streaming interface assets..."),
+    readyText: String(cfg.readyText ?? "Launch sequence complete"),
+  };
+}
+
+function setLoaderCopy(config) {
+  safeText(el("site-loader-label"), config?.eyebrow);
+  safeText(el("site-loader-title"), config?.title);
+}
+
+function setLoaderStatus(text) {
+  safeText(el("site-loader-status"), text);
+}
+
+function setLoaderProgress(value) {
+  const clamped = Math.max(0, Math.min(1, Number(value) || 0));
+  const progressBar = el("site-loader-progress-bar");
+  const progressText = el("site-loader-progress-text");
+
+  if (progressBar) progressBar.style.transform = `scaleX(${clamped.toFixed(4)})`;
+  if (progressText) progressText.textContent = `${Math.round(clamped * 100)}%`;
+}
+
+function hideLoader() {
+  const loader = el("site-loader");
+  document.body?.classList.remove("is-loading");
+  document.body?.classList.add("is-ready");
+  if (!loader) return;
+
+  loader.classList.add("is-hidden");
+  window.setTimeout(() => {
+    loader.setAttribute("aria-hidden", "true");
+  }, 520);
+}
+
+function showLoaderFailure(message) {
+  setLoaderStatus(message ?? "Loader sync failed");
+  setLoaderProgress(1);
+  document.body?.classList.remove("is-loading");
+}
+
+function collectImageUrls(input, bag = new Set()) {
+  if (!input) return bag;
+
+  if (typeof input === "string") {
+    const value = input.trim();
+    if (/\.(png|jpe?g|webp|gif|svg|ico|avif)(\?|#|$)/i.test(value)) {
+      bag.add(value);
+    }
+    return bag;
+  }
+
+  if (Array.isArray(input)) {
+    input.forEach((item) => collectImageUrls(item, bag));
+    return bag;
+  }
+
+  if (typeof input === "object") {
+    Object.values(input).forEach((value) => collectImageUrls(value, bag));
+  }
+
+  return bag;
+}
+
+function preloadImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const finish = () => resolve(url);
+    img.decoding = "async";
+    img.onload = finish;
+    img.onerror = finish;
+    img.src = url;
+  });
+}
+
+async function warmupVisualAssets(payloads, onProgress = () => {}) {
+  const urls = Array.from(
+    payloads.reduce((bag, payload) => collectImageUrls(payload, bag), new Set())
+  );
+
+  if (!urls.length) {
+    onProgress(1, 0);
+    return [];
+  }
+
+  let completed = 0;
+  onProgress(0, urls.length);
+
+  await Promise.all(
+    urls.map(async (url) => {
+      await preloadImage(url);
+      completed += 1;
+      onProgress(completed / urls.length, urls.length);
+    })
+  );
+
+  return urls;
+}
+
+function waitForFluidReady(timeoutMs = 2200) {
+  if (document.documentElement.dataset.fluidReady === "true") {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const handleReady = () => {
+      cleanup();
+      resolve();
+    };
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      window.removeEventListener("fluid-ready", handleReady);
+    };
+
+    const timer = window.setTimeout(() => {
+      cleanup();
+      resolve();
+    }, timeoutMs);
+
+    window.addEventListener("fluid-ready", handleReady);
+  });
+}
+
+function nextPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
 }
 
 // -----------------------------
@@ -177,6 +313,764 @@ function renderProfile(profile) {
       socials.appendChild(li);
     });
   }
+}
+
+function normalizeMusicTrack(track, index) {
+  return {
+    id: String(track?.id ?? `track-${index + 1}`),
+    title: String(track?.title ?? `Track ${index + 1}`),
+    artist: String(track?.artist ?? track?.subtitle ?? "Unknown artist"),
+    src: String(track?.src ?? track?.url ?? track?.file ?? "").trim(),
+    logo: String(track?.logo ?? track?.cover ?? track?.artwork ?? "").trim(),
+  };
+}
+
+function renderMusicPlayer(musicCfg) {
+  const socials = el("social-list");
+  const dock = el("music-dock");
+  if (!socials || !dock) return;
+
+  const launcherLi = document.createElement("li");
+  launcherLi.className = "social-item social-item--music";
+
+  const launcher = document.createElement("button");
+  launcher.type = "button";
+  launcher.className = "social-link social-link--music outline-grow-social";
+  launcher.setAttribute("aria-label", musicCfg?.label ?? "Open music player");
+  launcher.title = musicCfg?.label ?? "Open music player";
+  launcher.setAttribute("aria-controls", "music-dock");
+
+  const launcherLogo = String(musicCfg?.launcherLogo ?? "").trim();
+  if (launcherLogo) {
+    const logo = document.createElement("img");
+    logo.className = "social-link__logo";
+    logo.src = launcherLogo;
+    logo.alt = musicCfg?.label ?? "Music player";
+    logo.loading = "lazy";
+    launcher.appendChild(logo);
+  } else {
+    const icon = document.createElement("ion-icon");
+    icon.setAttribute("name", musicCfg?.launcherIcon ?? "musical-notes-outline");
+    launcher.appendChild(icon);
+  }
+
+  launcherLi.appendChild(launcher);
+  socials.appendChild(launcherLi);
+
+  const dockCover = el("music-dock-cover");
+  const dockTrack = el("music-dock-track");
+  const dockArtist = el("music-dock-artist");
+  const dockAudio = el("music-dock-audio");
+  const dockEmpty = el("music-dock-empty");
+  const dockClose = el("music-dock-close");
+  const dockPrev = el("music-dock-prev");
+  const dockNext = el("music-dock-next");
+  const dockHide = el("music-dock-hide");
+  const dockPlay = el("music-dock-play");
+  const dockPlayIcon = el("music-dock-play-icon");
+  const dockVolUp = el("music-dock-vol-up");
+  const dockVolDown = el("music-dock-vol-down");
+  const dockViz = el("music-dock-viz");
+  const dockSeek = el("music-dock-seek");
+  const dockCurrentTime = el("music-dock-current-time");
+  const dockDuration = el("music-dock-duration");
+
+  if (
+    !dockCover ||
+    !dockTrack ||
+    !dockArtist ||
+    !dockAudio ||
+    !dockEmpty ||
+    !dockClose ||
+    !dockPrev ||
+    !dockNext ||
+    !dockHide ||
+    !dockPlay ||
+    !dockPlayIcon ||
+    !dockVolUp ||
+    !dockVolDown ||
+    !dockViz ||
+    !dockSeek ||
+    !dockCurrentTime ||
+    !dockDuration
+  ) {
+    return;
+  }
+
+  const tracks = Array.isArray(musicCfg?.tracks)
+    ? musicCfg.tracks.map(normalizeMusicTrack)
+    : [];
+
+  const state = {
+    open: false,
+    index: 0,
+    tracks,
+    defaultLogo: String(musicCfg?.defaultLogo ?? "").trim(),
+    volumeStep: 0.12,
+    isSeeking: false,
+    visualizer: {
+      canvas: dockViz,
+      ctx: dockViz.getContext("2d", { alpha: true }),
+      audioContext: null,
+      analyser: null,
+      source: null,
+      data: null,
+      rafId: 0,
+      active: false,
+      supported: typeof window !== "undefined" && ("AudioContext" in window || "webkitAudioContext" in window),
+      barCount: 16,
+      pixelRatio: 1,
+      traces: [[], [], [], [], []],
+      lastPaint: 0,
+      fpsInterval: 1000 / 24,
+    },
+  };
+
+  const viz = state.visualizer;
+
+  const formatPlaybackTime = (seconds) => {
+    const totalSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+  };
+
+  const syncTimelineState = (previewTime = null) => {
+    const duration = Number.isFinite(dockAudio.duration) ? dockAudio.duration : 0;
+    const time = previewTime ?? (Number.isFinite(dockAudio.currentTime) ? dockAudio.currentTime : 0);
+    const safeDuration = duration > 0 ? duration : 0;
+    const clampedTime = Math.max(0, Math.min(time, safeDuration || Math.max(time, 0)));
+    const progress = safeDuration > 0 ? clampedTime / safeDuration : 0;
+
+    dockCurrentTime.textContent = formatPlaybackTime(clampedTime);
+    dockDuration.textContent = safeDuration > 0 ? formatPlaybackTime(safeDuration) : "0:00";
+    dockSeek.disabled = !state.tracks.length || safeDuration <= 0;
+    dockSeek.value = String(Math.round(progress * 1000));
+    dockSeek.style.setProperty("--seek-progress", `${(progress * 100).toFixed(2)}%`);
+  };
+
+  const getVisualizerPalette = () => {
+    const styles = getComputedStyle(document.documentElement);
+    return {
+      accent: styles.getPropertyValue("--accent-2").trim() || "#ffffff",
+      accentSoft: styles.getPropertyValue("--accent-1").trim() || "#cfcfcf",
+      highlight: styles.getPropertyValue("--white-1").trim() || "#ffffff",
+      whiteSoft: styles.getPropertyValue("--white-2").trim() || "#e8e8e8",
+      rail: styles.getPropertyValue("--accent-3").trim() || "#222222",
+      glow: styles.getPropertyValue("--accent-glow").trim() || "rgba(255,255,255,0.24)",
+    };
+  };
+
+  const syncVisualizerCanvasSize = () => {
+    if (!viz.canvas) return;
+
+    const rect = viz.canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(1, Math.round(rect.width * dpr));
+    const height = Math.max(1, Math.round(rect.height * dpr));
+
+    if (viz.canvas.width !== width || viz.canvas.height !== height) {
+      viz.canvas.width = width;
+      viz.canvas.height = height;
+      viz.pixelRatio = dpr;
+    }
+  };
+
+  const drawVisualizerLines = (traces, palette) => {
+    if (!viz.ctx) return;
+
+    const ctx = viz.ctx;
+    const width = viz.canvas.width;
+    const height = viz.canvas.height;
+    const dpr = viz.pixelRatio || 1;
+    const insetX = 4 * dpr;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const smoothstep = (edge0, edge1, value) => {
+      if (edge0 === edge1) return value < edge0 ? 0 : 1;
+      const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    };
+
+    const edgeEnvelope = (t) => {
+      const head = smoothstep(0.06, 0.2, t);
+      const tail = smoothstep(0.06, 0.2, 1 - t);
+      return head * tail;
+    };
+
+    const buildPoints = (levels, baseY, amplitude, mode = "wave", energy = 0) => {
+      const count = levels.length;
+      if (!count) return [];
+      const step = count > 1 ? (width - insetX * 2) / (count - 1) : 0;
+      const phase = energy * Math.PI * 1.5;
+
+      return levels.map((level, index) => {
+        const x = insetX + step * index;
+        const t = count > 1 ? index / (count - 1) : 0;
+        const envelope = edgeEnvelope(t);
+        const intensity = (Math.max(0, level ?? 0) * 0.88 + energy * 0.12) * envelope;
+        const harmonic = Math.sin(t * Math.PI * (3.6 + energy * 3.4) + phase);
+        let y = baseY;
+
+        if (mode === "wave-up") {
+          y = baseY - amplitude * (intensity * 0.9 + harmonic * 0.08 * envelope);
+        }
+
+        if (mode === "wave-down") {
+          y = baseY + amplitude * (intensity * 0.84 + harmonic * 0.06 * envelope);
+        }
+
+        if (mode === "alternate") {
+          y = baseY + (index % 2 === 0 ? -1 : 1) * amplitude * (intensity * 0.86) + harmonic * amplitude * 0.08 * envelope;
+        }
+
+        if (mode === "ribbon") {
+          y = baseY - amplitude * (intensity * 0.64) + harmonic * amplitude * 0.2 * envelope;
+        }
+
+        if (mode === "shimmer") {
+          y = baseY + harmonic * amplitude * 0.26 * envelope - amplitude * intensity * 0.14;
+        }
+
+        return { x, y };
+      });
+    };
+
+    const strokeSmooth = (points, gradient, lineWidth, alpha, glow) => {
+      if (points.length < 2) return;
+      ctx.save();
+      ctx.shadowColor = palette.glow;
+      ctx.shadowBlur = glow;
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = lineWidth;
+      ctx.globalAlpha = alpha;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+
+      for (let index = 1; index < points.length - 1; index += 1) {
+        const current = points[index];
+        const next = points[index + 1];
+        const midX = (current.x + next.x) / 2;
+        const midY = (current.y + next.y) / 2;
+        ctx.quadraticCurveTo(current.x, current.y, midX, midY);
+      }
+
+      const penultimate = points[points.length - 2];
+      const last = points[points.length - 1];
+      ctx.quadraticCurveTo(penultimate.x, penultimate.y, last.x, last.y);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const strokeSpikes = (levels, baseY, amplitude, gradient, lineWidth, alpha, glow, directionMode = "alternate") => {
+      if (!levels.length) return;
+      const spikeCount = levels.length;
+      const step = (width - insetX * 2) / spikeCount;
+
+      ctx.save();
+      ctx.shadowColor = palette.glow;
+      ctx.shadowBlur = glow;
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = lineWidth;
+      ctx.globalAlpha = alpha;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "miter";
+      ctx.beginPath();
+      ctx.moveTo(insetX, baseY);
+
+      for (let index = 0; index < spikeCount; index += 1) {
+        const startX = insetX + step * index;
+        const peakX = startX + step * 0.58;
+        const endX = startX + step;
+        const t = spikeCount > 1 ? index / (spikeCount - 1) : 0;
+        const level = (levels[index] ?? 0) * edgeEnvelope(t);
+
+        let direction = -1;
+        if (directionMode === "down") direction = 1;
+        if (directionMode === "alternate") direction = index % 2 === 0 ? -1 : 1;
+
+        ctx.lineTo(startX + step * 0.18, baseY);
+        const peakY = baseY + direction * amplitude * level;
+        ctx.lineTo(peakX, peakY);
+        ctx.lineTo(endX, baseY);
+      }
+
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const rawTraceDefs = [
+      {
+        levels: traces[0] ?? [],
+        baseY: height * 0.78,
+        amplitude: height * 0.24,
+        colorA: palette.accent,
+        colorB: palette.highlight,
+        alpha: 0.72,
+        width: 1.22 * dpr,
+        glow: 8 * dpr,
+        shape: "spike",
+        mode: "up",
+      },
+      {
+        levels: traces[1] ?? [],
+        baseY: height * 0.64,
+        amplitude: height * 0.16,
+        colorA: palette.accentSoft,
+        colorB: palette.highlight,
+        alpha: 0.52,
+        width: 1.04 * dpr,
+        glow: 6 * dpr,
+        shape: "ripple",
+        mode: "ribbon",
+      },
+      {
+        levels: traces[2] ?? [],
+        baseY: height * 0.5,
+        amplitude: height * 0.18,
+        colorA: palette.whiteSoft,
+        colorB: palette.highlight,
+        alpha: 0.78,
+        width: 1.26 * dpr,
+        glow: 9 * dpr,
+        shape: "wave",
+        mode: "alternate",
+      },
+      {
+        levels: traces[3] ?? [],
+        baseY: height * 0.38,
+        amplitude: height * 0.17,
+        colorA: palette.accentSoft,
+        colorB: palette.accent,
+        alpha: 0.68,
+        width: 1.08 * dpr,
+        glow: 8 * dpr,
+        shape: "spike",
+        mode: "down",
+      },
+      {
+        levels: traces[4] ?? [],
+        baseY: height * 0.26,
+        amplitude: height * 0.12,
+        colorA: palette.highlight,
+        colorB: palette.accentSoft,
+        alpha: 0.5,
+        width: 0.9 * dpr,
+        glow: 5 * dpr,
+        shape: "wave",
+        mode: "shimmer",
+      },
+    ];
+
+    const traceDefs = rawTraceDefs
+      .map((trace) => {
+        const energy = trace.levels.length
+          ? trace.levels.reduce((total, value) => total + value, 0) / trace.levels.length
+          : 0;
+        const dominance = 0.7 + Math.pow(energy, 0.84) * 1.55;
+
+        return {
+          ...trace,
+          energy,
+          amplitude: trace.amplitude * dominance,
+          alpha: Math.min(1, trace.alpha + energy * 0.34),
+          width: trace.width + energy * 0.5 * dpr,
+          glow: trace.glow + energy * 5.6 * dpr,
+        };
+      })
+      .sort((left, right) => left.energy - right.energy);
+
+    traceDefs.forEach((trace) => {
+      if (!trace.levels.length) return;
+
+      const gradient = ctx.createLinearGradient(insetX, 0, width - insetX, 0);
+      gradient.addColorStop(0, trace.colorA);
+      gradient.addColorStop(0.5, trace.colorB);
+      gradient.addColorStop(1, trace.colorA);
+
+      if (trace.shape === "spike") {
+        strokeSpikes(trace.levels, trace.baseY, trace.amplitude, gradient, trace.width, trace.alpha, trace.glow, trace.mode);
+        return;
+      }
+
+      const points = buildPoints(trace.levels, trace.baseY, trace.amplitude, trace.mode, trace.energy);
+
+      if (trace.shape === "ripple") {
+        const ripplePoints = points.map((point, index) => ({
+          x: point.x,
+          y: point.y + (index % 2 === 0 ? -1 : 1) * trace.amplitude * 0.1,
+        }));
+        strokeSmooth(ripplePoints, gradient, trace.width, trace.alpha, trace.glow);
+        return;
+      }
+
+      strokeSmooth(points, gradient, trace.width, trace.alpha, trace.glow);
+    });
+
+    ctx.globalAlpha = 1;
+  };
+
+  const setOpen = (open) => {
+    state.open = open;
+    dock.classList.toggle("is-open", open);
+    dock.setAttribute("aria-hidden", open ? "false" : "true");
+    launcher.setAttribute("aria-expanded", open ? "true" : "false");
+    if (!open) stopVisualizer();
+  };
+
+  const drawIdleVisualizer = () => {
+    if (!viz.ctx) return;
+
+    const palette = getVisualizerPalette();
+    syncVisualizerCanvasSize();
+    drawVisualizerLines(
+      [
+        Array.from({ length: viz.barCount }, (_, index) => 0.28 + Math.sin(index * 0.58) * 0.24),
+        Array.from({ length: viz.barCount }, (_, index) => 0.38 + Math.cos(index * 0.84) * 0.28),
+        Array.from({ length: viz.barCount }, (_, index) => 0.42 + Math.sin(index * 1.04 + 0.6) * 0.3),
+        Array.from({ length: viz.barCount }, (_, index) => 0.3 + Math.cos(index * 1.18 + 0.35) * 0.2),
+        Array.from({ length: viz.barCount }, (_, index) => 0.22 + Math.sin(index * 1.42 + 1.1) * 0.16),
+      ],
+      palette
+    );
+  };
+
+  const ensureVisualizer = () => {
+    if (!viz.supported || !viz.ctx) return false;
+    if (viz.audioContext && viz.analyser && viz.source && viz.data) return true;
+
+    const ContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!ContextCtor) return false;
+
+    try {
+      viz.audioContext = viz.audioContext || new ContextCtor();
+      viz.source = viz.source || viz.audioContext.createMediaElementSource(dockAudio);
+      viz.analyser = viz.analyser || viz.audioContext.createAnalyser();
+      viz.analyser.fftSize = 128;
+      viz.analyser.smoothingTimeConstant = 0.44;
+      viz.data = viz.data || new Uint8Array(viz.analyser.frequencyBinCount);
+
+      viz.source.connect(viz.analyser);
+      viz.analyser.connect(viz.audioContext.destination);
+      return true;
+    } catch (error) {
+      viz.supported = false;
+      return false;
+    }
+  };
+
+  const renderVisualizerFrame = () => {
+    if (!viz.ctx) return;
+
+    const palette = getVisualizerPalette();
+    syncVisualizerCanvasSize();
+
+    if (!viz.analyser || !viz.data) {
+      drawIdleVisualizer();
+      return;
+    }
+
+    viz.analyser.getByteFrequencyData(viz.data);
+    const bandConfigs = [
+      { start: 0.01, end: 0.15, gain: 2.85, floor: 0.07, traceIndex: 0, smoothing: 0.48 },
+      { start: 0.08, end: 0.28, gain: 2.45, floor: 0.06, traceIndex: 1, smoothing: 0.46 },
+      { start: 0.22, end: 0.54, gain: 2.55, floor: 0.055, traceIndex: 2, smoothing: 0.34 },
+      { start: 0.48, end: 0.78, gain: 2.65, floor: 0.05, traceIndex: 3, smoothing: 0.4 },
+      { start: 0.72, end: 0.98, gain: 2.25, floor: 0.045, traceIndex: 4, smoothing: 0.46 },
+    ];
+
+    const traces = bandConfigs.map((config) => {
+      const startBin = Math.floor(viz.data.length * config.start);
+      const endBin = Math.max(startBin + 1, Math.floor(viz.data.length * config.end));
+      const span = Math.max(1, endBin - startBin);
+      const segmentWidth = span / viz.barCount;
+      const previousTrace = viz.traces[config.traceIndex] ?? [];
+      const levels = [];
+
+      for (let index = 0; index < viz.barCount; index += 1) {
+        const segmentStart = startBin + Math.floor(segmentWidth * index);
+        const segmentEnd = Math.max(segmentStart + 1, startBin + Math.floor(segmentWidth * (index + 1)));
+        let sum = 0;
+
+        for (let cursor = segmentStart; cursor < Math.min(segmentEnd, viz.data.length); cursor += 1) {
+          sum += viz.data[cursor];
+        }
+
+        const average = sum / Math.max(1, Math.min(segmentEnd, viz.data.length) - segmentStart);
+        const normalized = Math.min(1, Math.pow(average / 255, 0.68) * config.gain);
+        const previous = previousTrace[index] ?? config.floor;
+        const smoothed = previous * config.smoothing + Math.max(config.floor, normalized) * (1 - config.smoothing);
+        levels.push(smoothed);
+      }
+
+      viz.traces[config.traceIndex] = levels;
+      return levels;
+    });
+
+    drawVisualizerLines(traces, palette);
+  };
+
+  const tickVisualizer = (timestamp = 0) => {
+    if (!viz.active) return;
+    if (timestamp - viz.lastPaint >= viz.fpsInterval) {
+      viz.lastPaint = timestamp;
+      renderVisualizerFrame();
+    }
+    viz.rafId = window.requestAnimationFrame(tickVisualizer);
+  };
+
+  const startVisualizer = async () => {
+    if (!state.open || !viz.supported || !ensureVisualizer()) return;
+
+    if (viz.audioContext?.state === "suspended") {
+      try {
+        await viz.audioContext.resume();
+      } catch (error) {
+        return;
+      }
+    }
+
+    if (viz.active) return;
+    viz.active = true;
+    viz.lastPaint = 0;
+    syncVisualizerCanvasSize();
+    tickVisualizer();
+  };
+
+  const stopVisualizer = () => {
+    viz.active = false;
+    if (viz.rafId) {
+      window.cancelAnimationFrame(viz.rafId);
+      viz.rafId = 0;
+    }
+    drawIdleVisualizer();
+  };
+
+  const syncPlaybackState = () => {
+    const isPlaying = Boolean(dockAudio.currentSrc) && !dockAudio.paused && !dockAudio.ended;
+    dock.classList.toggle("music-dock--playing", isPlaying);
+    dockPlayIcon.setAttribute("name", isPlaying ? "pause-outline" : "play-outline");
+    dockPlay.setAttribute("aria-label", isPlaying ? "Pause current track" : "Play current track");
+    dockPlay.setAttribute("aria-pressed", isPlaying ? "true" : "false");
+    dock.classList.toggle("music-dock--muted", dockAudio.volume <= 0.001);
+    if (isPlaying && state.open) {
+      startVisualizer();
+    } else {
+      stopVisualizer();
+    }
+  };
+
+  const syncControlAvailability = () => {
+    const disabled = !state.tracks.length;
+    dockClose.disabled = disabled && !state.open;
+    dockPrev.disabled = disabled;
+    dockNext.disabled = disabled;
+    dockPlay.disabled = disabled;
+    dockVolUp.disabled = disabled;
+    dockVolDown.disabled = disabled;
+    dockSeek.disabled = disabled || !(Number.isFinite(dockAudio.duration) && dockAudio.duration > 0);
+  };
+
+  const syncVolumeState = () => {
+    const volume = Math.round((dockAudio.volume ?? 1) * 100);
+    dockVolUp.setAttribute("aria-label", `Increase volume, current ${volume}%`);
+    dockVolDown.setAttribute("aria-label", `Decrease volume, current ${volume}%`);
+    dockVolUp.setAttribute("title", `Volume ${volume}%`);
+    dockVolDown.setAttribute("title", `Volume ${volume}%`);
+  };
+
+  const syncTrack = ({ autoPlay = false } = {}) => {
+    const track = state.tracks[state.index] ?? null;
+    const hasTracks = Boolean(track);
+    const hasSource = Boolean(track?.src);
+    const coverSrc = track?.logo || state.defaultLogo;
+
+    dock.classList.toggle("music-dock--empty", !hasTracks);
+    dockEmpty.hidden = hasTracks;
+    dockEmpty.textContent = musicCfg?.emptyState ?? "No tracks loaded yet. Add music in assets/data/music.json.";
+
+    dockTrack.textContent = hasTracks ? track.title : "No track loaded";
+    dockArtist.textContent = hasTracks
+      ? track.artist
+      : (musicCfg?.emptyState ?? "Add title, artist, src, and logo to music.json.");
+
+    if (coverSrc) {
+      dockCover.src = coverSrc;
+      dockCover.alt = hasTracks ? `${track.title} cover art` : "Music cover art";
+      dockCover.hidden = false;
+      dockCover.parentElement?.classList.remove("is-placeholder");
+    } else {
+      dockCover.removeAttribute("src");
+      dockCover.alt = "";
+      dockCover.hidden = true;
+      dockCover.parentElement?.classList.add("is-placeholder");
+    }
+
+    if (hasSource) {
+      if (dockAudio.dataset.src !== track.src) {
+        dockAudio.src = track.src;
+        dockAudio.dataset.src = track.src;
+        dockAudio.load();
+      }
+    } else {
+      dockAudio.pause();
+      dockAudio.removeAttribute("src");
+      dockAudio.dataset.src = "";
+      dockAudio.load();
+    }
+
+    syncControlAvailability();
+    syncPlaybackState();
+    syncVolumeState();
+    syncTimelineState(0);
+
+    if (hasSource && autoPlay) {
+      dockAudio.play().catch(() => {});
+    }
+  };
+
+  const changeTrack = (nextIndex, forcePlay = false) => {
+    if (!state.tracks.length) return;
+    const count = state.tracks.length;
+    state.index = (nextIndex + count) % count;
+    syncTrack({ autoPlay: forcePlay });
+  };
+
+  const togglePlayback = () => {
+    if (!state.tracks.length) return;
+    if (!dockAudio.currentSrc) {
+      syncTrack({ autoPlay: true });
+      return;
+    }
+
+    if (dockAudio.paused) {
+      dockAudio.play().catch(() => {});
+    } else {
+      dockAudio.pause();
+    }
+  };
+
+  const adjustVolume = (delta) => {
+    if (!state.tracks.length) return;
+    const currentVolume = Number.isFinite(dockAudio.volume) ? dockAudio.volume : 1;
+    const nextVolume = Math.max(0, Math.min(1, currentVolume + delta));
+    dockAudio.volume = Math.round(nextVolume * 100) / 100;
+    syncPlaybackState();
+    syncVolumeState();
+  };
+
+  launcher.addEventListener("click", () => {
+    setOpen(!state.open);
+    if (state.open) syncTrack();
+  });
+
+  dockPrev.addEventListener("click", () => changeTrack(state.index - 1, true));
+  dockNext.addEventListener("click", () => changeTrack(state.index + 1, true));
+  dockPlay.addEventListener("click", () => {
+    if (!state.open) setOpen(true);
+    togglePlayback();
+  });
+  dockVolUp.addEventListener("click", () => adjustVolume(state.volumeStep));
+  dockVolDown.addEventListener("click", () => adjustVolume(-state.volumeStep));
+  dockSeek.addEventListener("pointerdown", () => {
+    state.isSeeking = true;
+  });
+  dockSeek.addEventListener("pointerup", () => {
+    state.isSeeking = false;
+    syncTimelineState();
+  });
+  dockSeek.addEventListener("change", () => {
+    state.isSeeking = false;
+    syncTimelineState();
+  });
+  dockSeek.addEventListener("blur", () => {
+    state.isSeeking = false;
+    syncTimelineState();
+  });
+  dockSeek.addEventListener("input", () => {
+    const duration = Number.isFinite(dockAudio.duration) ? dockAudio.duration : 0;
+    if (duration <= 0) {
+      syncTimelineState(0);
+      return;
+    }
+
+    const progress = Number(dockSeek.value) / 1000;
+    const nextTime = duration * progress;
+    dockAudio.currentTime = nextTime;
+    syncTimelineState(nextTime);
+  });
+  dockHide.addEventListener("click", () => setOpen(false));
+  dockClose.addEventListener("click", () => {
+    dockAudio.pause();
+    setOpen(false);
+  });
+
+  dockAudio.addEventListener("ended", () => {
+    if (!state.tracks.length) return;
+    changeTrack(state.index + 1, true);
+  });
+
+  dockAudio.addEventListener("play", () => {
+    syncPlaybackState();
+    syncTimelineState();
+  });
+
+  dockAudio.addEventListener("pause", () => {
+    syncPlaybackState();
+    syncTimelineState();
+  });
+
+  dockAudio.addEventListener("emptied", () => {
+    syncPlaybackState();
+    syncVolumeState();
+    syncTimelineState(0);
+  });
+
+  dockAudio.addEventListener("volumechange", () => {
+    syncPlaybackState();
+    syncVolumeState();
+  });
+  dockAudio.addEventListener("loadedmetadata", () => {
+    syncControlAvailability();
+    syncTimelineState();
+  });
+  dockAudio.addEventListener("durationchange", () => {
+    syncControlAvailability();
+    syncTimelineState();
+  });
+  dockAudio.addEventListener("timeupdate", () => {
+    if (state.isSeeking) return;
+    syncTimelineState();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.open) setOpen(false);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopVisualizer();
+      return;
+    }
+
+    const isPlaying = Boolean(dockAudio.currentSrc) && !dockAudio.paused && !dockAudio.ended;
+    if (state.open && isPlaying) {
+      startVisualizer();
+    }
+  });
+
+  window.addEventListener("resize", syncVisualizerCanvasSize);
+
+  dockAudio.volume = 0.68;
+  drawIdleVisualizer();
+  setOpen(false);
+  syncTrack();
+  syncTimelineState(0);
 }
 
 function extractGithubUsername(raw) {
@@ -774,15 +1668,6 @@ function renderResume(resume, projectsData = null) {
       li.setAttribute("tabindex", "0");
       li.setAttribute("aria-label", `Open ${title || "organization"} website`);
 
-      const marker = document.createElement("span");
-      marker.className = "timeline-item-link-mark";
-      marker.setAttribute("aria-hidden", "true");
-
-      const arrow = document.createElement("span");
-      arrow.className = "timeline-item-link-arrow";
-      marker.appendChild(arrow);
-      li.appendChild(marker);
-
       const openWebsite = () => {
         window.open(website, "_blank", "noopener,noreferrer");
       };
@@ -854,7 +1739,7 @@ function renderResume(resume, projectsData = null) {
         date: String(project?.date ?? "").trim(),
         text: String(project?.description ?? "").trim(),
         website: String(project?.href ?? project?.url ?? "").trim(),
-        meta: capsules.slice(0, 4).join(" • "),
+        meta: capsules.slice(0, 4).join(" / "),
         group,
       };
     });
@@ -1017,6 +1902,22 @@ function getProjectLogoKey(project, capsules) {
 }
 
 function getProjectLogoMeta(project, capsules) {
+  const rawParts = [
+    ...(Array.isArray(capsules) ? capsules : []),
+    ...(Array.isArray(project?.tags) ? project.tags : []),
+    project?.categoryLabel,
+    project?.category,
+    project?.title,
+  ].map((v) => String(v ?? "").toLowerCase());
+  const full = rawParts.join(" ");
+
+  if (full.includes("molten engine")) {
+    return {
+      src: "./assets/images/project-logos/MoltenEngineLogo.png",
+      alt: "Molten Engine logo",
+    };
+  }
+
   const key = getProjectLogoKey(project, capsules);
   const labels = {
     unreal: "Unreal logo",
@@ -1148,7 +2049,7 @@ function wireProjectCardTilt(root = document) {
 }
 
 function wireLinkTilt(root = document) {
-  const links = root.querySelectorAll("a[href]:not(#projects-list .project-item > a)");
+  const links = root.querySelectorAll("a[href]:not(#projects-list .project-item > a), button.social-link");
   if (!links.length) return;
 
   const canUsePointerTilt = supportsPointerTilt();
@@ -1296,6 +2197,9 @@ function renderPortfolio(portfolio, projects) {
     (projects?.items ?? projects?.projects ?? []).forEach((p) => {
       const li = document.createElement("li");
       li.className = "project-item";
+      if (String(p.title ?? "").toLowerCase().includes("molten engine")) {
+        li.classList.add("project-item--molten");
+      }
       li.dataset.filterItem = "";
       li.dataset.category = parseCategories(p.categories ?? p.category ?? p.tags ?? p.categoryLabel)
         .map((cat) => (canonicalFilterKey(cat) === "highlighted projects" ? "featured" : cat))
@@ -1325,6 +2229,21 @@ function renderPortfolio(portfolio, projects) {
         ? `<div class="project-capsules">${capsules.map((capsule) => `<span class="project-capsule">${capsule}</span>`).join("")}</div>`
         : "";
       const logo = getProjectLogoMeta(p, capsules);
+      const statusLabel = String(p.statusBadge ?? p.banner ?? p.status ?? "").trim();
+      const statusHtml = statusLabel
+        ? `<span class="project-status-badge">${statusLabel}</span>`
+        : "";
+      const imageSrc = String(p.image ?? "").trim();
+      if (!imageSrc) li.classList.add("project-item--no-cover");
+      const imageLabel = String(p.imageLabel ?? p.shortTitle ?? p.title ?? displayLabel ?? "Project").trim();
+      const coverHtml = imageSrc
+        ? `<img class="project-cover-image" src="${imageSrc}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">`
+        : `
+            <div class="project-img-fallback" aria-hidden="true">
+              <img class="project-img-fallback-logo" src="${logo.src}" alt="" loading="lazy">
+              <span class="project-img-fallback-text">${imageLabel}</span>
+            </div>
+          `;
 
       const description = String(p.description ?? p.desc ?? "").trim();
       const descriptionHtml = description
@@ -1334,10 +2253,11 @@ function renderPortfolio(portfolio, projects) {
       li.innerHTML = `
         <a href="${p.href ?? "#"}" target="_blank" rel="noreferrer">
           <figure class="project-img">
+            ${statusHtml}
             <div class="project-item-icon-box">
               <img class="project-hover-logo" src="${logo.src}" alt="${logo.alt}" loading="lazy">
             </div>
-            <img src="${p.image ?? ""}" alt="${p.alt ?? p.title ?? "project"}" loading="lazy">
+            ${coverHtml}
           </figure>
           <h3 class="project-title">${p.title ?? ""}</h3>
           ${capsulesHtml}
@@ -1555,6 +2475,7 @@ async function init() {
     portfolio,
     projects,
     contact,
+    music,
   ] = await Promise.all([
     loadJSON(DATA.site),
     loadJSON(DATA.profile),
@@ -1565,6 +2486,7 @@ async function init() {
     loadJSON(DATA.portfolio),
     loadJSON(DATA.projects),
     loadJSON(DATA.contact),
+    loadJSON(DATA.music).catch(() => ({ music: { tracks: [] } })),
   ]);
 
   const siteData = unwrapPayload(site, "site");
@@ -1575,6 +2497,54 @@ async function init() {
   const resumeData = unwrapPayload(resume, "resume");
   const portfolioData = unwrapPayload(portfolio, "portfolio");
   const contactData = unwrapPayload(contact, "contact");
+  const musicData = unwrapPayload(music, "music");
+  const loaderConfig = getLoaderConfig(siteData);
+  let imageRatio = 0;
+  let imageUnits = 0;
+  let fontsReady = 0;
+  let fluidReady = 0;
+  const syncLoaderProgress = () => {
+    const totalUnits = Math.max(1, imageUnits + 2);
+    const progress = ((imageRatio * imageUnits) + fontsReady + fluidReady) / totalUnits;
+    setLoaderProgress(progress);
+  };
+
+  setLoaderCopy(loaderConfig);
+  setLoaderStatus(loaderConfig.loadingText);
+  setLoaderProgress(0.04);
+
+  const assetWarmup = warmupVisualAssets(
+    [
+      siteData,
+      profileData,
+      aboutData,
+      servicesData,
+      referencesData,
+      resumeData,
+      portfolioData,
+      projects,
+      contactData,
+      musicData,
+    ],
+    (ratio, total) => {
+      imageRatio = ratio;
+      imageUnits = total;
+      syncLoaderProgress();
+    }
+  );
+
+  const fontWarmup = (document.fonts && "ready" in document.fonts
+    ? document.fonts.ready
+    : Promise.resolve()
+  ).then(() => {
+    fontsReady = 1;
+    syncLoaderProgress();
+  });
+
+  const fluidWarmup = waitForFluidReady().then(() => {
+    fluidReady = 1;
+    syncLoaderProgress();
+  });
 
   if (siteData?.title) document.title = siteData.title;
   if (siteData?.theme && !document.documentElement.dataset.theme) {
@@ -1595,7 +2565,9 @@ async function init() {
     if (cv) cv.href = siteData.cvUrl;
   }
 
+  setLoaderStatus("Hydrating interface modules...");
   renderProfile(profileData);
+  renderMusicPlayer(musicData);
   renderSidebarQuest(profileData, siteData);
   renderAbout(aboutData);
   renderServices(servicesData);
@@ -1603,13 +2575,26 @@ async function init() {
   renderResume(resumeData, projects);
   renderPortfolio(portfolioData, projects);
   renderContact(contactData);
-  await renderFooter(siteData);
+  renderFooter(siteData).catch((err) => {
+    console.warn("[app] footer render degraded:", err);
+  });
   wireLinkTilt();
+  setLoaderStatus("Inlining themed assets...");
   await inlineThemeableSvgs(document);
+  setLoaderStatus("Calibrating motion and media...");
+  await Promise.all([assetWarmup, fontWarmup, fluidWarmup]);
+  setLoaderStatus(loaderConfig.readyText);
+  setLoaderProgress(1);
+  await nextPaint();
+  await new Promise((resolve) => window.setTimeout(resolve, 220));
+  hideLoader();
 
   console.log("[app] render ok");
 }
 
 init().catch((err) => {
   console.error("[app] init failed:", err);
+  showLoaderFailure("Boot interrupted. Refresh and retry.");
 });
+
+

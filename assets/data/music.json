@@ -1,0 +1,27 @@
+{
+  "music": {
+    "label": "Open music player",
+    "launcherIcon": "musical-notes-outline",
+    "launcherLogo": "",
+    "panelTitle": "Signal Deck",
+    "panelSubtitle": "Curated favorites loaded from local files.",
+    "defaultLogo": "",
+    "emptyState": "No tracks loaded yet. Add title, artist, src, and logo entries in assets/data/music.json.",
+    "tracks": [
+      {
+        "id": "lululai",
+        "title": "Lululai",
+        "artist": "Komiat",
+        "src": "./assets/music/Lululai.mp3",
+        "logo": "./assets/images/MusicPoster/lululai.jpg"
+      },
+      {
+        "id": "takatukka",
+        "title": "Takatukka",
+        "artist": "Antti Paalanen",
+        "src": "./assets/music/Takatukka.mp3",
+        "logo": "./assets/images/MusicPoster/takatukka.png"
+      }
+    ]
+  }
+}
