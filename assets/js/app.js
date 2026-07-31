@@ -37,141 +37,6 @@ function unwrapPayload(payload, key) {
   return payload;
 }
 
-function getLoaderConfig(siteData) {
-  const cfg = siteData?.loader ?? {};
-  return {
-    eyebrow: String(cfg.eyebrow ?? "// Booting spring build"),
-    title: String(cfg.title ?? siteData?.title ?? "Swastik Toprani"),
-    loadingText: String(cfg.loadingText ?? "Streaming interface assets..."),
-    readyText: String(cfg.readyText ?? "Launch sequence complete"),
-  };
-}
-
-function setLoaderCopy(config) {
-  safeText(el("site-loader-label"), config?.eyebrow);
-  safeText(el("site-loader-title"), config?.title);
-}
-
-function setLoaderStatus(text) {
-  safeText(el("site-loader-status"), text);
-}
-
-function setLoaderProgress(value) {
-  const clamped = Math.max(0, Math.min(1, Number(value) || 0));
-  const progressBar = el("site-loader-progress-bar");
-  const progressText = el("site-loader-progress-text");
-
-  if (progressBar) progressBar.style.transform = `scaleX(${clamped.toFixed(4)})`;
-  if (progressText) progressText.textContent = `${Math.round(clamped * 100)}%`;
-}
-
-function hideLoader() {
-  const loader = el("site-loader");
-  document.body?.classList.remove("is-loading");
-  document.body?.classList.add("is-ready");
-  if (!loader) return;
-
-  loader.classList.add("is-hidden");
-  window.setTimeout(() => {
-    loader.setAttribute("aria-hidden", "true");
-  }, 520);
-}
-
-function showLoaderFailure(message) {
-  setLoaderStatus(message ?? "Loader sync failed");
-  setLoaderProgress(1);
-  document.body?.classList.remove("is-loading");
-}
-
-function collectImageUrls(input, bag = new Set()) {
-  if (!input) return bag;
-
-  if (typeof input === "string") {
-    const value = input.trim();
-    if (/\.(png|jpe?g|webp|gif|svg|ico|avif)(\?|#|$)/i.test(value)) {
-      bag.add(value);
-    }
-    return bag;
-  }
-
-  if (Array.isArray(input)) {
-    input.forEach((item) => collectImageUrls(item, bag));
-    return bag;
-  }
-
-  if (typeof input === "object") {
-    Object.values(input).forEach((value) => collectImageUrls(value, bag));
-  }
-
-  return bag;
-}
-
-function preloadImage(url) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const finish = () => resolve(url);
-    img.decoding = "async";
-    img.onload = finish;
-    img.onerror = finish;
-    img.src = url;
-  });
-}
-
-async function warmupVisualAssets(payloads, onProgress = () => {}) {
-  const urls = Array.from(
-    payloads.reduce((bag, payload) => collectImageUrls(payload, bag), new Set())
-  );
-
-  if (!urls.length) {
-    onProgress(1, 0);
-    return [];
-  }
-
-  let completed = 0;
-  onProgress(0, urls.length);
-
-  await Promise.all(
-    urls.map(async (url) => {
-      await preloadImage(url);
-      completed += 1;
-      onProgress(completed / urls.length, urls.length);
-    })
-  );
-
-  return urls;
-}
-
-function waitForFluidReady(timeoutMs = 2200) {
-  if (document.documentElement.dataset.fluidReady === "true") {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => {
-    const handleReady = () => {
-      cleanup();
-      resolve();
-    };
-
-    const cleanup = () => {
-      clearTimeout(timer);
-      window.removeEventListener("fluid-ready", handleReady);
-    };
-
-    const timer = window.setTimeout(() => {
-      cleanup();
-      resolve();
-    }, timeoutMs);
-
-    window.addEventListener("fluid-ready", handleReady);
-  });
-}
-
-function nextPaint() {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(resolve));
-  });
-}
-
 // -----------------------------
 // NAV + PAGE SWITCH
 // -----------------------------
@@ -1619,7 +1484,7 @@ function renderResume(resume, projectsData = null) {
     const head = document.createElement("div");
     head.className = "timeline-item-head";
 
-    if (options.education) {
+    if (options.education || logo) {
       const media = document.createElement("div");
       media.className = "timeline-item-media";
 
@@ -1630,7 +1495,7 @@ function renderResume(resume, projectsData = null) {
         img.alt = item?.logoAlt ?? `${title || "School"} logo`;
         img.loading = "lazy";
         media.appendChild(img);
-      } else {
+      } else if (options.education) {
         const fallback = document.createElement("span");
         fallback.className = "timeline-item-logo-fallback";
         fallback.textContent = (title.match(/[A-Za-z0-9]/g) || []).slice(0, 2).join("").toUpperCase() || "ED";
@@ -1910,6 +1775,13 @@ function getProjectLogoMeta(project, capsules) {
     project?.title,
   ].map((v) => String(v ?? "").toLowerCase());
   const full = rawParts.join(" ");
+
+  if (full.includes("odd qubit") || full.includes("cowboy life simulator")) {
+    return {
+      src: "https://oddqubit.com/wp-content/uploads/2022/01/oddqubit_white-500-1-e1643296900880.png",
+      alt: "Odd Qubit logo",
+    };
+  }
 
   if (full.includes("molten engine")) {
     return {
@@ -2498,54 +2370,6 @@ async function init() {
   const portfolioData = unwrapPayload(portfolio, "portfolio");
   const contactData = unwrapPayload(contact, "contact");
   const musicData = unwrapPayload(music, "music");
-  const loaderConfig = getLoaderConfig(siteData);
-  let imageRatio = 0;
-  let imageUnits = 0;
-  let fontsReady = 0;
-  let fluidReady = 0;
-  const syncLoaderProgress = () => {
-    const totalUnits = Math.max(1, imageUnits + 2);
-    const progress = ((imageRatio * imageUnits) + fontsReady + fluidReady) / totalUnits;
-    setLoaderProgress(progress);
-  };
-
-  setLoaderCopy(loaderConfig);
-  setLoaderStatus(loaderConfig.loadingText);
-  setLoaderProgress(0.04);
-
-  const assetWarmup = warmupVisualAssets(
-    [
-      siteData,
-      profileData,
-      aboutData,
-      servicesData,
-      referencesData,
-      resumeData,
-      portfolioData,
-      projects,
-      contactData,
-      musicData,
-    ],
-    (ratio, total) => {
-      imageRatio = ratio;
-      imageUnits = total;
-      syncLoaderProgress();
-    }
-  );
-
-  const fontWarmup = (document.fonts && "ready" in document.fonts
-    ? document.fonts.ready
-    : Promise.resolve()
-  ).then(() => {
-    fontsReady = 1;
-    syncLoaderProgress();
-  });
-
-  const fluidWarmup = waitForFluidReady().then(() => {
-    fluidReady = 1;
-    syncLoaderProgress();
-  });
-
   if (siteData?.title) document.title = siteData.title;
   if (siteData?.theme && !document.documentElement.dataset.theme) {
     document.documentElement.dataset.theme = siteData.theme;
@@ -2565,7 +2389,6 @@ async function init() {
     if (cv) cv.href = siteData.cvUrl;
   }
 
-  setLoaderStatus("Hydrating interface modules...");
   renderProfile(profileData);
   renderMusicPlayer(musicData);
   renderSidebarQuest(profileData, siteData);
@@ -2579,22 +2402,13 @@ async function init() {
     console.warn("[app] footer render degraded:", err);
   });
   wireLinkTilt();
-  setLoaderStatus("Inlining themed assets...");
   await inlineThemeableSvgs(document);
-  setLoaderStatus("Calibrating motion and media...");
-  await Promise.all([assetWarmup, fontWarmup, fluidWarmup]);
-  setLoaderStatus(loaderConfig.readyText);
-  setLoaderProgress(1);
-  await nextPaint();
-  await new Promise((resolve) => window.setTimeout(resolve, 220));
-  hideLoader();
 
   console.log("[app] render ok");
 }
 
 init().catch((err) => {
   console.error("[app] init failed:", err);
-  showLoaderFailure("Boot interrupted. Refresh and retry.");
 });
 
 

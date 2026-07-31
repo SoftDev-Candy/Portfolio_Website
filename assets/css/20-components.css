@@ -993,6 +993,11 @@
   gap: 12px;
 }
 
+.timeline-item--experience:has(.timeline-item-media) .timeline-item-head {
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 12px;
+}
+
 .timeline-item-media {
   width: 56px;
   height: 56px;

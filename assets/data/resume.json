@@ -21,6 +21,20 @@
     ],
     "experience": [
       {
+        "title": "Gameplay UI Programmer — Odd Qubit / Cowboy Life Simulator",
+        "date": "Professional Project",
+        "meta": "Unreal Engine | UMG | Blueprints | UI Performance",
+        "text": "Contributed to gameplay UI optimization and debugging for Cowboy Life Simulator, supporting maintainable and reliable world-space interface behavior in Unreal Engine.",
+        "highlights": [
+          "Supported the optimization and maintenance of reusable world-space gameplay UI systems.",
+          "Worked with Unreal Engine, UMG, Blueprints, widget lifecycle management, and interface-driven HUD communication.",
+          "Investigated and resolved runtime UI behavior while preserving established gameplay interactions."
+        ],
+        "website": "https://oddqubit.com/cowboy/",
+        "logo": "https://oddqubit.com/wp-content/uploads/2022/01/oddqubit_white-500-1-e1643296900880.png",
+        "logoAlt": "Odd Qubit logo"
+      },
+      {
         "title": "Future Games Warsaw",
         "date": "2024 - Present",
         "meta": "Game Programmer | Team Pipeline | Jira ",
@@ -88,6 +102,20 @@
     },
     "projectExperience": [
       {
+        "group": "Data & Machine Learning",
+        "title": "GuardianSAR — SAR Image Intelligence and Classification",
+        "meta": "Python | pandas | Pillow | NumPy | Jupyter | PyTorch | matplotlib | Streamlit",
+        "text": "Developing an explainable and reproducible computer-vision pipeline around the public MSTAR Synthetic Aperture Radar dataset, covering 5,744 grayscale images across 11 classes and separate training and testing splits.",
+        "highlights": [
+          "Created an image-metadata pipeline covering every dataset file and recording its class, split, filename, extension, dimensions, and image mode.",
+          "Validated dataset structure for missing metadata and duplicate image identities, then exported a reusable processed metadata CSV.",
+          "Analysed class distribution, identified moderate class imbalance, and discovered class-linked native image dimensions that could introduce shortcut-learning risks.",
+          "Next phase: standardise resizing and normalisation, create PyTorch Dataset and DataLoader components, and train a baseline CNN classifier.",
+          "Planned evaluation includes per-class metrics, a confusion matrix, degraded-image robustness testing, and a minimal analyst-facing Streamlit interface."
+        ],
+        "website": "https://github.com/SoftDev-Candy/GeoSpace_Defense_AI"
+      },
+      {
         "group": "Solo Projects",
         "title": "Molten Engine",
         "meta": "C++ | OpenGL | ImGui | CMake",
@@ -130,7 +158,7 @@
       "technicalGroups": [
         {
           "title": "Languages",
-          "items": ["C++", "C#", "Rust"]
+          "items": ["C++", "C#", "Python", "SQL"]
         },
         {
           "title": "Game Engines",
@@ -150,12 +178,14 @@
         },
         {
           "title": "Platforms & Networking",
-          "items": ["Linux", "Windows", "5G", "RAN"]
+          "items": ["Linux", "Windows"]
         }
       ],
       "technical": [
         "C++",
         "C#",
+        "Python",
+        "SQL",
         "Unreal Engine 5",
         "Unity",
         "OOP / OOD",

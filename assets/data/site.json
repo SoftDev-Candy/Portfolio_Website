@@ -5,12 +5,6 @@
     "motionMode": "auto",
     "favicon": "./assets/images/Iconpng.ico",
     "cvUrl": "/assets/Swastik.Toprani (1).pdf",
-    "loader": {
-      "eyebrow": "// Booting seasonal build",
-      "title": "Swastik Toprani",
-      "loadingText": "Streaming panels, shaders, and media...",
-      "readyText": "Launch sequence complete"
-    },
     "footer": {
       "signature": "Debug Tavern/>",
       "tagline": "Powered by C++ and poor life choices",
