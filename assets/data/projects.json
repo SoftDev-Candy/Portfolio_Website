@@ -1,6 +1,28 @@
 {
-  "filters": ["All", "Highlighted Projects", "Game Development", "System Development", "Network Development"],
+  "filters": ["All", "Highlighted Projects", "Work Experience", "Data & Analytics", "Game Development", "System Development", "Network Development"],
   "projects": [
+    {
+      "title": "Cowboy Life Simulator — R&D and Optimization ",
+      "categoryLabel": "Work Experience",
+      "capsules": ["Unreal Engine", "Blueprints", "Widget Pooling"],
+      "description": "Contributed to gameplay UI optimization and debugging for Odd Qubit's Cowboy Life Simulator in Unreal Engine.",
+      "tags": ["work experience", "highlighted projects"],
+      "href": "https://oddqubit.com/cowboy/",
+      "statusBadge": "Professional Work",
+      "image": "https://oddqubit.com/wp-content/uploads/2023/08/cowboy-min.jpg",
+      "alt": "Cowboy Life Simulator rider crossing a western landscape"
+    },
+    {
+      "title": "GuardianSAR",
+      "categoryLabel": "Data & Analytics",
+      "capsules": ["Python", "pandas", "PyTorch", "Computer Vision"],
+      "description": "SAR image-intelligence project using 5,744 public MSTAR images . Builds a reproducible data pipeline toward radar-image classification.",
+      "tags": ["data & analytics", "highlighted projects"],
+      "href": "https://github.com/SoftDev-Candy/GeoSpace_Defense_AI",
+      "statusBadge": "In Development",
+      "imageLabel": "SAR",
+      "alt": "GuardianSAR synthetic aperture radar classification project"
+    },
     {
       "title": "🌋 Molten Engine",
       "categoryLabel": "System Development",
@@ -18,8 +40,7 @@
       "description": "Secure orbital uplink platform exploring telemetry, networking, and systems-level tooling for defense-style communication workflows.",
       "tags": ["system development", "network development", "highlighted projects"],
       "href": "https://github.com/SoftDev-Candy/SecureOribitalUplinkLayer",
-      "statusBadge": "Work in Progress",
-      "imageLabel": "SOUL",
+      "image": "./assets/images/portfolio/SOUL.gif",
       "alt": "SOUL"
     },
     {
@@ -27,7 +48,7 @@
       "categoryLabel": "Network Development",
       "capsules": ["Python", "JS", "Hackathon"],
       "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
-      "tags": ["network development", "highlighted projects"],
+      "tags": ["network development", "data & analytics", "highlighted projects"],
       "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
       "image": "./assets/images/portfolio/JourneyRadar-gif.gif",
       "alt": "Journey Radar-HackYeah"
@@ -47,7 +68,7 @@
       "categoryLabel": "Network Development",
       "capsules": ["C++", "Sockets"],
       "description": "Socket programming project implementing handshake flow and connection reliability.",
-      "tags": ["network development", "highlighted projects"],
+      "tags": ["network development"],
       "href": "https://github.com/SoftDev-Candy/NetworkProgramming",
       "image": "./assets/images/portfolio/ServerHandShake.gif",
       "alt": "ServerHandShake"
