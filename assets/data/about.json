@@ -2,37 +2,38 @@
   "about": {
     "title": "<Lorebook/>",
     "paragraphs": [
-      "HeyO ! I am **Swastik**, a **C++ backend and systems engineer** building robust software across **networked services** and **real-time gameplay systems**. I enjoy owning the full loop from architecture and implementation to profiling and debugging, with a strong focus on **performance**, **clean code**, and **reliable multiplayer/backend flows**. Right now I am deepening **Linux**, **CMake**, **engine fundamentals**, and **system design** while shipping projects that balance technical depth with real player impact."
+      "I’m **Swastik**, a Computer Science graduate building practical skills in **Python, SQL, data analysis, and machine learning**.",
+      "My current work covers **exploratory analysis, data-quality pipelines, computer vision, and reproducible ML workflows**, supported by a software-engineering background in **C++, backend development, and networking**."
     ],
     "servicesTitle": "<ActiveQuestline>",
     "services": [
       {
-        "title": "Backend Development",
-        "text": "Building reliable and scalable systems with C++ and modern tools, focusing on performance and clean architecture.",
-        "icon": "./assets/images/icon-design.svg",
-        "iconAlt": "Backend icon",
+        "title": "Data Analysis",
+        "text": "Exploring, cleaning, querying, and visualising data with Python, pandas, SQL, and Jupyter to uncover clear, decision-ready insights.",
+        "icon": "./assets/images/icon-data-analysis.svg",
+        "iconAlt": "Data analysis chart icon",
         "iconWidth": 55
       },
       {
-        "title": "Networking",
-        "text": "Learning and developing socket-based applications, exploring protocols, and building secure, efficient client-server solutions.",
-        "icon": "./assets/images/icon-dev.svg",
-        "iconAlt": "Networking icon",
+        "title": "Machine Learning",
+        "text": "Building reproducible classification and computer-vision workflows with scikit-learn and PyTorch, from baseline models to responsible evaluation.",
+        "icon": "./assets/images/icon-machine-learning.svg",
+        "iconAlt": "Machine learning network icon",
         "iconWidth": 55
       },
       {
-        "title": "Game Engine Fundamentals",
-        "text": "Studying the internals of game engines, from rendering and physics to memory management and real-time systems.",
-        "icon": "./assets/images/icon-app.svg",
-        "iconAlt": "Game engine icon",
-        "iconWidth": 66
+        "title": "Data Engineering Foundations",
+        "text": "Creating structured metadata systems, reusable processing pipelines, and dependable validation steps that make analysis easier to reproduce.",
+        "icon": "./assets/images/icon-data-engineering.svg",
+        "iconAlt": "Data pipeline icon",
+        "iconWidth": 55
       },
       {
-        "title": "Hackathons and Volunteering",
-        "text": "Participating in hackathons and volunteering for tech events, gaining hands-on experience while collaborating with others.",
-        "icon": "./assets/images/icon-photo.svg",
-        "iconAlt": "Hackathon icon",
-        "iconWidth": 58
+        "title": "Systems Engineering",
+        "text": "Applying experience in C++, backend development, and networking to build reliable data tools and software systems with solid foundations.",
+        "icon": "./assets/images/icon-systems-engineering.svg",
+        "iconAlt": "Systems engineering icon",
+        "iconWidth": 55
       }
     ]
   }
