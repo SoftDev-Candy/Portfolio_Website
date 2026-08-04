@@ -2,7 +2,7 @@
   "filters": ["All", "Highlighted Projects", "Work Experience", "Data & Analytics", "Game Development", "System Development", "Network Development"],
   "projects": [
     {
-      "title": "Cowboy Life Simulator — R&D and Optimization ",
+      "title": "Odd Qubit — R&D and Optimization intern",
       "categoryLabel": "Work Experience",
       "capsules": ["Unreal Engine", "Blueprints", "Widget Pooling"],
       "description": "Contributed to gameplay UI optimization and debugging for Odd Qubit's Cowboy Life Simulator in Unreal Engine.",

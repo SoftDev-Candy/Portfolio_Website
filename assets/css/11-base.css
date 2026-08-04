@@ -1,7 +1,7 @@
 @layer base;
 @layer base {
   :root {
-    --site-scale: 1.1;
+    --site-scale: 1;
   }
 
   html,
