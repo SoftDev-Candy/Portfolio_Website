@@ -46,8 +46,8 @@
     {
       "title": "🧭 JourneyRadar",
       "categoryLabel": "Network Development",
-      "capsules": ["Python", "JS", "Hackathon"],
-      "description": "Hackathon networking prototype combining route intelligence, data sync, and communication layers.",
+      "capsules": ["Python", "GTFS", "Forecasting"],
+      "description": "Predictive transit prototype combining live GTFS data, route-level delay forecasting, incident-aware ETAs, and real-time map visualisation.",
       "tags": ["network development", "data & analytics", "highlighted projects"],
       "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
       "image": "./assets/images/portfolio/JourneyRadar-gif.gif",
@@ -55,10 +55,10 @@
     },
     {
       "title": "🛡️ Travel Guardian API",
-      "categoryLabel": "System Development",
-      "capsules": ["C++", "API", "Server"],
-      "description": "Backend service for trip safety workflows with modular APIs, auth handling, and alerting paths.",
-      "tags": ["system development", "highlighted projects"],
+      "categoryLabel": "Predictive Systems",
+      "capsules": ["C++", "Analytics", "SSE"],
+      "description": "Real-time backend connecting explainable delay analytics, dynamic routing, forecast ingestion, and proactive transit alerts.",
+      "tags": ["system development", "data & analytics", "highlighted projects"],
       "href": "https://github.com/SoftDev-Candy/TG_3SIX_O",
       "image": "./assets/images/portfolio/TG_3SIXO.gif",
       "alt": "Travel Guardian"

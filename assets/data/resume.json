@@ -21,7 +21,7 @@
     ],
     "experience": [
       {
-        "title": "R&D and Optimization intern — Odd Qubit / Cowboy Life Simulator",
+        "title": "R&D and Optimization Engineer — Odd Qubit / Cowboy Life Simulator",
         "date": "Professional Project",
         "meta": "Unreal Engine | UMG | Blueprints | UI Performance",
         "text": "Contributed to gameplay UI optimization and debugging for Cowboy Life Simulator, supporting maintainable and reliable world-space interface behavior in Unreal Engine.",
@@ -142,14 +142,14 @@
       {
         "group": "HackYeah Hackathon",
         "title": "TG360 - Travel Guardian 360",
-        "meta": "C++17 | Cpp-httplib | nlohmann::json | SSE | Dijkstra | FastAPI",
-        "text": "Led a 5-person HackYeah team and shipped a working real-time transit disruption demo from concept to live presentation.",
+        "meta": "Python | pandas | PyTorch | Chronos | GTFS Realtime | C++17 | FastAPI | SSE",
+        "text": "Led a 5-person HackYeah team in building a predictive transport-intelligence prototype that combined live transit data, delay forecasting, incident-aware routing, and real-time visualisation.",
         "highlights": [
-          "Built a C++17 backend with clear JSON endpoints for routing, incident reporting, prediction, and live client updates.",
-          "Implemented graph-based shortest-path routing and recomputed ETAs when incidents changed travel-time weights.",
-          "Streamed real-time updates using Server-Sent Events to keep the UI synced without polling.",
-          "Applied modern C++ concurrency with threads, mutexes, and condition variables to keep shared state safe and responsive.",
-          "Debugged and fixed a critical SSE lifetime and concurrency crash, then validated reliability with curl and PowerShell tests."
+          "Designed a hybrid Python and C++ data flow that joined Krakow GTFS Realtime vehicle positions with trip updates to expose route, location, and delay information on an interactive map.",
+          "Integrated an experimental Python forecasting pipeline using pandas, PyTorch, and Amazon Chronos to group historical delays by route and generate multi-step median forecasts from sampled model outputs.",
+          "Standardised forecast results as reusable JSON records so predicted delays could be imported by the C++ backend and surfaced through the live dashboard and alert stream.",
+          "Developed TransitDNA, an explainable rolling-history layer that aggregates observed delay by location and incident severity to estimate route risk and expected delay impact.",
+          "Combined forecast signals with incident-adjusted Dijkstra routing, baseline-versus-adjusted ETA comparison, and Server-Sent Events for responsive decision support."
         ],
         "website": "https://github.com/SoftDev-Candy/TG_3SIX_O"
       }
@@ -179,6 +179,10 @@
         {
           "title": "Platforms & Networking",
           "items": ["Linux", "Windows"]
+        },
+        {
+          "title": "Data & Analytics",
+          "items": ["pandas", "NumPy", "Excel", "Power BI", "Jupyter", "matplotlib", "Exploratory Data Analysis", "Statistical Analysis"]
         }
       ],
       "technical": [
@@ -201,7 +205,15 @@
         "SDL",
         "GLFW",
         "GLAD",
-        "GLM"
+        "GLM",
+        "pandas",
+        "NumPy",
+        "Excel",
+        "Power BI",
+        "Jupyter",
+        "matplotlib",
+        "Exploratory Data Analysis",
+        "Statistical Analysis"
       ],
       "professional": [
         "Problem Solving",
