@@ -1359,7 +1359,7 @@
 .skills-group-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 14px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1371,7 +1371,7 @@
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   background: rgba(255,255,255,0.01);
-  padding: 11px;
+  padding: 14px;
 }
 
 .skills-group-card::before {
@@ -1387,10 +1387,13 @@
 }
 
 .skills-group-title {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 8px;
+  width: 100%;
+  margin: 0 0 11px;
+  padding: 0 0 9px;
+  border-bottom: 1px solid rgba(255,255,255,0.09);
   font-family: var(--ff-mono);
   font-size: var(--fs-7);
   letter-spacing: 0.05em;
@@ -1440,6 +1443,20 @@
 
 @media (min-width: 900px) {
   .skills-group-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skills-group-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .skills-group-card:last-child .skills-group-items {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1250px) {
+  .skills-group-card:last-child .skills-group-items {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
